@@ -1,607 +1,417 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package assignment;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
+import assignment.controller.SalesController;
+import assignment.controller.StockController;
+import assignment.controller.MemberController;
+import assignment.controller.StaffController;
+import assignment.model.Staff;
+import assignment.enums.LogMenu;
+import assignment.enums.MainMenu;
+import assignment.enums.OrderMenu;
+import assignment.enums.SalesMenu;
+import assignment.enums.StockMenu;
+import assignment.repo.PaidItemRepository;
+import assignment.repo.StockRepository;
+import assignment.repo.TransactionRepository;
+import assignment.service.PaymentService;
+import assignment.service.SalesService;
+import assignment.service.StockService;
+import assignment.util.ConsoleUtil; // Utility for logo, clearScreen, pause
+import assignment.util.ValidationUtil; // Utility for input validation
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author evansleong
- */
 public class Main {
 
-    public static int totalPayment = 0;
+    public static int totalPayment = 0; // Global accumulator
+
+    // Controllers shared for this Main instance
+    private final StockController stockController;
+    private final SalesController salesController;
+    private final MemberController memberController;
+    private final StaffController staffController;
 
     public static void main(String[] args) {
         Main main = new Main();
         main.entry();
     }
 
-    public void entry() {
-        Main main = new Main();
-        Staff staff = new Staff();
-        Scanner scanner = new Scanner(System.in);
+    // Initialise repository, services and controllers and wire them to this Main
+    public Main() {
+        StockRepository stockRepo = new StockRepository();
+        StockService stockService = new StockService(stockRepo);
+        this.stockController = new StockController(stockService);
 
-        String stfIc, stfPassword, stfTempName, stfTempId;
-        int registrationCode = 1234;
-        boolean loggedIn = false;
-        boolean exitProgram = false; // Added to control program exit
+        SalesService salesService = new SalesService(stockRepo);
+        
+        // Wire payment-related repositories and services
+        PaidItemRepository paidItemRepo = new PaidItemRepository();
+        TransactionRepository transactionRepo = new TransactionRepository();
+        PaymentService paymentService = new PaymentService(stockRepo, paidItemRepo, transactionRepo);
+        
+        this.salesController = new SalesController(salesService, paymentService);
 
-        while (!exitProgram) { // Loop for the entire program
-            boolean inMainMenu = true; // Flag to control whether the user is in the main menu
-
-            while (true) { // Loop for the menu
-                clearScreen();
-                logo();
-                main.logMenu();
-                System.out.print("ENTER YOUR SELECTION: ");
-
-                while (!scanner.hasNextInt()) {
-                    System.out.println("<<<INVALID OPTION - PLEASE ENTER A VALID NUMBER>>>");
-                    System.out.print("ENTER YOUR SELECTION: ");
-                    scanner.next(); // Consume non-integer input
-                }
-
-                int logMenuOpt = scanner.nextInt();
-
-                scanner.nextLine();
-
-                if (!inMainMenu) {
-                    break; // Exit the menu loop if not in the main menu
-                }
-
-                switch (logMenuOpt) {
-                    case 1:
-                        // Check if the user enters the specific code to register
-                        clearScreen();
-                        logo();
-                        System.out.print("ENTER REGISTRATION CODE OR PRESS 'E' TO RETURN TO THE MENU: ");
-                        String inputCodeOrReturn = scanner.nextLine();
-
-                        if (inputCodeOrReturn.equalsIgnoreCase("E")) {
-                            clearScreen();
-                            break; // Return to the main menu
-                        }
-
-                        int inputCode = Integer.parseInt(inputCodeOrReturn);
-
-                        if (inputCode == registrationCode) {
-                            // Allow registration
-                            System.out.println("PROCEEDING TO STAFF REGISTRATION...");
-                            systemPause();
-                            clearScreen();
-                            staff.add();
-                            systemPause();
-                        } else {
-                            System.out.println("<<<INCORRECT ! REGISTRATION DENIED !>>>");
-                            systemPause();
-                        }
-                        clearScreen();
-                        break;
-                    case 2:
-                        while (!loggedIn) {
-                            clearScreen();
-                            logo();
-                            System.out.println("[ LOG IN ]");
-                            System.out.println("-------------------------------------------------------");
-                            System.out.println("WELCOME TO OUR SYSTEM...");
-                            System.out.println("Press enter key to continue...");
-                            scanner.nextLine(); // Consume the newline character
-                            System.out.print("ENTER IC: ");
-                            stfIc = scanner.nextLine();
-
-                            System.out.print("ENTER PASSWORD: ");
-                            stfPassword = scanner.nextLine();
-
-                            if (login(stfIc, stfPassword)) {
-                                // Once the user successfully logs in, you can display the menu here
-                                // Example: displayMenu();
-                                loggedIn = true;
-                                inMainMenu = false; // Set the flag to false to exit the main menu loop
-                                systemPause();
-                                clearScreen();
-                                main.run();
-                            } else {
-                                System.out.println("<<<LOGIN FAILED ! PLEASE TRY AGAIN!\n");
-
-                                // Check if the user wants to return to the menu
-                                System.out.print("PRESS 'E' TO RETURN TO THE LOGMENU OR ANY OTHER KEY TO RETRY: ");
-                                String returnToMenu = scanner.next();
-                                if (returnToMenu.equalsIgnoreCase("E")) {
-                                    clearScreen();
-                                    break; // Return to the main menu
-                                }
-                                systemPause();
-                            }
-                        }
-                        loggedIn = false; // Reset loggedIn flag
-                        systemPause();
-                        clearScreen();
-                        break;
-                    case 3:
-                        // Exit the program
-                        System.out.println("EXITING THE PROGRAM...");
-                        System.exit(0);
-                        break;
-                    default:
-                        System.out.println("<<<INVALID OPTION!>>>");
-                        systemPause();
-                }
-
-                if (loggedIn) {
-                    break; // Exit the inner loop and program if exitProgram is true
-                }
-            }
-        }
+        // Member and staff controllers rely directly on their models/utilities
+        this.memberController = new MemberController();
+        this.staffController = new StaffController();
     }
 
-    public void run() {
-        boolean exit = false;
-        Scanner scanner = new Scanner(System.in);
-
-        while (!exit) {
-            logo();
-            menu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            while (!scanner.hasNextInt()) {
-                System.out.println("<<<INVALID OPTION - PLEASE ENTER A VALID NUMBER>>>");
-                System.out.print("ENTER YOUR SELECTION: ");
-                scanner.next(); // Consume non-integer input
-            }
-
-            int opt = scanner.nextInt();
-
-            switch (opt) {
-                case 1 -> {
-                    clearScreen();
-                    runMember();
-                }
-                case 2 -> {
-                    clearScreen();
-                    try {
-                        runSales();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                case 3 -> {
-                    clearScreen();
-                    runStaff();
-                }
-                case 4 -> {
-                    clearScreen();
-                    runStock();
-                }
-                case 0 -> {
-                    System.out.println("LOGGING OUT...");
-                    entry();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION!>>>");
-                    systemPause();
-                    clearScreen();
-                }
-            }
-        }
-    }
-
-    public static void logo() {
-        System.out.println("  _____  _    ____     ____    _    _____ _____ ");
-        System.out.println(" |_   _|/ \\  |  _ \\   / ___|  / \\  |  ___| ____|");
-        System.out.println("   | | / _ \\ | |_) | | |     / _ \\ | |_  |  _|  ");
-        System.out.println("   | |/ ___ \\|  _ <  | |___ / ___ \\|  _| | |___ ");
-        System.out.println("   |_/_/   \\_\\_| \\_\\  \\____/_/   \\_\\_|   |_____|");
-        System.out.println("                   .-=========-.");
-        System.out.println("                   |  Welcome  |");
-        System.out.println("                   |    to     |");
-        System.out.println("                   |  TAR CAFE |");
-        System.out.println("                   .-=========-.");
-        System.out.println("-------------------------------------------------------");
-
-    }
+    // --- Menu Presentation (Uses Enums) ---
 
     public void logMenu() {
         System.out.println("[ LOGMENU ]");
         System.out.println("-------------------------------------------------------");
-        System.out.println("1. SIGN UP");
-        System.out.println("2. LOG IN");
-        System.out.println("3. EXIT");
+        for (LogMenu menu : LogMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
+        }
     }
 
     public void menu() {
         System.out.println("[ MAIN MENU ]");
         System.out.println("-------------------------------------------------------");
-        System.out.println("1. MEMBERSHIP MANAGEMENT");
-        System.out.println("2. SALES MANAGEMENT");
-        System.out.println("3. STAFF MANAGEMENT");
-        System.out.println("4. FOOD AND BEVERAGES");
-        System.out.println("0. LOGOUT");
-    }
-
-    public void runMember() {
-        boolean exit = false;
-        Scanner scanner = new Scanner(System.in);
-        Membership member = new NormalMember();
-
-        while (!exit) {
-            logo();
-            memberMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            while (!scanner.hasNextInt()) {
-                System.out.println("<<<INVALID OPTION - PLEASE ENTER A VALID NUMBER>>>");
-                System.out.print("ENTER YOUR SELECTION: ");
-                scanner.next(); // Consume non-integer input
-            }
-
-            int memberOpt = scanner.nextInt();
-
-            switch (memberOpt) {
-                case 1 -> {
-                    clearScreen();
-                    addToWhichMember();
-                }
-                case 2 -> {
-                    clearScreen();
-                    member.delete();
-                }
-                case 3 -> {
-                    clearScreen();
-                    member.search();
-                }
-                case 4 -> {
-                    clearScreen();
-                    member.view();
-                }
-                case 0 -> {
-                    System.out.println("BACK TO MAIN MENU...");
-                    systemPause();
-                    clearScreen();
-                    run();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION>>>");
-                    systemPause();
-                    clearScreen();
-                }
-            }
+        for (MainMenu menu : MainMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
         }
-    }
-
-    public void runStaff() {
-        boolean exit = false;
-        Scanner scanner = new Scanner(System.in);
-        Staff staff = new Staff();
-
-        while (!exit) {
-            logo();
-            staffMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            while (!scanner.hasNextInt()) {
-                System.out.println("<<<INVALID OPTION - PLEASE ENTER A VALID NUMBER>>>");
-                System.out.print("ENTER YOUR SELECTION: ");
-                scanner.next(); // Consume non-integer input
-            }
-
-            int staffOpt = scanner.nextInt();
-
-            switch (staffOpt) {
-                case 1 -> {
-                    clearScreen();
-                    staff.add();
-                }
-                case 2 -> {
-                    clearScreen();
-                    staff.delete();
-                }
-                case 3 -> {
-                    clearScreen();
-                    staff.search();
-                }
-                case 4 -> {
-                    clearScreen();
-                    staff.view();
-                }
-                case 0 -> {
-                    System.out.println("BACK TO MAIN MENU...");
-                    systemPause();
-                    clearScreen();
-                    run();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION>>>");
-                    systemPause();
-                    clearScreen();
-                }
-            }
-        }
-    }
-
-    public void runStock() {
-        boolean exit = false;
-        Scanner scanner = new Scanner(System.in);
-        Stock stock = new Stock();
-
-        while (!exit) {
-            logo();
-            stockMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            while (!scanner.hasNextInt()) {
-                System.out.println("<<<INVALID OPTION - PLEASE ENTER A VALID NUMBER>>>");
-                System.out.print("ENTER YOUR SELECTION: ");
-                scanner.next(); // Consume non-integer input
-            }
-
-            int stockOpt = scanner.nextInt();
-
-            switch (stockOpt) {
-                case 1 -> {
-                    clearScreen();
-                    stock.add();
-                }
-                case 2 -> {
-                    clearScreen();
-                    stock.delete();
-                }
-                case 3 -> {
-                    clearScreen();
-                    stock.view();
-                }
-                case 0 -> {
-                    System.out.println("BACK TO MAIN MENU...");
-                    systemPause();
-                    clearScreen();
-                    run();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION>>>");
-                    systemPause();
-                    clearScreen();
-                }
-            }
-        }
-    }
-
-    public void runSales() throws IOException {
-        boolean exit = false;
-        Sales sales = new Sales();
-
-        while (!exit) {
-            logo();
-            salesMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            int salesOpt = sales.intValidation(0, 2);
-
-            switch (salesOpt) {
-                case 1 -> {
-                    clearScreen();
-                    totalPayment += runOrder();
-                }
-                case 2 -> {
-                    clearScreen();
-                    transactionRecord();
-                }
-                case 0 -> {
-                    System.out.println("BACK TO MAIN MENU...");
-                    systemPause();
-                    clearScreen();
-                    run();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION>>>");
-                    systemPause();
-                    clearScreen();
-                }
-            }
-        }
-    }
-
-    public int runOrder() throws IOException {
-        boolean exit = false;
-        int successPayment = 0;
-
-        Sales sales = new Sales();
-        Payment payment = new Payment();
-
-        while (!exit) {
-            logo();
-            createOrderMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-            int orderOpt = sales.intValidation(0, 5);
-
-            switch (orderOpt) {
-                case 1 -> {
-                    clearScreen();
-                    sales.addOrder();
-                }
-                case 2 -> {
-                    clearScreen();
-                    sales.editOrder();
-                }
-                case 3 -> {
-                    clearScreen();
-                    sales.searchOrder();
-                }
-                case 4 -> {
-                    clearScreen();
-                    sales.removeOrder();
-                }
-                case 5 -> {
-                    clearScreen();
-                    successPayment += payment.makePayment();
-                }
-                case 0 -> {
-                    clearScreen();
-                    runSales();
-                }
-                default -> {
-                    System.out.println("<<<INVALID OPTION>>>");
-
-                    systemPause();
-                    clearScreen();
-                }
-            }
-        }
-        return successPayment;
-    }
-
-    public void memberMenu() {
-        System.out.println("[ MEMBER MANAGEMENT SYSTEM ]");
-        System.out.println("-------------------------------------------------------");
-        System.out.println("1. ADD NEW MEMBER");
-        System.out.println("2. DELETE MEMBER");
-        System.out.println("3. SEARCH MEMBER");
-        System.out.println("4. VIEW REGISTERED MEMBER LIST");
-        System.out.println("0. BACK TO MAIN MENU");
-        System.out.println("-------------------------------------------------------");
-    }
-
-    public void staffMenu() {
-        System.out.println("[ STAFF MANAGEMENT SYSTEM ]");
-        System.out.println("-------------------------------------------------------");
-        System.out.println("1. ADD NEW STAFF");
-        System.out.println("2. DELETE STAFF ");
-        System.out.println("3. SEARCH STAFF ");
-        System.out.println("4. VIEW REGISTERED STAFF LIST");
-        System.out.println("0. BACK TO MAIN MENU");
-        System.out.println("-------------------------------------------------------");
     }
 
     public void stockMenu() {
         System.out.println("[ FOOD AND BEVERAGE MANAGEMENT SYSTEM ]");
         System.out.println("-------------------------------------------------------");
-        System.out.println("1. ADD NEW PRODUCT");
-        System.out.println("2. DELETE PRODUCT");
-        System.out.println("3. VIEW PRODUCT LIST");
-        System.out.println("0. BACK TO MAIN MENU");
+        for (StockMenu menu : StockMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
+        }
         System.out.println("-------------------------------------------------------");
     }
 
     public void salesMenu() {
         System.out.println("[ SALES MANAGEMENT SYSTEM ]");
         System.out.println("-------------------------------------------------------");
-        System.out.println("1. MAKE ORDER");
-        System.out.println("2. TRANSACTION REPORT");
-        System.out.println("0. BACK TO MAIN MENU");
+        for (SalesMenu menu : SalesMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
+        }
         System.out.println("-------------------------------------------------------");
     }
 
     public void createOrderMenu() {
         System.out.println("[ ORDERING MANAGEMENT]");
         System.out.println("-------------------------------------------------------");
-        System.out.println("1. ADD NEW ORDER");
-        System.out.println("2. EDIT AN ORDER");
-        System.out.println("3. SEARCH AN ORDER");
-        System.out.println("4. REMOVE AN ORDER");
-        System.out.println("5. MAKE PAYMENT");
-        System.out.println("0. BACK TO PREVIOUS PAGE");
+        for (OrderMenu menu : OrderMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
+        }
         System.out.println("-------------------------------------------------------");
     }
 
-    public static void addToWhichMember() {
-        Scanner scanner = new Scanner(System.in);
-        char userChoice;
+    public void entry() {
+        String stfIc = null;
 
-        do {
-            logo();
-            System.out.println("[ REGISTER MEMBER ]");
-            System.out.println("-------------------------------------------------------");
-            System.out.println("CHOOSE MEMBER TYPE:");
-            System.out.println("1 = NORMAL");
-            System.out.println("2 = GOLD");
-            System.out.println("3 = PREMIUM");
-            System.out.println("ENTER 'E' TO RETURN MIAN MENU");
-            System.out.print("YOUR CHOICE: ");
-            userChoice = scanner.next().charAt(0);
-            System.out.println("-------------------------------------------------------");
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            logMenu();
+            System.out.print("ENTER YOUR SELECTION: ");
 
-            switch (userChoice) {
-                case '1':
-                    NormalMember normalMember = new NormalMember();
-                    normalMember.setMemberType("Normal");
-                    normalMember.add();
-                    break;
-                case '2':
-                    GoldMember goldMember = new GoldMember();
-                    goldMember.setMemberType("Gold");
-                    goldMember.add();
-                    break;
-                case '3':
-                    PremiumMember premiumMember = new PremiumMember();
-                    premiumMember.setMemberType("Premium");
-                    premiumMember.add();
-                    break;
-                case 'E':
-                case 'e':
-                    // User wants to cancel and return to the main menu
-                    clearScreen();
-                    return;
-                default:
-                    System.out.println("<<<INVALID OPTION>>>");
-                    break;
+            // Input Validation using ValidationUtil (range 1 to 3)
+            int logMenuOpt = ValidationUtil.intValidation(1, 3);
+
+            if (logMenuOpt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
             }
 
-            // Ask if the user wants to add another member
-            System.out.print("ADD MORE MEMBER ? (Y = YES , N = NO): ");
-            char addAnother = scanner.next().charAt(0);
-            if (addAnother == 'N' || addAnother == 'n') {
-                clearScreen();
-                return; // Return to the main menu
+            LogMenu logSelection = LogMenu.getByOption(logMenuOpt);
+            if (logSelection == null) {
+                System.out.println("<<<INVALID OPTION!>>>");
+                ConsoleUtil.systemPause();
+                continue;
             }
-            clearScreen();
-        } while (true);
-    }
 
-    public static void clearScreen() {
-        try {
-            Robot robot = new Robot();
-            robot.setAutoDelay(1);
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_L);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            robot.keyRelease(KeyEvent.VK_L);
-        } catch (AWTException ex) {
+            switch (logSelection) {
+                case SIGN_UP:
+                    // SIGN UP/REGISTRATION
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    System.out.print("ENTER REGISTRATION CODE OR PRESS 'E' TO RETURN TO THE MENU: ");
+                    String inputCodeOrReturn = ValidationUtil.scanner.nextLine();
+
+                    if (inputCodeOrReturn.equalsIgnoreCase("E")) {
+                        ConsoleUtil.clearScreen();
+                        break;
+                    }
+
+                    try {
+                        int inputCode = Integer.parseInt(inputCodeOrReturn);
+                        int registrationCode = 1234;
+
+                        if (inputCode == registrationCode) {
+                            System.out.println("PROCEEDING TO STAFF REGISTRATION...");
+                            ConsoleUtil.systemPause();
+                            ConsoleUtil.clearScreen();
+                            Staff staff = new Staff();
+                            staff.add();
+                        } else {
+                            System.out.println("<<<INCORRECT ! REGISTRATION DENIED !>>>");
+                            ConsoleUtil.systemPause();
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("<<<INVALID INPUT. REGISTRATION CODE MUST BE A NUMBER.>>>");
+                        ConsoleUtil.systemPause();
+                    }
+                    ConsoleUtil.clearScreen();
+                    break;
+                case LOG_IN:
+                    // LOG IN
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    System.out.println("[ LOG IN ]");
+                    System.out.println("-------------------------------------------------------");
+
+                    // IC LENGTH AND FORMAT VALIDATION
+                    do {
+                        System.out.print("ENTER IC: ");
+                        stfIc = ValidationUtil.digitOnlyValidation(12);
+                    }while(stfIc == null);
+
+                    System.out.print("ENTER PASSWORD: ");
+                    String stfPassword = ValidationUtil.scanner.nextLine();
+
+                    Staff staff = new Staff();
+                    if (staff.login(stfIc, stfPassword)) {
+                        System.out.println("LOGIN SUCCESSFUL!");
+                        ConsoleUtil.systemPause();
+                        ConsoleUtil.clearScreen();
+                        run();
+                        return;
+                    } else {
+                        System.out.println("<<<LOGIN FAILED ! PLEASE TRY AGAIN!>>>\n");
+
+                        System.out.print("PRESS 'E' TO RETURN TO THE LOGMENU OR ANY OTHER KEY TO RETRY: ");
+                        String returnToMenu = ValidationUtil.scanner.nextLine();
+                        if (returnToMenu.equalsIgnoreCase("E")) {
+                            ConsoleUtil.clearScreen();
+                            break;
+                        }
+                        ConsoleUtil.systemPause();
+                    }
+                    break;
+                case EXIT:
+                    // EXIT
+                    System.out.println("EXITING THE PROGRAM...");
+                    System.exit(0);
+                    break;
+            }
         }
     }
 
-    public static void systemPause() {
-        System.out.println("\n\t\tPress Enter to continue...");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine(); // Wait for the user to press Enter
+    public void run() {
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            menu();
+            System.out.print("ENTER YOUR SELECTION: ");
+
+            // Max option is 4 (STOCK_MANAGEMENT)
+            int opt = ValidationUtil.intValidation(0, 4);
+
+            if (opt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            MainMenu selection = MainMenu.getByOption(opt);
+            if (selection == null) {
+                System.out.println("<<<INVALID OPTION!>>>");
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (selection) {
+                case MEMBERSHIP_MANAGEMENT -> {
+                    memberController.manageMembers();
+                }
+                case SALES_MANAGEMENT -> {
+                    try {
+                        runSales();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                case STAFF_MANAGEMENT -> {
+                    staffController.manageStaff();
+                }
+                case STOCK_MANAGEMENT -> {
+                    runStock(); // Calls StockController methods
+                }
+                case LOGOUT -> {
+                    System.out.println("LOGGING OUT...");
+                    return; // Return to entry loop
+                }
+            }
+        }
     }
 
-    public static boolean login(String ic, String password) {
-        Staff staff = new Staff();
-        boolean loggedIn;
+    public void runStock() {
+        // *** REFACACTORED: Delegates to StockController ***
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            stockMenu();
+            System.out.print("ENTER YOUR SELECTION: ");
 
-        // Create a Staff object and invoke the login method
-        loggedIn = staff.login(ic, password);
+            int stockOpt = ValidationUtil.intValidation(0, 3);
 
-        return loggedIn;
+            if (stockOpt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            StockMenu selection = StockMenu.getByOption(stockOpt);
+
+            if (selection == null) {
+                System.out.println("<<<INVALID OPTION!>>>");
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (selection) {
+                case ADD_PRODUCT -> stockController.add();
+                case DELETE_PRODUCT -> stockController.delete();
+                case VIEW_PRODUCT_LIST -> stockController.view();
+                case BACK_TO_MAIN -> {
+                    System.out.println("BACK TO MAIN MENU...");
+                    ConsoleUtil.systemPause();
+                    return;
+                }
+            }
+        }
+    }
+
+    public void runSales() throws IOException {
+        // *** REFACACTORED: Uses SalesMenu and delegates Order logic ***
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            salesMenu();
+            System.out.print("ENTER YOUR SELECTION: ");
+
+            int salesOpt = ValidationUtil.intValidation(0, 2);
+
+            if (salesOpt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            SalesMenu selection = SalesMenu.getByOption(salesOpt);
+
+            if (selection == null) {
+                System.out.println("<<<INVALID OPTION!>>>");
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (selection) {
+                case MAKE_ORDER -> {
+                    runOrder();
+                }
+                case TRANSACTION_REPORT -> {
+                    transactionRecord();
+                }
+                case BACK_TO_MAIN -> {
+                    System.out.println("BACK TO MAIN MENU...");
+                    ConsoleUtil.systemPause();
+                    return; // Exit sales loop
+                }
+            }
+        }
+    }
+
+    public void runOrder() throws IOException {
+        // *** REFACACTORED: Delegates to SalesController ***
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            createOrderMenu();
+            System.out.print("ENTER YOUR SELECTION: ");
+
+            int orderOpt = ValidationUtil.intValidation(0, 5);
+
+            if (orderOpt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            OrderMenu selection = OrderMenu.getByOption(orderOpt);
+
+            if (selection == null) {
+                System.out.println("<<<INVALID OPTION!>>>");
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (selection) {
+                case ADD_ORDER -> salesController.addOrder();
+                case EDIT_ORDER -> salesController.editOrder();
+                case SEARCH_ORDER -> salesController.searchOrder();
+                case REMOVE_ORDER -> salesController.removeOrder();
+                case MAKE_PAYMENT -> {
+                    salesController.makePayment();
+                }
+                case BACK_TO_PREVIOUS -> {
+                    System.out.println("BACK TO PREVIOUS PAGE...");
+                    return; // Exit order loop
+                }
+            }
+        }
     }
 
     public static void transactionRecord() {
-        logo();
+        ConsoleUtil.clearScreen();
+        ConsoleUtil.logo();
         System.out.println("[ TRANSACTION REPORT ]");
         System.out.println("-------------------------------------------------------");
-
-        Payment.displayItemDetailsFromFile("PaidItem.txt");
-        Payment.displayTransactionDetailsAndSum("Transaction.txt");
-
-        systemPause();
-        clearScreen();
+        
+        TransactionRepository transactionRepo = new TransactionRepository();
+        java.util.List<TransactionRepository.Transaction> transactions = transactionRepo.loadAllTransactions();
+        
+        if (transactions.isEmpty()) {
+            System.out.println("NO TRANSACTIONS FOUND.");
+        } else {
+            System.out.printf("%-10s %-15s %-15s %-15s %-15s\n", "NO.", "SUBTOTAL", "DISCOUNT", "TAX", "TOTAL");
+            System.out.println("-------------------------------------------------------");
+            
+            int transactionNo = 1;
+            double grandTotalSubtotal = 0.0;
+            double grandTotalDiscount = 0.0;
+            double grandTotalTax = 0.0;
+            double grandTotal = 0.0;
+            
+            for (TransactionRepository.Transaction transaction : transactions) {
+                System.out.printf("%-10d RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n",
+                        transactionNo++,
+                        transaction.getSubtotal(),
+                        transaction.getDiscount(),
+                        transaction.getTax(),
+                        transaction.getTotal());
+                
+                grandTotalSubtotal += transaction.getSubtotal();
+                grandTotalDiscount += transaction.getDiscount();
+                grandTotalTax += transaction.getTax();
+                grandTotal += transaction.getTotal();
+            }
+            
+            System.out.println("-------------------------------------------------------");
+            System.out.printf("%-10s RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n", 
+                    "TOTAL:",
+                    grandTotalSubtotal,
+                    grandTotalDiscount,
+                    grandTotalTax,
+                    grandTotal);
+            System.out.println("-------------------------------------------------------");
+            System.out.println("TOTAL TRANSACTIONS: " + transactions.size());
+        }
+        
+        ConsoleUtil.systemPause();
+        ConsoleUtil.clearScreen();
     }
 
 }
