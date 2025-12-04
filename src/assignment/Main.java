@@ -166,32 +166,36 @@ public class Main {
                     System.out.println("[ LOG IN ]");
                     System.out.println("-------------------------------------------------------");
 
-                    // IC LENGTH AND FORMAT VALIDATION
-                    do {
-                        System.out.print("ENTER IC: ");
-                        stfIc = ValidationUtil.digitOnlyValidation(12);
-                    }while(stfIc == null);
+                    // Start a simple loop for retries
+                    // The loop will be exited by return on success or break on exit
+                    while (true) {
+                        // IC LENGTH AND FORMAT VALIDATION
+                        do {
+                            System.out.print("ENTER IC: ");
+                            stfIc = ValidationUtil.digitOnlyValidation(12);
+                        } while (stfIc == null);
 
-                    System.out.print("ENTER PASSWORD: ");
-                    String stfPassword = ValidationUtil.scanner.nextLine();
+                        System.out.print("ENTER PASSWORD: ");
+                        String stfPassword = ValidationUtil.scanner.nextLine();
 
-                    Staff staff = new Staff();
-                    if (staff.login(stfIc, stfPassword)) {
-                        System.out.println("LOGIN SUCCESSFUL!");
-                        ConsoleUtil.systemPause();
-                        ConsoleUtil.clearScreen();
-                        run();
-                        return;
-                    } else {
-                        System.out.println("<<<LOGIN FAILED ! PLEASE TRY AGAIN!>>>\n");
-
-                        System.out.print("PRESS 'E' TO RETURN TO THE LOGMENU OR ANY OTHER KEY TO RETRY: ");
-                        String returnToMenu = ValidationUtil.scanner.nextLine();
-                        if (returnToMenu.equalsIgnoreCase("E")) {
+                        Staff staff = new Staff();
+                        if (staff.login(stfIc, stfPassword)) {
+                            System.out.println("LOGIN SUCCESSFUL!");
+                            ConsoleUtil.systemPause();
                             ConsoleUtil.clearScreen();
-                            break;
+                            run();
+                            return;
+                        } else {
+                            System.out.println("<<<LOGIN FAILED ! PLEASE TRY AGAIN!>>>\n");
+
+                            System.out.print("PRESS 'E' TO RETURN TO THE LOGMENU OR ANY OTHER KEY TO RETRY: ");
+                            String returnToMenu = ValidationUtil.scanner.nextLine();
+                            if (returnToMenu.equalsIgnoreCase("E")) {
+                                ConsoleUtil.clearScreen();
+                                break; // Exit to the LogMenu ()
+                            }
+                            ConsoleUtil.systemPause();
                         }
-                        ConsoleUtil.systemPause();
                     }
                     break;
                 case EXIT:
