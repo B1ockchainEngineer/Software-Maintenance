@@ -18,7 +18,7 @@ public class PremiumMember extends Membership {
         PremiumMember.premiumRate = premiumRate;
     }
 
-    public static double getGoldRate() {
+    public static double getPremiumRate() {
         return premiumRate;
     }
 
