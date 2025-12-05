@@ -3,19 +3,14 @@ package assignment.util;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import static assignment.util.ConsoleUtil.clearScreen;
-<<<<<<< HEAD
-=======
 import java.time.LocalDate;
 import java.time.DateTimeException;
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 
 public class ValidationUtil {
     // Shared Scanner instance for the whole application.
     // Exposed as public so legacy code that accesses ValidationUtil.scanner still compiles.
     public static final Scanner scanner = new Scanner(System.in);
 
-<<<<<<< HEAD
-=======
     public static String digitOnlyValidation(int length) {
         String input = scanner.nextLine().trim();
 
@@ -34,7 +29,6 @@ public class ValidationUtil {
         return input;  // valid digit-only string
     }
 
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     public static int intValidation(int startingNum, int endingNum) {
         int input;
 
@@ -158,8 +152,4 @@ public class ValidationUtil {
             return null;
         }
     }
-<<<<<<< HEAD
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
-=======
->>>>>>> parent of 93b2678 (nameValidation (avoid code repetition))
 }
