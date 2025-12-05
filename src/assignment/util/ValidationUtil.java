@@ -159,15 +159,6 @@ public class ValidationUtil {
         }
     }
 <<<<<<< HEAD
-
-    public static boolean nameValidation(String name){
-        if (name.matches("^[a-zA-Z ]+$")) {
-            return true;
-        } else {
-            System.out.println("Invalid input. Please enter a name with alphabet characters only. \n");
-            return false;
-        }
-    }
 >>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 =======
 >>>>>>> parent of 93b2678 (nameValidation (avoid code repetition))
