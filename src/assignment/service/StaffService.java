@@ -36,6 +36,30 @@ public class StaffService {
     }
 
     /**
+<<<<<<< HEAD
+     * Updates an existing staff member.
+     * Returns true if updated successfully, false if staff not found.
+     */
+    public boolean updateStaff(Staff updatedStaff) {
+        // Verify staff exists
+        Staff existing = staffRepo.findById(updatedStaff.getId());
+        if (existing == null) {
+            return false;
+        }
+        
+        // Check if IC is being changed and if new IC already exists
+        if (!existing.getIc().equals(updatedStaff.getIc())) {
+            if (staffRepo.existsByIc(updatedStaff.getIc())) {
+                return false; // New IC already exists
+            }
+        }
+        
+        return staffRepo.updateStaff(updatedStaff);
+    }
+
+    /**
+=======
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
      * Deletes a staff member by IC. Returns true if deleted.
      */
     public boolean deleteByIc(String staffIc) {
@@ -43,6 +67,16 @@ public class StaffService {
     }
 
     /**
+<<<<<<< HEAD
+     * Deletes a staff member by ID. Returns true if deleted.
+     */
+    public boolean deleteById(int staffId) {
+        return staffRepo.deleteById(staffId);
+    }
+
+    /**
+=======
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
      * Finds a staff member by ID.
      */
     public Staff findById(int staffId) {
@@ -50,6 +84,23 @@ public class StaffService {
     }
 
     /**
+<<<<<<< HEAD
+     * Finds a staff member by IC.
+     */
+    public Staff findByIc(String ic) {
+        return staffRepo.findByIc(ic);
+    }
+
+    /**
+     * Finds staff members by name (case-insensitive partial match).
+     */
+    public List<Staff> findByName(String name) {
+        return staffRepo.findByName(name);
+    }
+
+    /**
+=======
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
      * Attempts to log in with given credentials.
      * Returns the Staff if found, otherwise null.
      */
