@@ -12,14 +12,8 @@ import assignment.enums.MainMenu;
 import assignment.enums.OrderMenu;
 import assignment.enums.SalesMenu;
 import assignment.enums.StockMenu;
-import assignment.repo.PaidItemRepository;
-import assignment.repo.StaffRepository;
-import assignment.repo.StockRepository;
-import assignment.repo.TransactionRepository;
-import assignment.service.PaymentService;
-import assignment.service.SalesService;
-import assignment.service.StaffService;
-import assignment.service.StockService;
+import assignment.repo.*;
+import assignment.service.*;
 import assignment.util.ConsoleUtil; // Utility for logo, clearScreen, pause
 import assignment.util.ValidationUtil; // Utility for input validation
 import java.io.IOException;
@@ -68,8 +62,10 @@ public class Main {
         this.loginController = new LoginController(staffService);
         this.signupController = new SignupController(staffService);
 
-        // Member controller (relies directly on models/utilities)
-        this.memberController = new MemberController();
+        // Member-related setup
+        MemberRepository memberRepo = new MemberRepository();
+        MemberService memberService = new MemberService(memberRepo);
+        this.memberController = new MemberController(memberService);
     }
 
     // --- Menu Presentation (Uses Enums) ---

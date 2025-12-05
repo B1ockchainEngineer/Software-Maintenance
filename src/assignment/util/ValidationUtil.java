@@ -159,4 +159,16 @@ public class ValidationUtil {
             return false;
         }
     }
+
+    public static char confirmValidation(String question){
+        char yesNo;
+        do {
+            System.out.print(question);
+            yesNo = charValidation();
+            if (yesNo != 'Y' && yesNo != 'N')
+                System.out.println("Invalid Option! Please Re-enter!");
+        } while (yesNo != 'Y' && yesNo != 'N');
+
+        return yesNo;
+    }
 }

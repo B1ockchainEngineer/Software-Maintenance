@@ -44,13 +44,13 @@ public abstract class Person {
         return id;
     }
 
-    public abstract void add();
-
-    public abstract void delete();
-
-    public abstract void view();
-
-    public abstract void search();
+//    public abstract void add();
+//
+//    public abstract void delete();
+//
+//    public abstract void view();
+//
+//    public abstract void search();
 
     public boolean fileExists(String filePath) {
         File file = new File(filePath);

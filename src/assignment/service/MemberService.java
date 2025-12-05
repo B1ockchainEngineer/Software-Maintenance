@@ -42,16 +42,8 @@ public class MemberService {
         return memberRepo.deleteById(memberId);
     }
 
-    /**
-     * Finds a member by ID, or null if not found.
-     */
-    public Membership findMemberById(int memberId) {
-        for (Membership member : memberRepo.loadAllMembers()) {
-            if (member.getId() == memberId) {
-                return member;
-            }
-        }
-        return null;
+    public boolean icExists(String filePath, String targetIC) {
+        return memberRepo.existsByIc(targetIC);
     }
 }
 

@@ -84,7 +84,6 @@ public class Staff extends Person {
      * Required by Person abstract class.
      * UI logic is handled by StaffController.
      */
-    @Override
     public void add() {
         throw new UnsupportedOperationException("Use StaffController.addStaff() instead");
     }
@@ -93,7 +92,6 @@ public class Staff extends Person {
      * Required by Person abstract class.
      * UI logic is handled by StaffController.
      */
-    @Override
     public void delete() {
         throw new UnsupportedOperationException("Use StaffController.deleteStaff() instead");
     }
@@ -102,7 +100,6 @@ public class Staff extends Person {
      * Required by Person abstract class.
      * UI logic is handled by StaffController.
      */
-    @Override
     public void view() {
         throw new UnsupportedOperationException("Use StaffController.viewStaffList() instead");
     }
@@ -111,7 +108,6 @@ public class Staff extends Person {
      * Required by Person abstract class.
      * UI logic is handled by StaffController.
      */
-    @Override
     public void search() {
         throw new UnsupportedOperationException("Use StaffController.searchStaff() instead");
     }
