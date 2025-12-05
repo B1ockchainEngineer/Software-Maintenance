@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package assignment;
+package assignment.model;
 
 import java.io.File;
 import java.util.Objects;
 
 /**
- *
- * @author evansleong
+ * Base class for people (staff, members).
  */
 public abstract class Person {
 
@@ -91,5 +86,6 @@ public abstract class Person {
         hash = 37 * hash + this.id;
         return hash;
     }
-
 }
+
+

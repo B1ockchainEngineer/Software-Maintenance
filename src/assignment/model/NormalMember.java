@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package assignment;
+package assignment.model;
 
 /**
- *
- * @author evansleong
+ * Normal membership tier.
  */
 public class NormalMember extends Membership {
 
@@ -37,5 +32,6 @@ public class NormalMember extends Membership {
         return super.toString()
                 + "\nNORMAL DISCOUNT RATE: " + normalRate;
     }
-
 }
+
+

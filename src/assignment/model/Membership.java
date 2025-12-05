@@ -1,32 +1,22 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package assignment;
+package assignment.model;
 
-import static assignment.Main.clearScreen;
-import static assignment.Main.logo;
-import static assignment.Main.systemPause;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import assignment.repo.MemberRepository;
+import assignment.util.ConsoleUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
 /**
- *
- * @author evansleong
+ * Membership management base class using ConsoleUtil for output.
  */
 public abstract class Membership extends Person {
 
-    protected final List<Membership> memberList = new ArrayList<>(); // Store members in a list
+    protected final List<Membership> memberList = new ArrayList<>();
+    private static final MemberRepository memberRepo = new MemberRepository();
 
-    private String memberHp, memberType;
+    private String memberHp;
+    private String memberType;
     private double discountRate = 0;
     private static int noOfMember = 0;
 
@@ -89,21 +79,23 @@ public abstract class Membership extends Person {
         do {
             System.out.println("Press enter key to continue...");
             scanner.nextLine(); // Consume the newline character
+
+            // IC
             do {
                 System.out.print("ENTER MEMBER IC: ");
                 memberIC = scanner.nextLine();
                 if (memberIC.matches("\\d{12}")) {
-                    // Check if the IC already exists in the file
                     if (icExists("members.txt", memberIC)) {
                         System.out.println("<<<IC already exists in the file. Please reenter!>>>");
                     } else {
-                        break; // IC is valid and does not exist in the file
+                        break;
                     }
                 } else {
                     System.out.println("<<<Invalid. Please enter 12 digits!>>>");
                 }
             } while (true);
 
+            // Name
             do {
                 System.out.print("ENTER MEMBER NAME: ");
                 memberName = scanner.nextLine();
@@ -114,11 +106,11 @@ public abstract class Membership extends Person {
                 }
             } while (true);
 
+            // HP
             do {
                 System.out.print("ENTER MEMBER HP: ");
                 memberHP = scanner.nextLine();
 
-                // Check if memberHp contains 10 or 11 digits
                 if (memberHP.matches("\\d{10,11}")) {
                     break;
                 } else {
@@ -136,19 +128,8 @@ public abstract class Membership extends Person {
             char yesNo = scanner.next().charAt(0);
 
             if (yesNo == 'Y' || yesNo == 'y') {
-                try {
-                    FileWriter writer = new FileWriter("members.txt", true);
-                    writer.write(getName() + "\t");
-                    writer.write(getIc() + "\t");
-                    writer.write(getMemberHp() + "\t");
-                    writer.write(getId() + "\t");
-                    writer.write(getMemberType() + "\t");
-                    writer.write(calDiscount() + "\t");
-                    writer.write("\n");
-                    writer.close();
-                } catch (IOException e) {
-                    System.err.println("Error writing to the file: " + e.getMessage());
-                }
+                // Persist via repository
+                memberRepo.appendMember(this);
 
                 System.out.println("NEW MEMBER ADDED TO THE SYSTEM...");
                 System.out.println("---------------------------------------------------");
@@ -158,20 +139,18 @@ public abstract class Membership extends Person {
                 System.out.println("MEMBER HP >> " + getMemberHp());
                 System.out.println("MEMBER TYPE >> " + getMemberType());
                 System.out.println("---------------------------------------------------");
-                System.out.println("\n");
+                System.out.println();
 
-                break; // Exit the input loop and continue to the next member
+                break;
             }
         } while (true);
-        // You can remove the fileExists check here since it's done before writing.
-        // loadMembersFromFile("members.txt"); // Load members if needed.
     }
 
     @Override
     public void delete() {
         Scanner scanner = new Scanner(System.in);
 
-        logo();
+        ConsoleUtil.logo();
         System.out.println("[ DELETE MEMBER ]");
         System.out.println("-------------------------------------------------------");
 
@@ -179,73 +158,58 @@ public abstract class Membership extends Person {
         String input = scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
-            // User wants to cancel and return to the main menu
-            clearScreen();
+            ConsoleUtil.clearScreen();
             return;
         }
 
         try {
             int memberIdToDelete = Integer.parseInt(input);
-            File inputFile = new File("members.txt");
-            File tempFile = new File("dltTemp.txt");
 
-            boolean found = false;
-            try (
-                    BufferedReader reader = new BufferedReader(new FileReader(inputFile)); BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] data = line.split("\t");
-
-                    int dltMemberId = Integer.parseInt(data[3]);
-
-                    if (dltMemberId == memberIdToDelete) {
-                        // Display member details to delete
-                        System.out.println("Member Details to Delete:");
-                        System.out.println("MEMBER ID >> " + data[3]);
-                        System.out.println("MEMBER IC >> " + data[1]);
-                        System.out.println("MEMBER NAME >> " + data[0]);
-                        System.out.println("MEMBER HP >> " + data[2]);
-                        System.out.println("MEMBER TYPE >> " + data[4]);
-                        System.out.println("-------------------------------------------------------");
-                        System.out.print("CONFIRM DELETION? (Y = YES, ANY KEY TO CANCEL): ");
-                        char confirm = scanner.next().trim().toUpperCase().charAt(0);
-
-                        if (confirm == 'Y') {
-                            found = true;
-                            continue; // Skip this line in the output file
-                        }
-                    }
-
-                    writer.write(line + System.getProperty("line.separator"));
+            // Load members from repository
+            loadMembersFromRepo();
+            Membership target = null;
+            for (Membership member : memberList) {
+                if (member.getId() == memberIdToDelete) {
+                    target = member;
+                    break;
                 }
             }
 
-            if (found) {
-                inputFile.delete(); // Delete the original file
-                boolean successful = tempFile.renameTo(inputFile);
-                if (!successful) {
-                    System.out.println("Error renaming the temp file.");
-                } else {
-                    System.out.println("MEMBER WITH ID M-" + memberIdToDelete + " HAS BEEN DELETED.");
-                }
-            } else {
+            if (target == null) {
                 System.out.println("MEMBER WITH ID M-" + memberIdToDelete + " NOT FOUND OR DELETION CANCELLED.");
+            } else {
+                System.out.println("Member Details to Delete:");
+                System.out.println("MEMBER ID >> " + target.getId());
+                System.out.println("MEMBER IC >> " + target.getIc());
+                System.out.println("MEMBER NAME >> " + target.getName());
+                System.out.println("MEMBER HP >> " + target.getMemberHp());
+                System.out.println("MEMBER TYPE >> " + target.getMemberType());
+                System.out.println("-------------------------------------------------------");
+                System.out.print("CONFIRM DELETION? (Y = YES, ANY KEY TO CANCEL): ");
+                char confirm = scanner.next().trim().toUpperCase().charAt(0);
+
+                if (confirm == 'Y') {
+                    boolean deleted = memberRepo.deleteById(memberIdToDelete);
+                    if (deleted) {
+                        System.out.println("MEMBER WITH ID M-" + memberIdToDelete + " HAS BEEN DELETED.");
+                        loadMembersFromRepo();
+                    } else {
+                        System.out.println("Failed to delete member from file.");
+                    }
+                }
             }
 
         } catch (NumberFormatException e) {
             System.out.println("<<<Invalid input. Please enter a valid member ID or 'E' to cancel.>>>");
-        } catch (IOException e) {
-            System.out.println("Error deleting member: " + e.getMessage());
         }
-        systemPause();
-        clearScreen();
+        ConsoleUtil.systemPause();
+        ConsoleUtil.clearScreen();
     }
 
     @Override
     public void view() {
-        loadMembersFromFile("members.txt");
-        logo();
+        loadMembersFromRepo();
+        ConsoleUtil.logo();
         System.out.println("[ VIEW ALL MEMBERS ]");
         System.out.println("-------------------------------------------------------");
 
@@ -264,37 +228,37 @@ public abstract class Membership extends Person {
                 String input = scanner.next().trim();
 
                 switch (input.toUpperCase()) {
-                    case "1":
+                    case "1" -> {
                         displayMembersByType("Normal");
                         validChoice = true;
-                        break;
-                    case "2":
+                    }
+                    case "2" -> {
                         displayMembersByType("Gold");
                         validChoice = true;
-                        break;
-                    case "3":
+                    }
+                    case "3" -> {
                         displayMembersByType("Premium");
                         validChoice = true;
-                        break;
-                    case "E":
-                        clearScreen();
-                        return; // Return to the menu
-                    default:
-                        System.out.println("<<<Invalid choice. Please try again.>>>");
+                    }
+                    case "E" -> {
+                        ConsoleUtil.clearScreen();
+                        return;
+                    }
+                    default -> System.out.println("<<<Invalid choice. Please try again.>>>");
                 }
             }
         }
 
-        systemPause();
-        clearScreen();
+        ConsoleUtil.systemPause();
+        ConsoleUtil.clearScreen();
     }
 
     @Override
     public void search() {
-        loadMembersFromFile("members.txt");
+        loadMembersFromRepo();
         Scanner scanner = new Scanner(System.in);
 
-        logo();
+        ConsoleUtil.logo();
         System.out.println("[ SEARCH MEMBER BY ID ]");
         System.out.println("-------------------------------------------------------");
 
@@ -302,8 +266,7 @@ public abstract class Membership extends Person {
         String input = scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
-            // User wants to cancel and return to the main menu
-            clearScreen();
+            ConsoleUtil.clearScreen();
             return;
         }
 
@@ -317,7 +280,7 @@ public abstract class Membership extends Person {
                     found = true;
                     System.out.println("\tMEMBER FOUND !");
                     System.out.println(member.toString());
-                    break; // Exit the loop once a member is found
+                    break;
                 }
             }
 
@@ -328,14 +291,14 @@ public abstract class Membership extends Person {
             System.out.println("Invalid input. Please enter a valid member ID or 'E' to cancel.");
         }
 
-        systemPause();
-        System.out.println("\n");
-        clearScreen();
+        ConsoleUtil.systemPause();
+        System.out.println();
+        ConsoleUtil.clearScreen();
     }
 
     private void displayMembersByType(String membershipType) {
         System.out.println("---------------------------------------------------------------------------------------");
-        System.out.println("MEMBER ID |MEMBER IC     |MEMBER HP   |MEMBER TYPE |MEMBER NAME");
+        System.out.println("MEMBER ID |MEMBER NAME  |MEMBER HP   |MEMBER TYPE |MEMBER IC");
         System.out.println("---------------------------------------------------------------------------------------");
 
         boolean foundMembers = false;
@@ -376,56 +339,15 @@ public abstract class Membership extends Person {
                 + "\nTYPE OF MEMBERSHIP: " + getMemberType();
     }
 
-    public void loadMembersFromFile(String filePath) {
-        memberList.clear(); // Clear the existing data in the ArrayList before loading
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\t"); // Assuming the data is tab-separated
-
-                if (parts.length >= 6) {
-                    String memberIC = parts[0];
-                    String memberName = parts[1];
-                    String memberHP = parts[2];
-                    int memberId = Integer.parseInt(parts[3]);
-                    String membershipType = parts[4];
-                    double discountRate = Double.parseDouble(parts[5]);
-
-                    Membership member = null;
-
-                    switch (membershipType) {
-                        case "Normal" ->
-                            member = new NormalMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
-                        case "Gold" ->
-                            member = new GoldMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
-                        case "Premium" ->
-                            member = new PremiumMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
-                        default -> {
-                            continue; // Skip invalid data
-                        }
-                    }
-
-                    memberList.add(member); // Add the loaded member to the ArrayList
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading from the file: " + e.getMessage());
-        }
+    public void loadMembersFromRepo() {
+        memberList.clear();
+        memberList.addAll(memberRepo.loadAllMembers());
     }
 
     private boolean icExists(String filePath, String targetIC) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\t"); // Assuming the data is tab-separated
-                if (parts.length >= 2 && parts[1].equals(targetIC)) {
-                    return true; // IC already exists in the file
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading from the file: " + e.getMessage());
-        }
-        return false; // IC does not exist in the file
+        // filePath ignored; repository is the single source of truth
+        return memberRepo.existsByIc(targetIC);
     }
 }
+
+

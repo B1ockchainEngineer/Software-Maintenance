@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package assignment;
+package assignment.model;
 
 /**
- *
- * @author evansleong
+ * Premium membership tier.
  */
-public class PremiumMember extends Membership{
+public class PremiumMember extends Membership {
+
     private static double premiumRate = 0.15;
 
     public PremiumMember() {
@@ -25,9 +21,9 @@ public class PremiumMember extends Membership{
     public static double getGoldRate() {
         return premiumRate;
     }
-    
+
     @Override
-    public double calDiscount(){
+    public double calDiscount() {
         return super.calculateDiscountRate() + premiumRate;
     }
 
@@ -36,5 +32,6 @@ public class PremiumMember extends Membership{
         return super.toString()
                 + "\nPREMIUM DISCOUNT RATE: " + premiumRate;
     }
-
 }
+
+
