@@ -100,8 +100,6 @@ public class ValidationUtil {
 
         return input;
     }
-<<<<<<< HEAD
-=======
 
     public static String icValidation() {
         String input = scanner.nextLine().trim();
