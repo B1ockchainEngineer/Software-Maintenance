@@ -184,7 +184,6 @@ public class MemberController {
             char yesNo = ValidationUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
 
             if (yesNo == 'Y') {
-                // Let SERVICE handle saving, not controller->repo directly
                 memberService.addMember(member);
 
                 System.out.println("NEW MEMBER ADDED TO THE SYSTEM...");
@@ -266,35 +265,27 @@ public class MemberController {
         if (memberService.getAllMembers().isEmpty()) {
             System.out.println("THERE IS NO MEMBER TO DISPLAY...");
         } else {
-            boolean validChoice = false;
-            while (!validChoice) {
+            while (true){
                 System.out.println("FILTER MEMBER BY MEMBERSHIP TYPE:");
-                System.out.println("1. NORMAL");
-                System.out.println("2. GOLD");
-                System.out.println("3. PREMIUM");
-                System.out.println("E. RETURN TO MENU");
-                System.out.print("ENTER YOUR CHOICE (1, 2, 3, E) > ");
-                Scanner scanner = new Scanner(System.in);
-                String input = scanner.next().trim();
+                for (TierMenu menu : TierMenu.values()){
+                    System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
+                }
+                System.out.print("ENTER YOUR CHOICE > ");
+                int option = ValidationUtil.intValidation(0, 3);
+                TierMenu choice = TierMenu.getByOption(option);
 
-                switch (input.toUpperCase()) {
-                    case "1" -> {
-                        displayMembersByType("Normal");
-                        validChoice = true;
-                    }
-                    case "2" -> {
-                        displayMembersByType("Gold");
-                        validChoice = true;
-                    }
-                    case "3" -> {
-                        displayMembersByType("Premium");
-                        validChoice = true;
-                    }
-                    case "E" -> {
-                        ConsoleUtil.clearScreen();
-                        return;
-                    }
-                    default -> System.out.println("<<<Invalid choice. Please try again.>>>");
+                if (choice == null) {
+                    System.out.println("<<<INVALID OPTION>>>");
+                    ConsoleUtil.systemPause();
+                    continue;
+                }
+
+                switch (choice) {
+                    case NORMAL_MEMBER -> displayMembersByType("Normal");
+                    case GOLD_MEMBER   -> displayMembersByType("Gold");
+                    case PREMIUM_MEMBER -> displayMembersByType("Premium");
+                    case BACK_TO_MEMBER_MENU -> { return; }
+                    default -> System.out.println("<<<INVALID OPTION>>>");
                 }
             }
         }
@@ -346,7 +337,8 @@ public class MemberController {
 
     private void displayMembersByType(String membershipType) {
         System.out.println("---------------------------------------------------------------------------------------");
-        System.out.println("MEMBER ID |MEMBER NAME  |MEMBER HP   |MEMBER TYPE |MEMBER IC");
+        System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
+                "MEMBER ID", "MEMBER NAME", "MEMBER HP", "MEMBER TYPE", "MEMBER IC");
         System.out.println("---------------------------------------------------------------------------------------");
 
         boolean foundMembers = false;
@@ -371,11 +363,14 @@ public class MemberController {
     }
 
     private void printMemberDetails(Membership member) {
-        System.out.println("M-" + member.getId()
-                + "     |" + member.getName()
-                + "  |" + member.getMemberHp()
-                + "  |" + member.getMemberType()
-                + "      |" + member.getIc());
+        String memberId = "M-" + member.getId();
+
+        System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
+                memberId,
+                member.getName(),
+                member.getMemberHp(),
+                member.getMemberType(),
+                member.getIc());
     }
 
 

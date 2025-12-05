@@ -47,8 +47,9 @@ public class MemberRepository {
                 String[] parts = line.split("\t");
 
                 if (parts.length >= 6) {
-                    String memberIC = parts[0];
-                    String memberName = parts[1];
+                    // memberName and memberIC wrong position
+                    String memberName = parts[0];
+                    String memberIC = parts[1];
                     String memberHP = parts[2];
                     int memberId = Integer.parseInt(parts[3]);
                     String membershipType = parts[4];
