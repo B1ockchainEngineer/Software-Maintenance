@@ -141,7 +141,6 @@ public class Staff extends Person {
     public void add() {
         Scanner scanner = new Scanner(System.in);
         String stfName, stfIc, stfPW, confirmPassword;
-        boolean validName;
         int stfAGE;
         double stfSlr;
 
@@ -156,7 +155,7 @@ public class Staff extends Person {
             }while(stfIc == null);
 
             if (staffRepo.existsByIc(stfIc)) {
-                System.out.println("<<<IC already exists in the file. Please re-enter!>>> \n");
+                System.out.println("<<<IC already exists in the file. Please reenter!>>>");
             } else {
                 break; // IC is valid and does not exist in the file
             }
@@ -166,8 +165,12 @@ public class Staff extends Person {
         do {
             System.out.print("ENTER NEW STAFF NAME: ");
             stfName = scanner.nextLine();
-            validName = ValidationUtil.nameValidation(stfName);
-        } while (!validName);
+            if (stfName.matches("^[a-zA-Z ]+$")) {
+                break; // Valid input, exit the loop
+            } else {
+                System.out.println("Invalid input. Please enter a name with alphabet characters only.");
+            }
+        } while (true);
 
         do {
             System.out.print("ENTER NEW PASSWORD (8-16 alphanumeric characters): ");
@@ -178,10 +181,10 @@ public class Staff extends Person {
                 if (stfPW.equals(confirmPassword)) {
                     break; // Valid input and confirmed, exit the loop
                 } else {
-                    System.out.println("<<<Password does not match the confirmation. Please re-enter!>>> \n");
+                    System.out.println("<<<Password does not match the confirmation. Please re-enter!>>>");
                 }
             } else {
-                System.out.println("<<<Invalid input. Please enter a password with 8-16 alphanumeric characters!>>> \n");
+                System.out.println("<<<Invalid input. Please enter a password with 8-16 alphanumeric characters!>>>");
             }
         } while (true);
 
@@ -191,7 +194,7 @@ public class Staff extends Person {
             if (stfAGE >= 18 && stfAGE <= 54) {
                 break; // Valid input, exit the loop
             } else {
-                System.out.println("<<<Invalid input. Please enter an age between 18 and 54!>>> \n");
+                System.out.println("<<<Invalid input. Please enter an age between 18 and 54!>>>");
             }
         } while (true);
 

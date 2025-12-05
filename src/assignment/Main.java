@@ -4,11 +4,8 @@ import assignment.controller.SalesController;
 import assignment.controller.StockController;
 import assignment.controller.MemberController;
 import assignment.controller.StaffController;
-<<<<<<< HEAD
 import assignment.controller.LoginController;
 import assignment.controller.SignupController;
-=======
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 import assignment.model.Staff;
 import assignment.enums.LogMenu;
 import assignment.enums.MainMenu;
@@ -16,18 +13,12 @@ import assignment.enums.OrderMenu;
 import assignment.enums.SalesMenu;
 import assignment.enums.StockMenu;
 import assignment.repo.PaidItemRepository;
-<<<<<<< HEAD
 import assignment.repo.StaffRepository;
-=======
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 import assignment.repo.StockRepository;
 import assignment.repo.TransactionRepository;
 import assignment.service.PaymentService;
 import assignment.service.SalesService;
-<<<<<<< HEAD
 import assignment.service.StaffService;
-=======
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 import assignment.service.StockService;
 import assignment.util.ConsoleUtil; // Utility for logo, clearScreen, pause
 import assignment.util.ValidationUtil; // Utility for input validation
@@ -44,15 +35,12 @@ public class Main {
     private final SalesController salesController;
     private final MemberController memberController;
     private final StaffController staffController;
-<<<<<<< HEAD
     private final LoginController loginController;
     private final SignupController signupController;
     
     // Current logged-in staff
     private Staff currentStaff;
 
-=======
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -61,15 +49,11 @@ public class Main {
 
     // Initialise repository, services and controllers and wire them to this Main
     public Main() {
-<<<<<<< HEAD
         // Stock-related setup
-=======
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
         StockRepository stockRepo = new StockRepository();
         StockService stockService = new StockService(stockRepo);
         this.stockController = new StockController(stockService);
 
-<<<<<<< HEAD
         // Sales-related setup
         SalesService salesService = new SalesService(stockRepo);
         PaidItemRepository paidItemRepo = new PaidItemRepository();
@@ -86,20 +70,6 @@ public class Main {
 
         // Member controller (relies directly on models/utilities)
         this.memberController = new MemberController();
-=======
-        SalesService salesService = new SalesService(stockRepo);
-        
-        // Wire payment-related repositories and services
-        PaidItemRepository paidItemRepo = new PaidItemRepository();
-        TransactionRepository transactionRepo = new TransactionRepository();
-        PaymentService paymentService = new PaymentService(stockRepo, paidItemRepo, transactionRepo);
-        
-        this.salesController = new SalesController(salesService, paymentService);
-
-        // Member and staff controllers rely directly on their models/utilities
-        this.memberController = new MemberController();
-        this.staffController = new StaffController();
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     }
 
     // --- Menu Presentation (Uses Enums) ---
@@ -114,18 +84,11 @@ public class Main {
             System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
         }
         System.out.println("-------------------------------------------------------");
-<<<<<<< HEAD
-=======
-        for (LogMenu menu : LogMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     }
 
     public void menu() {
         System.out.println("[ MAIN MENU ]");
         System.out.println("-------------------------------------------------------");
-<<<<<<< HEAD
         if (currentStaff != null) {
             System.out.println("Logged in as: " + currentStaff.getName().toUpperCase());
             System.out.println("-------------------------------------------------------");
@@ -136,11 +99,6 @@ public class Main {
             System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
         }
         System.out.println("-------------------------------------------------------");
-=======
-        for (MainMenu menu : MainMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     }
 
     public void stockMenu() {
@@ -171,7 +129,6 @@ public class Main {
     }
 
     public void entry() {
-<<<<<<< HEAD
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
@@ -181,19 +138,6 @@ public class Main {
             // Input Validation using ValidationUtil (range 1 to 3)
             int logMenuOpt = ValidationUtil.intValidation(1, 3);
 
-=======
-        String stfIc = null;
-
-        while (true) {
-            ConsoleUtil.clearScreen();
-            ConsoleUtil.logo();
-            logMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
-
-            // Input Validation using ValidationUtil (range 1 to 3)
-            int logMenuOpt = ValidationUtil.intValidation(1, 3);
-
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
             if (logMenuOpt == -9999) {
                 ConsoleUtil.systemPause();
                 continue;
@@ -208,7 +152,6 @@ public class Main {
 
             switch (logSelection) {
                 case SIGN_UP:
-<<<<<<< HEAD
                     // SIGN UP/REGISTRATION - Delegated to SignupController
                     signupController.performSignup();
                     break;
@@ -232,81 +175,6 @@ public class Main {
                     System.out.println("  THANK YOU FOR USING TAR CAFE SYSTEM");
                     System.out.println("========================================");
                     System.out.println("EXITING THE PROGRAM...\n");
-=======
-                    // SIGN UP/REGISTRATION
-                    ConsoleUtil.clearScreen();
-                    ConsoleUtil.logo();
-                    System.out.print("ENTER REGISTRATION CODE OR PRESS 'E' TO RETURN TO THE MENU: ");
-                    String inputCodeOrReturn = ValidationUtil.scanner.nextLine();
-
-                    if (inputCodeOrReturn.equalsIgnoreCase("E")) {
-                        ConsoleUtil.clearScreen();
-                        break;
-                    }
-
-                    try {
-                        int inputCode = Integer.parseInt(inputCodeOrReturn);
-                        int registrationCode = 1234;
-
-                        if (inputCode == registrationCode) {
-                            System.out.println("PROCEEDING TO STAFF REGISTRATION...");
-                            ConsoleUtil.systemPause();
-                            ConsoleUtil.clearScreen();
-                            Staff staff = new Staff();
-                            staff.add();
-                        } else {
-                            System.out.println("<<<INCORRECT ! REGISTRATION DENIED !>>>");
-                            ConsoleUtil.systemPause();
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("<<<INVALID INPUT. REGISTRATION CODE MUST BE A NUMBER.>>>");
-                        ConsoleUtil.systemPause();
-                    }
-                    ConsoleUtil.clearScreen();
-                    break;
-                case LOG_IN:
-                    // LOG IN
-                    ConsoleUtil.clearScreen();
-                    ConsoleUtil.logo();
-                    System.out.println("[ LOG IN ]");
-                    System.out.println("-------------------------------------------------------");
-
-                    // Start a simple loop for retries
-                    // The loop will be exited by return on success or break on exit
-                    while (true) {
-                        // IC LENGTH AND FORMAT VALIDATION
-                        do {
-                            System.out.print("ENTER IC: ");
-                            stfIc = ValidationUtil.digitOnlyValidation(12);
-                        } while (stfIc == null);
-
-                        System.out.print("ENTER PASSWORD: ");
-                        String stfPassword = ValidationUtil.scanner.nextLine();
-
-                        Staff staff = new Staff();
-                        if (staff.login(stfIc, stfPassword)) {
-                            System.out.println("LOGIN SUCCESSFUL!");
-                            ConsoleUtil.systemPause();
-                            ConsoleUtil.clearScreen();
-                            run();
-                            return;
-                        } else {
-                            System.out.println("<<<LOGIN FAILED ! PLEASE TRY AGAIN!>>>\n");
-
-                            System.out.print("PRESS 'E' TO RETURN TO THE LOGMENU OR ANY OTHER KEY TO RETRY: ");
-                            String returnToMenu = ValidationUtil.scanner.nextLine();
-                            if (returnToMenu.equalsIgnoreCase("E")) {
-                                ConsoleUtil.clearScreen();
-                                break; // Exit to the LogMenu ()
-                            }
-                            ConsoleUtil.systemPause();
-                        }
-                    }
-                    break;
-                case EXIT:
-                    // EXIT
-                    System.out.println("EXITING THE PROGRAM...");
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                     System.exit(0);
                     break;
             }
@@ -353,7 +221,6 @@ public class Main {
                     runStock(); // Calls StockController methods
                 }
                 case LOGOUT -> {
-<<<<<<< HEAD
                     // Logout current staff
                     if (currentStaff != null) {
                         loginController.logout();
@@ -361,9 +228,6 @@ public class Main {
                     }
                     System.out.println("\nRETURNING TO LOGIN MENU...");
                     ConsoleUtil.systemPause();
-=======
-                    System.out.println("LOGGING OUT...");
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                     return; // Return to entry loop
                 }
             }

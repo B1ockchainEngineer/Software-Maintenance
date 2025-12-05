@@ -158,6 +158,7 @@ public class ValidationUtil {
             return null;
         }
     }
+<<<<<<< HEAD
 
     public static boolean nameValidation(String name){
         if (name.matches("^[a-zA-Z ]+$")) {
@@ -168,4 +169,6 @@ public class ValidationUtil {
         }
     }
 >>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
+=======
+>>>>>>> parent of 93b2678 (nameValidation (avoid code repetition))
 }

@@ -77,7 +77,6 @@ public abstract class Membership extends Person {
     public void add() {
         Scanner scanner = new Scanner(System.in);
         String memberName, memberHP, memberIC;
-        boolean validName;
 
         Random random = new Random();
         setId((random.nextInt(898) + 100));
@@ -119,8 +118,12 @@ public abstract class Membership extends Person {
             do {
                 System.out.print("ENTER MEMBER NAME: ");
                 memberName = scanner.nextLine();
-                validName = ValidationUtil.nameValidation(memberName);
-            } while (!validName);
+                if (memberName.matches("[a-zA-Z ]+")) {
+                    break;
+                } else {
+                    System.out.println("<<<Invalid. Please enter a valid name!>>>");
+                }
+            } while (true);
 
             // HP
             do {
