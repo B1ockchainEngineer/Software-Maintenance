@@ -21,7 +21,7 @@ public class ValidationUtil {
         }
 
         if(length != input.length()){
-            System.out.print("THE INPUT LENGTH MUST BE IN " + length + " DIGITS!!\n");
+            System.out.println("THE INPUT LENGTH MUST BE IN " + length + " DIGITS!!\n");
             clearScreen();  // matches existing behaviour in intValidation
             return null;
         }
