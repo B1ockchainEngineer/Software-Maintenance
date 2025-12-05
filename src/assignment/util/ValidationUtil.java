@@ -150,4 +150,13 @@ public class ValidationUtil {
             return null;
         }
     }
+
+    public static boolean nameValidation(String name){
+        if (name.matches("^[a-zA-Z ]+$")) {
+            return true;
+        } else {
+            System.out.println("Invalid input. Please enter a name with alphabet characters only. \n");
+            return false;
+        }
+    }
 }
