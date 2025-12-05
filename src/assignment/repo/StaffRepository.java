@@ -159,6 +159,7 @@ public class StaffRepository {
     }
 
     /**
+<<<<<<< HEAD
      * Finds a staff member by IC.
      */
     public Staff findByIc(String ic) {
@@ -282,6 +283,8 @@ public class StaffRepository {
     }
 
     /**
+=======
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
      * Finds a staff by IC and password (for login).
      */
     public Staff findByCredentials(String stfIc, String stfPassword) {

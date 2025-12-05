@@ -2,6 +2,7 @@ package assignment.controller;
 
 import assignment.enums.StaffMenu;
 import assignment.model.Staff;
+<<<<<<< HEAD
 import assignment.service.StaffService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
@@ -18,6 +19,21 @@ public class StaffController {
 
     public StaffController(StaffService staffService) {
         this.staffService = staffService;
+=======
+import assignment.util.ConsoleUtil;
+import assignment.util.ValidationUtil;
+
+/**
+ * Controller for staff-related flows.
+ * Handles staff menu and delegates to Staff model for file operations.
+ */
+public class StaffController {
+
+    private final Staff staff;
+
+    public StaffController() {
+        this.staff = new Staff();
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     }
 
     public void manageStaff() {
@@ -27,7 +43,11 @@ public class StaffController {
             printStaffMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
+<<<<<<< HEAD
             int staffOpt = ValidationUtil.intValidation(0, 5);
+=======
+            int staffOpt = ValidationUtil.intValidation(0, 4);
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 
             if (staffOpt == -9999) {
                 ConsoleUtil.systemPause();
@@ -36,13 +56,18 @@ public class StaffController {
 
             StaffMenu selection = StaffMenu.getByOption(staffOpt);
             if (selection == null) {
+<<<<<<< HEAD
                 System.out.println("<<<INVALID OPTION!>>>");
+=======
+                System.out.println("<<<INVALID OPTION>>>");
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                 ConsoleUtil.systemPause();
                 continue;
             }
 
             switch (selection) {
                 case ADD_STAFF -> {
+<<<<<<< HEAD
                     addStaff();
                 }
                 case UPDATE_STAFF -> {
@@ -59,6 +84,25 @@ public class StaffController {
                 }
                 case BACK_TO_MAIN -> {
                     System.out.println("\nRETURNING TO MAIN MENU...");
+=======
+                    ConsoleUtil.clearScreen();
+                    staff.add();
+                }
+                case DELETE_STAFF -> {
+                    ConsoleUtil.clearScreen();
+                    staff.delete();
+                }
+                case SEARCH_STAFF -> {
+                    ConsoleUtil.clearScreen();
+                    staff.search();
+                }
+                case VIEW_STAFF_LIST -> {
+                    ConsoleUtil.clearScreen();
+                    staff.view();
+                }
+                case BACK_TO_MAIN -> {
+                    System.out.println("BACK TO MAIN MENU...");
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                     ConsoleUtil.systemPause();
                     return;
                 }
@@ -66,6 +110,7 @@ public class StaffController {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Handles adding a new staff member.
      */
@@ -1001,6 +1046,11 @@ public class StaffController {
         System.out.println("Please select an option:");
         System.out.println("-------------------------------------------------------");
         
+=======
+    private void printStaffMenu() {
+        System.out.println("[ STAFF MANAGEMENT SYSTEM ]");
+        System.out.println("-------------------------------------------------------");
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
         for (StaffMenu menu : StaffMenu.values()) {
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
         }

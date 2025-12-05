@@ -1,7 +1,15 @@
 package assignment.model;
+<<<<<<< HEAD
 
 import assignment.repo.MemberRepository;
 import assignment.util.ConsoleUtil;
+=======
+
+import assignment.repo.MemberRepository;
+import assignment.util.ConsoleUtil;
+import assignment.util.ValidationUtil;
+
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -69,6 +77,7 @@ public abstract class Membership extends Person {
     public void add() {
         Scanner scanner = new Scanner(System.in);
         String memberName, memberHP, memberIC;
+        boolean validName;
 
         Random random = new Random();
         setId((random.nextInt(898) + 100));
@@ -82,6 +91,7 @@ public abstract class Membership extends Person {
 
             // IC
             do {
+<<<<<<< HEAD
                 System.out.print("ENTER MEMBER IC: ");
                 memberIC = scanner.nextLine();
                 if (memberIC.matches("\\d{12}")) {
@@ -90,21 +100,27 @@ public abstract class Membership extends Person {
                     } else {
                         break;
                     }
+=======
+                do {
+                    System.out.print("ENTER MEMBER IC: ");
+                    memberIC = ValidationUtil.icValidation();
+                }while(memberIC == null);
+
+                if (icExists("members.txt", memberIC)) {
+                    System.out.println("<<<IC already exists in the file. Please reenter!>>>");
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                 } else {
-                    System.out.println("<<<Invalid. Please enter 12 digits!>>>");
+                    break;
                 }
+
             } while (true);
 
             // Name
             do {
                 System.out.print("ENTER MEMBER NAME: ");
                 memberName = scanner.nextLine();
-                if (memberName.matches("[a-zA-Z ]+")) {
-                    break;
-                } else {
-                    System.out.println("<<<Invalid. Please enter a valid name!>>>");
-                }
-            } while (true);
+                validName = ValidationUtil.nameValidation(memberName);
+            } while (!validName);
 
             // HP
             do {

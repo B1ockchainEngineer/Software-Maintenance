@@ -3,12 +3,38 @@ package assignment.util;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import static assignment.util.ConsoleUtil.clearScreen;
+<<<<<<< HEAD
+=======
+import java.time.LocalDate;
+import java.time.DateTimeException;
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 
 public class ValidationUtil {
     // Shared Scanner instance for the whole application.
     // Exposed as public so legacy code that accesses ValidationUtil.scanner still compiles.
     public static final Scanner scanner = new Scanner(System.in);
 
+<<<<<<< HEAD
+=======
+    public static String digitOnlyValidation(int length) {
+        String input = scanner.nextLine().trim();
+
+        // Check if empty or contains non-digit characters
+        if (input.isEmpty() || !input.matches("\\d+")) {
+            System.out.println("PLEASE ENTER DIGITS ONLY (NO SPACES OR LETTERS).\n");
+            return null;
+        }
+
+        if(length != input.length()){
+            System.out.println("THE INPUT LENGTH MUST BE IN " + length + " DIGITS!!\n");
+            clearScreen();  // matches existing behaviour in intValidation
+            return null;
+        }
+
+        return input;  // valid digit-only string
+    }
+
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     public static int intValidation(int startingNum, int endingNum) {
         int input;
 
@@ -80,4 +106,66 @@ public class ValidationUtil {
 
         return input;
     }
+<<<<<<< HEAD
+=======
+
+    public static String icValidation() {
+        String input = scanner.nextLine().trim();
+
+        // Must be exactly 12 digits
+        if (input.length() != 12 || !input.matches("\\d+")) {
+            System.out.println("<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>\n");
+            return null;
+        }
+
+        try {
+            int yy = Integer.parseInt(input.substring(0, 2));
+            int mm = Integer.parseInt(input.substring(2, 4));
+            int dd = Integer.parseInt(input.substring(4, 6));
+            int pb = Integer.parseInt(input.substring(6, 8));
+
+            // Place of birth: only 01-16 allowed
+            if (pb < 1 || pb > 16) {
+                System.out.println("<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>\n");
+                return null;
+            }
+
+            LocalDate now = LocalDate.now();
+            LocalDate minBirthDateForIC = now.minusYears(12); // anyone born on/after this date +1 day is <12 years old today
+
+            // First try 2000 + yy (21st century)
+            try {
+                LocalDate birthDate20 = LocalDate.of(2000 + yy, mm, dd);
+
+                // If this person is at least 12 years old today to be accepted as 20xx (they can have IC)
+                if (!birthDate20.isAfter(minBirthDateForIC)) {
+                    return input;
+                }
+
+            } catch (DateTimeException ignored) {
+                // Invalid date in 20xx, so force to 19xx
+            }
+
+            // Change to 1900 + yy (20th century)
+            LocalDate birthDate19 = LocalDate.of(1900 + yy, mm, dd);
+            return input;
+
+        } catch (DateTimeException e) {
+            System.out.println("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
+            return null;
+        } catch (Exception e) {
+            System.out.println("<<< INVALID IC FORMAT >>>\n");
+            return null;
+        }
+    }
+
+    public static boolean nameValidation(String name){
+        if (name.matches("^[a-zA-Z ]+$")) {
+            return true;
+        } else {
+            System.out.println("Invalid input. Please enter a name with alphabet characters only. \n");
+            return false;
+        }
+    }
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 }

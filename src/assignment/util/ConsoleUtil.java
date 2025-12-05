@@ -31,7 +31,19 @@ public class ConsoleUtil {
 
     public static void systemPause() {
         System.out.println("\n\t\tPress Enter to continue...");
+<<<<<<< HEAD
         // Use Scanner to avoid buffering conflicts with other Scanner usage
         ValidationUtil.scanner.nextLine();
+=======
+        try {
+            System.in.read();
+            // Consume remaining characters (like newline)
+            if (System.in.available() > 0) {
+                System.in.skip(System.in.available());
+            }
+        } catch(IOException e) {
+            System.err.println("Pause error: " + e.getMessage());
+        }
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     }
 }
