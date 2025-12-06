@@ -1,6 +1,8 @@
 package assignment.model;
 
-<<<<<<< HEAD
+import assignment.repo.StaffRepository;
+import assignment.util.ConsoleUtil;
+import assignment.util.ValidationUtil;
 import java.time.LocalDateTime;
 
 /**
@@ -10,26 +12,8 @@ import java.time.LocalDateTime;
  */
 public class Staff extends Person {
 
-=======
-import assignment.repo.StaffRepository;
-import assignment.util.ConsoleUtil;
-import assignment.util.ValidationUtil;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
-/**
- * Staff domain model with file-based persistence.
- */
-public class Staff extends Person {
-
     private final List<Staff> staffList = new ArrayList<>(); // Store staff in a list
     private static final StaffRepository staffRepo = new StaffRepository();
-
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
     private int stfAge;
     private String stfPassword;
     private double stfSalary;
@@ -101,7 +85,7 @@ public class Staff extends Person {
         this.clockOut = clockOut;
     }
 
-<<<<<<< HEAD
+
     /**
      * Required by Person abstract class.
      * UI logic is handled by StaffController.
@@ -135,8 +119,8 @@ public class Staff extends Person {
      */
     @Override
     public void search() {
-        throw new UnsupportedOperationException("Use StaffController.searchStaff() instead");
-=======
+        throw new UnsupportedOperationException("Use StaffController.searchStaff() instead");}
+
     @Override
     public void add() {
         Scanner scanner = new Scanner(System.in);
@@ -230,66 +214,30 @@ public class Staff extends Person {
         loadStaffFromRepo();
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
+    public void add() {
+        throw new UnsupportedOperationException("Use StaffController.addStaff() instead");
     }
 
-    @Override
+    /**
+     * Required by Person abstract class.
+     * UI logic is handled by StaffController.
+     */
     public void delete() {
-        Scanner scanner = new Scanner(System.in);
-
-        ConsoleUtil.logo();
-        System.out.println("[ DELETE STAFF ]");
-        System.out.println("-------------------------------------------------------");
-
-        System.out.print("ENTER STAFF IC ID TO DELETE (ENTER 'E' TO CANCEL): S-");
-        String staffICToDelete = scanner.nextLine().trim();
-
-        if (staffICToDelete.equalsIgnoreCase("E")) {
-            // User wants to cancel and return to the main menu
-            ConsoleUtil.clearScreen();
-            return;
-        }
-
-        boolean deleted = staffRepo.deleteByIc(staffICToDelete);
-        if (deleted) {
-            System.out.println("STAFF WITH IC " + staffICToDelete + " HAS BEEN DELETED.");
-            loadStaffFromRepo();
-        } else {
-            System.out.println("STAFF WITH IC " + staffICToDelete + " NOT FOUND.");
-        }
-        ConsoleUtil.systemPause();
-        ConsoleUtil.clearScreen();
+        throw new UnsupportedOperationException("Use StaffController.deleteStaff() instead");
     }
 
-    @Override
+    /**
+     * Required by Person abstract class.
+     * UI logic is handled by StaffController.
+     */
     public void view() {
-        loadStaffFromRepo();
-        ConsoleUtil.logo();
-        System.out.println("[ VIEW ALL STAFF ]");
-        System.out.println("-------------------------------------------------------");
-
-        if (staffList.isEmpty()) {
-            System.out.println("THERE IS NO STAFF TO DISPLAY...");
-        } else {
-            System.out.println("---------------------------------------------------------------------------------------");
-            System.out.println("STAFF ID  |STAFF NAME     |STAFF IC      |STAFF AGE |STAFF SALARY |");
-            System.out.println("---------------------------------------------------------------------------------------");
-
-            for (Staff staff : staffList) {
-                System.out.println("M-" + staff.getId()
-                        + "|" + staff.getName()
-                        + "     |" + staff.getIc()
-                        + "  |" + staff.getStfAge()
-                        + "      |" + "RM " + staff.getStfSalary()
-                        + "        |");
-            }
-            System.out.println("---------------------------------------------------------------------------------------");
-        }
-
-        ConsoleUtil.systemPause();
-        ConsoleUtil.clearScreen();
+        throw new UnsupportedOperationException("Use StaffController.viewStaffList() instead");
     }
 
-    @Override
+    /**
+     * Required by Person abstract class.
+     * UI logic is handled by StaffController.
+     */
     public void search() {
         loadStaffFromRepo();
         Scanner scanner = new Scanner(System.in);
@@ -345,7 +293,7 @@ public class Staff extends Person {
         setClockIn(loginTime);
         System.out.println("LOGIN SUCCESSFUL FOR " + getName() + " AT " + loginTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         return true;
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
+        throw new UnsupportedOperationException("Use StaffController.searchStaff() instead");
     }
 
     @Override
@@ -353,10 +301,8 @@ public class Staff extends Person {
         return "\nSTAFF INFO\n-------------\nSTAFF ID >> S-" + getId()
                 + "\nSTAFF NAME: " + getName()
                 + "\nSTAFF IC: " + getIc()
-<<<<<<< HEAD
                 + "\nSTAFF AGE: " + getStfAge()
                 + "\nSTAFF SALARY: RM " + String.format("%.2f", getStfSalary());
-=======
                 + "\nSATFF AGE: " + getStfAge()
                 + "\nSTAFF SALARY: " + getStfSalary();
     }
@@ -364,8 +310,9 @@ public class Staff extends Person {
     private void loadStaffFromRepo() {
         staffList.clear();
         staffList.addAll(staffRepo.loadAllStaff());
->>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
+                + "\nSTAFF AGE: " + getStfAge()
+                + "\nSTAFF SALARY: RM " + String.format("%.2f", getStfSalary());
     }
-}
+}}
 
 

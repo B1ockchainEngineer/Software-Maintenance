@@ -10,8 +10,8 @@ public class GoldMember extends Membership {
     public GoldMember() {
     }
 
-    public GoldMember(String name, String ic, int id, String memberHp, String memberType, double discountRate) {
-        super(name, ic, id, memberHp, memberType, discountRate);
+    public GoldMember(String name, String ic, int id, String memberHp, String memberType) {
+        super(name, ic, id, memberHp, memberType);
     }
 
     public static void setGoldRate(double goldRate) {

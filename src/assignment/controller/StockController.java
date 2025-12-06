@@ -4,48 +4,27 @@ import assignment.model.Stock;
 import assignment.service.StockService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
+import assignment.view.StockView;
 import java.util.List;
 import java.util.Scanner;
 
 public class StockController {
     private final StockService stockService;
-    private final Scanner scanner;
+    private final StockView stockView;
+
 
     public StockController(StockService stockService) {
         this.stockService = stockService;
+        this.stockView = new StockView();
         // Scanner is fine here, as it's primarily used for non-validated string inputs (like confirmation)
-        this.scanner = new Scanner(System.in);
+        // Scanner removed to prevent conflicts
+
     }
 
     public void view() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        System.out.println("         [ VIEW ALL PRODUCTS IN STOCK ]");
-        System.out.println("------------------------------------------------------------------");
-
-        // Header
-        System.out.printf("%-10s      %-25s%-10s  %-10s\n", "PRODUCT ID", "PRODUCT NAME", "QUANTITY", "PRICE");
-        System.out.println("------------------------------------------------------------------");
-
-        List<Stock> stockList = stockService.getAvailableStock();
-        boolean found = false;
-
-        for (Stock product : stockList) {
-            // Display all products, even those with 0 quantity, for inventory view
-            System.out.printf("%-10d      %-25s%-10d  RM%-10.2f\n",
-                    product.getStockID(),
-                    product.getStockName(),
-                    product.getQty(),
-                    product.getPrice());
-            System.out.println("------------------------------------------------------------------");
-            found = true;
-        }
-
-        if (!found) {
-            System.out.println("No products found in the inventory file.");
-            System.out.println("------------------------------------------------------------------");
-        }
-
+        stockView.displayAvailableStock(stockService.getAvailableStock());
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
@@ -56,20 +35,19 @@ public class StockController {
         do {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            System.out.println("[ ADD NEW PRODUCT ]");
-            System.out.println("-------------------------------------------------------");
+            stockView.printAddStockHeader();
 
             Stock newStock = new Stock();
 
             int displayID = stockService.getNextStockID();
-            System.out.println("PRODUCT ID >> P-" + displayID);
+            stockView.printProductID(displayID);
             ConsoleUtil.systemPause();
 
             // 1. Get Product Name
             String inputName;
             do {
                 System.out.print("ENTER PRODUCT NAME [OR 'E' TO Exit]: ");
-                inputName = scanner.nextLine();
+                inputName = ValidationUtil.scanner.nextLine();
 
                 if (inputName.equalsIgnoreCase("E")) {
                     System.out.println("\nEXITING PRODUCT ADDITION");
@@ -116,8 +94,8 @@ public class StockController {
                 }
             } while (true);
 
-            System.out.println("\nPRODUCT INFORMATION:");
-            System.out.println(newStock.toString());
+            // Show Summary
+            stockView.printNewStockSummary(newStock);
 
             // 4. Confirmation and Save
             OUTER:
@@ -128,10 +106,9 @@ public class StockController {
                 switch (confirmation) {
                     case 'Y' -> {
                         if (stockService.addNewStock(newStock)) {
-                            System.out.println("\nNEW PRODUCT ADDED TO THE SYSTEM...");
-                            System.out.println("---------------------------------------------------");
+                            stockView.printAddSuccess();
                         } else {
-                            System.out.println("\nFAILED TO ADD PRODUCT! Check service logs.");
+                            stockView.printAddFailure();
                         }
                         break OUTER;
                     }
@@ -146,7 +123,7 @@ public class StockController {
 
             // 5. Ask to continue
             System.out.print("\nDO YOU WANT TO ADD ANOTHER PRODUCT? (Y FOR YES, ANY KEY TO EXIT): ");
-            String continueInput = scanner.nextLine().toUpperCase();
+            String continueInput = ValidationUtil.scanner.nextLine().toUpperCase();
 
             if (!continueInput.equals("Y")) {
                 System.out.println("EXITING PRODUCT ADDITION...");
@@ -164,8 +141,7 @@ public class StockController {
         do {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            System.out.println("[ DELETE A PRODUCT ]");
-            System.out.println("-------------------------------------------------------");
+            stockView.printDeleteStockMenu();
             continueDelete = true;
 
             System.out.print("ENTER PRODUCT ID TO BE DELETED [OR '0' TO EXIT]: ");
@@ -180,29 +156,26 @@ public class StockController {
             Stock productToDelete = stockService.getStockByID(inputID);
 
             if (productToDelete != null) {
-                System.out.println("-------------------------------------------------------");
-                System.out.println("PRODUCT INFORMATION TO BE DELETED:");
-                System.out.println(productToDelete.toString());
-                System.out.println("-------------------------------------------------------");
+                stockView.displayStockDetails(productToDelete);
 
                 System.out.print("ARE YOU SURE YOU WANT TO DELETE THIS PRODUCT? (Y = YES, N = CANCEL): ");
                 char confirm = ValidationUtil.charValidation();
 
                 if (confirm == 'Y') {
                     if (stockService.deleteStock(inputID)) {
-                        System.out.println("PRODUCT WITH ID " + inputID + " HAS BEEN DELETED");
+                        stockView.printDeleteSuccess(inputID);
                     } else {
-                        System.out.println("PRODUCT DELETION FAILED.");
+                        stockView.printDeleteFailure();
                     }
                 } else {
                     System.out.println("DELETION CANCELLED.");
                 }
             } else {
-                System.out.println("PRODUCT WITH ID " + inputID + " NOT FOUND");
+                stockView.printStockNotFound(inputID);
             }
 
             System.out.print("\nDO YOU WANT TO DELETE ANOTHER PRODUCT? (Y FOR YES, ANY KEY TO EXIT): ");
-            String input = scanner.nextLine().toUpperCase();
+            String input = ValidationUtil.scanner.nextLine().toUpperCase();
 
             if (!input.equals("Y")) {
                 System.out.println("EXITING PRODUCT DELETION");

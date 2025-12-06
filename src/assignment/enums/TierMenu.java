@@ -1,17 +1,15 @@
 package assignment.enums;
 
-public enum MemberMenu {
-    BACK_TO_MAIN(0, "BACK TO PREVIOUS MENU"),
-    ADD_MEMBER(1, "ADD NEW MEMBER"),
-    DELETE_MEMBER(2, "DELETE MEMBER"),
-    EDIT_MEMBER(3, "EDIT MEMBER"),
-    SEARCH_MEMBER(4, "SEARCH MEMBER"),
-    VIEW_MEMBER_LIST(5, "VIEW REGISTERED MEMBER LIST");
+public enum TierMenu {
+    BACK_TO_MEMBER_MENU(0, "BACK TO MEMBER MENU"),
+    NORMAL_MEMBER(1, "NORMAL MEMBER"),
+    GOLD_MEMBER(2, "GOLD MEMBER"),
+    PREMIUM_MEMBER(3, "PREMIUM MEMBER");
 
     private final int option;
     private final String description;
 
-    MemberMenu(int option, String description) {
+    TierMenu(int option, String description) {
         this.option = option;
         this.description = description;
     }
@@ -24,8 +22,8 @@ public enum MemberMenu {
         return description;
     }
 
-    public static MemberMenu getByOption(int opt) {
-        for (MemberMenu menu : values()) {
+    public static TierMenu getByOption(int opt) {
+        for (TierMenu menu : values()) {
             if (menu.option == opt) {
                 return menu;
             }
@@ -33,5 +31,3 @@ public enum MemberMenu {
         return null;
     }
 }
-
-
