@@ -35,6 +35,20 @@ public class MemberService {
         return true;
     }
 
+    public Membership findMemberById(int memberId) {
+        for (Membership member : memberRepo.loadAllMembers()) {
+            if (member.getId() == memberId) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    // Save the entire list back to file
+    public void saveAllMembers() {
+        memberRepo.saveAllMembers(memberRepo.loadAllMembers());
+    }
+
     /**
      * Deletes a member by ID. Returns true if deleted.
      */

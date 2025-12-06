@@ -58,6 +58,10 @@ public class MemberController {
                     ConsoleUtil.clearScreen();
                     delete();
                 }
+                case EDIT_MEMBER -> {
+                    ConsoleUtil.clearScreen();
+                    edit();
+                }
                 case SEARCH_MEMBER -> {
                     ConsoleUtil.clearScreen();
                     search();
@@ -334,6 +338,141 @@ public class MemberController {
         System.out.println();
         ConsoleUtil.clearScreen();
     }
+
+    public void edit() {
+        ConsoleUtil.clearScreen();
+        ConsoleUtil.logo();
+        System.out.println("[ EDIT MEMBER ]");
+        System.out.println("-------------------------------------------------------");
+
+        System.out.print("ENTER MEMBER ID (e.g. 741 or M-741): ");
+        String rawId = scanner.nextLine().trim();
+
+        int memberId;
+        try {
+            if (rawId.toUpperCase().startsWith("M-")) {
+                memberId = Integer.parseInt(rawId.substring(2));
+            } else {
+                memberId = Integer.parseInt(rawId);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("<<< INVALID MEMBER ID FORMAT >>>");
+            ConsoleUtil.systemPause();
+            return;
+        }
+
+        // Ask service to find the member
+        Membership member = memberService.findMemberById(memberId);
+
+        if (member == null) {
+            System.out.println("<<< MEMBER NOT FOUND >>>");
+            ConsoleUtil.systemPause();
+            return;
+        }
+
+        // Show current details
+        System.out.println("CURRENT MEMBER DETAILS:");
+        System.out.println("-------------------------------------------------------");
+        printMemberDetails(member);
+        System.out.println("-------------------------------------------------------");
+
+        boolean done = false;
+        while (!done) {
+            System.out.println("WHAT DO YOU WANT TO EDIT?");
+            System.out.println("1. MEMBER NAME");
+            System.out.println("2. MEMBER HP");
+            System.out.println("3. MEMBER IC");
+            System.out.println("4. MEMBER TYPE");
+            System.out.println("0. BACK");
+            System.out.print("YOUR CHOICE: ");
+
+            int choice = ValidationUtil.intValidation(0, 4);
+
+            switch (choice) {
+                case 1 -> { // Edit name
+                    String newName;
+                    boolean validName;
+                    do {
+                        System.out.print("ENTER NEW MEMBER NAME: ");
+                        newName = scanner.nextLine();
+                        validName = ValidationUtil.nameValidation(newName);
+                    } while (!validName);
+
+                    member.setName(newName);
+                    System.out.println("<<< MEMBER NAME UPDATED >>>");
+                }
+                case 2 -> { // Edit HP
+                    String newHp;
+                    do {
+                        System.out.print("ENTER NEW MEMBER HP (10–11 digits): ");
+                        newHp = scanner.nextLine();
+                        if (newHp.matches("\\d{10,11}")) {
+                            break;
+                        } else {
+                            System.out.println("<<<Invalid input. Please enter a 10 or 11-digit number!>>>");
+                        }
+                    } while (true);
+
+                    member.setMemberHp(newHp);
+                    System.out.println("<<< MEMBER HP UPDATED >>>");
+                }
+                case 3 -> { // Edit IC
+                    String newIc;
+                    do {
+                        System.out.print("ENTER NEW MEMBER IC: ");
+                        newIc = ValidationUtil.icValidation();
+                        if (newIc == null) continue;
+
+                        // check IC used by another member
+                        if (memberService.icExists(newIc, member.getIc())) {
+                            System.out.println("<<<IC already exists for another member. Please reenter!>>>");
+                        } else {
+                            break;
+                        }
+                    } while (true);
+
+                    member.setIc(newIc);
+                    System.out.println("<<< MEMBER IC UPDATED >>>");
+                }
+                case 4 -> { // Edit member type
+                    System.out.println("SELECT NEW MEMBER TYPE:");
+                    System.out.println("1. NORMAL");
+                    System.out.println("2. GOLD");
+                    System.out.println("3. PREMIUM");
+                    System.out.print("YOUR CHOICE: ");
+
+                    int typeOpt = ValidationUtil.intValidation(1, 3);
+                    switch (typeOpt) {
+                        case 1 -> member.setMemberType("Normal");
+                        case 2 -> member.setMemberType("Gold");
+                        case 3 -> member.setMemberType("Premium");
+                    }
+                    System.out.println("<<< MEMBER TYPE UPDATED >>>");
+                }
+                case 0 -> done = true;
+            }
+
+            if (!done) {
+                System.out.println("-------------------------------------------------------");
+                System.out.println("UPDATED MEMBER DETAILS:");
+                printMemberDetails(member);
+                System.out.println("-------------------------------------------------------");
+
+                System.out.print("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO): ");
+                char more = Character.toUpperCase(ValidationUtil.charValidation());
+                if (more == 'N') {
+                    done = true;
+                }
+            }
+        }
+
+        // Persist all changes via service
+        memberService.saveAllMembers();
+        System.out.println("<<< MEMBER DETAILS SAVED >>>");
+        ConsoleUtil.systemPause();
+        ConsoleUtil.clearScreen();
+    }
+
 
     private void displayMembersByType(String membershipType) {
         System.out.println("---------------------------------------------------------------------------------------");

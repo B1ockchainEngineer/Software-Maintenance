@@ -94,6 +94,32 @@ public class MemberRepository {
     }
 
     /**
+     * Saves the particular member's info back into the file.
+     */
+
+    public void saveAllMembers(List<Membership> members) {
+        ensureFileExists();
+
+        try (FileWriter fw = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
+            for (Membership member : members) {
+                String line =
+                        member.getName() + "\t" +
+                                member.getIc() + "\t" +
+                                member.getMemberHp() + "\t" +
+                                member.getId() + "\t" +
+                                member.getMemberType() + "\t" +
+                                member.getDiscountRate() +
+                                System.lineSeparator();
+
+                fw.write(line);
+            }
+        } catch (IOException e) {
+            System.out.println("<<< ERROR SAVING MEMBERS: " + e.getMessage() + " >>>");
+        }
+    }
+
+
+    /**
      * Deletes a member by ID, returns true if a record was removed.
      */
     public boolean deleteById(int memberIdToDelete) {
