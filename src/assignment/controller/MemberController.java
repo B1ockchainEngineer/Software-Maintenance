@@ -25,7 +25,8 @@ import java.util.Scanner;
  */
 public class MemberController {
 
-    private final Scanner scanner = new Scanner(System.in);
+    //Scanner removed to prevent conflicts
+
     private final MemberService memberService;
     private final MemberView memberView;
 
@@ -158,7 +159,7 @@ public class MemberController {
 
         do {
             System.out.println("Press enter key to continue...");
-            scanner.nextLine(); // consume newline
+            ValidationUtil.scanner.nextLine(); // consume newline
 
             // IC
             do {
@@ -176,7 +177,7 @@ public class MemberController {
             // Name
             do {
                 System.out.print("ENTER MEMBER NAME: ");
-                memberName = scanner.nextLine();
+                memberName = ValidationUtil.scanner.nextLine();
                 validName = MemberUtil.nameValidation(memberName);
             } while (!validName);
 
@@ -185,6 +186,7 @@ public class MemberController {
                 System.out.print("ENTER MEMBER HP: ");
                 memberHP = MemberUtil.hpValidation();
             } while (memberHP == null);
+            
             // Set values on the object
 
             member.setIc(memberIC);

@@ -11,13 +11,14 @@ import java.util.Scanner;
 public class StockController {
     private final StockService stockService;
     private final StockView stockView;
-    private final Scanner scanner;
+
 
     public StockController(StockService stockService) {
         this.stockService = stockService;
         this.stockView = new StockView();
         // Scanner is fine here, as it's primarily used for non-validated string inputs (like confirmation)
-        this.scanner = new Scanner(System.in);
+        // Scanner removed to prevent conflicts
+
     }
 
     public void view() {
@@ -46,7 +47,7 @@ public class StockController {
             String inputName;
             do {
                 System.out.print("ENTER PRODUCT NAME [OR 'E' TO Exit]: ");
-                inputName = scanner.nextLine();
+                inputName = ValidationUtil.scanner.nextLine();
 
                 if (inputName.equalsIgnoreCase("E")) {
                     System.out.println("\nEXITING PRODUCT ADDITION");
@@ -122,7 +123,7 @@ public class StockController {
 
             // 5. Ask to continue
             System.out.print("\nDO YOU WANT TO ADD ANOTHER PRODUCT? (Y FOR YES, ANY KEY TO EXIT): ");
-            String continueInput = scanner.nextLine().toUpperCase();
+            String continueInput = ValidationUtil.scanner.nextLine().toUpperCase();
 
             if (!continueInput.equals("Y")) {
                 System.out.println("EXITING PRODUCT ADDITION...");
@@ -174,7 +175,7 @@ public class StockController {
             }
 
             System.out.print("\nDO YOU WANT TO DELETE ANOTHER PRODUCT? (Y FOR YES, ANY KEY TO EXIT): ");
-            String input = scanner.nextLine().toUpperCase();
+            String input = ValidationUtil.scanner.nextLine().toUpperCase();
 
             if (!input.equals("Y")) {
                 System.out.println("EXITING PRODUCT DELETION");
