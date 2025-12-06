@@ -420,7 +420,7 @@ public class MemberController {
                     boolean validName;
                     do {
                         System.out.print("ENTER NEW MEMBER NAME: ");
-                        newName = scanner.nextLine();
+                        newName = ValidationUtil.scanner.nextLine();
                         validName = MemberUtil.nameValidation(newName);
                     } while (!validName);
 
