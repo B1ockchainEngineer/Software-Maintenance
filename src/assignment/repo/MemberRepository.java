@@ -57,9 +57,9 @@ public class MemberRepository {
                     String membershipType = parts[4];
 
                     Membership member = switch (membershipType) {
-                        case "Normal" -> new NormalMember(memberName, memberIC, memberId, memberHP, membershipType);
-                        case "Gold" -> new GoldMember(memberName, memberIC, memberId, memberHP, membershipType);
-                        case "Premium" -> new PremiumMember(memberName, memberIC, memberId, memberHP, membershipType);
+                        case MemberConfig.MEMBER_TYPE_NORMAL -> new NormalMember(memberName, memberIC, memberId, memberHP, membershipType);
+                        case MemberConfig.MEMBER_TYPE_GOLD -> new GoldMember(memberName, memberIC, memberId, memberHP, membershipType);
+                        case MemberConfig.MEMBER_TYPE_PREMIUM -> new PremiumMember(memberName, memberIC, memberId, memberHP, membershipType);
                         default -> null;
                     };
 

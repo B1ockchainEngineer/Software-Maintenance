@@ -17,6 +17,11 @@ public class MemberConfig {
     public static final String TITLE_SEARCH_MEMBER   = "[ SEARCH MEMBER BY ID ]";
     public static final String TITLE_EDIT_MEMBER     = "[ EDIT MEMBER ]";
 
+    // ================== MEMBER TYPES ==================
+    public static final String MEMBER_TYPE_NORMAL  = "Normal";
+    public static final String MEMBER_TYPE_GOLD    = "Gold";
+    public static final String MEMBER_TYPE_PREMIUM = "Premium";
+
     // ================== NESTED ERROR MESSAGE CLASS ==================
     public static final class ErrorMessage {
 
@@ -29,8 +34,6 @@ public class MemberConfig {
                 "Error reading members file";
         public static final String FILE_WRITE_ERROR =
                 "Error writing member record";
-        public static final String FILE_SAVE_ERROR =
-                "Error saving member records";
         public static final String FILE_DELETE_ERROR =
                 "Error finalizing member deletion.";
 

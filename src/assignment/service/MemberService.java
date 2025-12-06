@@ -3,7 +3,6 @@ package assignment.service;
 import assignment.model.Membership;
 import assignment.repo.MemberRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

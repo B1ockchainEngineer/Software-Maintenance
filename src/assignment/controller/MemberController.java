@@ -119,22 +119,22 @@ public class MemberController {
             }
 
             switch (userChoice) {
-                case BACK_TO_MEMBER_MENU -> { return; }
                 case NORMAL_MEMBER -> {
                     NormalMember normalMember = new NormalMember();
-                    normalMember.setMemberType("Normal");
+                    normalMember.setMemberType(MemberConfig.MEMBER_TYPE_NORMAL);
                     handleAddMember(normalMember);
                 }
                 case GOLD_MEMBER   -> {
                     GoldMember goldMember = new GoldMember();
-                    goldMember.setMemberType("Gold");
+                    goldMember.setMemberType(MemberConfig.MEMBER_TYPE_GOLD);
                     handleAddMember(goldMember);
                 }
                 case PREMIUM_MEMBER -> {
                     PremiumMember premiumMember = new PremiumMember();
-                    premiumMember.setMemberType("Premium");
+                    premiumMember.setMemberType(MemberConfig.MEMBER_TYPE_PREMIUM);
                     handleAddMember(premiumMember);
                 }
+                case BACK_TO_MEMBER_MENU -> { return; }
             }
 
             System.out.print("ADD MORE MEMBER? (Y = YES , N = NO): ");
@@ -313,9 +313,9 @@ public class MemberController {
 
                 switch (choice) {
                     case BACK_TO_MEMBER_MENU -> { return; }
-                    case NORMAL_MEMBER -> displayMembersByType("Normal");
-                    case GOLD_MEMBER   -> displayMembersByType("Gold");
-                    case PREMIUM_MEMBER -> displayMembersByType("Premium");
+                    case NORMAL_MEMBER -> displayMembersByType(MemberConfig.MEMBER_TYPE_NORMAL);
+                    case GOLD_MEMBER   -> displayMembersByType(MemberConfig.MEMBER_TYPE_GOLD);
+                    case PREMIUM_MEMBER -> displayMembersByType(MemberConfig.MEMBER_TYPE_PREMIUM);
                     default -> System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 }
             }
@@ -421,7 +421,6 @@ public class MemberController {
             }
 
             switch (userEditChoice) {
-                case BACK_TO_PREVIOUS_MENU -> done = true;  // Back
                 case MEMBER_NAME -> { // Edit name
                     String newName;
                     boolean validName;
@@ -487,18 +486,19 @@ public class MemberController {
                     switch (userChoice) {
                         case NORMAL_MEMBER -> {
                             NormalMember normalMember = new NormalMember();
-                            normalMember.setMemberType("Normal");
+                            normalMember.setMemberType(MemberConfig.MEMBER_TYPE_NORMAL);
                         }
                         case GOLD_MEMBER   -> {
                             GoldMember goldMember = new GoldMember();
-                            goldMember.setMemberType("Gold");
+                            goldMember.setMemberType(MemberConfig.MEMBER_TYPE_GOLD);
                         }
                         case PREMIUM_MEMBER -> {
                             PremiumMember premiumMember = new PremiumMember();
-                            premiumMember.setMemberType("Premium");
+                            premiumMember.setMemberType(MemberConfig.MEMBER_TYPE_PREMIUM);
                         }
                     }
                 }
+                case BACK_TO_PREVIOUS_MENU -> done = true;  // Back
             }
 
             if (!done) {
@@ -552,13 +552,13 @@ public class MemberController {
         boolean foundMembers = false;
 
         for (Membership member : memberService.getAllMembers()) {
-            if (membershipType.equals("Normal") && member instanceof NormalMember) {
+            if (membershipType.equals(MemberConfig.MEMBER_TYPE_NORMAL) && member instanceof NormalMember) {
                 printMemberDetails(member);
                 foundMembers = true;
-            } else if (membershipType.equals("Gold") && member instanceof GoldMember) {
+            } else if (membershipType.equals(MemberConfig.MEMBER_TYPE_GOLD) && member instanceof GoldMember) {
                 printMemberDetails(member);
                 foundMembers = true;
-            } else if (membershipType.equals("Premium") && member instanceof PremiumMember) {
+            } else if (membershipType.equals(MemberConfig.MEMBER_TYPE_PREMIUM) && member instanceof PremiumMember) {
                 printMemberDetails(member);
                 foundMembers = true;
             }
