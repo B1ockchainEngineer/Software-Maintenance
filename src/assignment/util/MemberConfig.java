@@ -48,8 +48,6 @@ public class MemberConfig {
                 "<<<Invalid HP. Must start with '01'. Enter 11 digits for 011 prefix, or 10 digits for others.>>>";
         public static final String INVALID_OPTION =
                 "<<<INVALID OPTION>>>";
-        public static final String INVALID_CHOICE =
-                "<<<Invalid choice. Please try again.>>>";
 
         // Generic formatted error (for exceptions)
         public static final String SAVE_MEMBERS_FAILED_TEMPLATE =

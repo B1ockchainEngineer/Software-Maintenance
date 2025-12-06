@@ -7,6 +7,11 @@ import java.time.LocalDate;
 import assignment.util.ValidationUtil;
 
 public class MemberUtil {
+    /**
+     * Helper to validate IC input.
+     * Checks for length, numeric format, and valid date of birth.
+     * Returns valid IC string or null if invalid.
+     */
     public static String icValidation() {
         String input = ValidationUtil.scanner.nextLine().trim();
 
@@ -58,6 +63,10 @@ public class MemberUtil {
         }
     }
 
+    /**
+     * Checks if the name contains only alphabet characters.
+     * Returns true if valid, false otherwise.
+     */
     public static boolean nameValidation(String name){
         if (name.matches("^[a-zA-Z ]+$")) {
             return true;
@@ -67,6 +76,11 @@ public class MemberUtil {
         }
     }
 
+    /**
+     * Validates Malaysian phone number format.
+     * Must start with '01'.
+     * Returns valid string or null if invalid.
+     */
     public static String hpValidation() {
         String data = ValidationUtil.scanner.nextLine().trim();
 
@@ -94,6 +108,10 @@ public class MemberUtil {
         return null;
     }
 
+    /**
+     * Asks a Yes/No question and gets user input.
+     * Returns 'Y' or 'N'.
+     */
     public static char confirmValidation(String question){
         char yesNo;
         do {

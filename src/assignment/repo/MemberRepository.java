@@ -25,6 +25,10 @@ public class MemberRepository {
 
     private static final Logger LOGGER = Logger.getLogger(MemberRepository.class.getName());
 
+    /**
+     * Checks if the file exists.
+     * Creates a new file if it does not exist.
+     */
     private void ensureFileExists() {
         File file = new File(MemberConfig.MEMBER_FILE_PATH);
         if (!file.exists()) {
@@ -37,7 +41,8 @@ public class MemberRepository {
     }
 
     /**
-     * Loads all members from the file into a list of Membership instances.
+     * Reads all members from the text file.
+     * Returns a list of Membership objects.
      */
     public List<Membership> loadAllMembers() {
         ensureFileExists();
@@ -76,7 +81,7 @@ public class MemberRepository {
     }
 
     /**
-     * Appends a new member record to the file.
+     * Adds a new member to the end of the file.
      */
     public void appendMember(Membership member) {
         ensureFileExists();
@@ -95,7 +100,8 @@ public class MemberRepository {
     }
 
     /**
-     * Saves the particular member's info back into the file.
+     * Saves the list of members to the file.
+     * This overwrites all existing data in the file.
      */
 
     public void saveAllMembers(List<Membership> members) {
@@ -120,7 +126,8 @@ public class MemberRepository {
 
 
     /**
-     * Deletes a member by ID, returns true if a record was removed.
+     * Deletes a member from the file by their ID.
+     * Returns true if the member was deleted.
      */
     public boolean deleteById(int memberIdToDelete) {
         ensureFileExists();
@@ -162,7 +169,8 @@ public class MemberRepository {
     }
 
     /**
-     * Checks whether a member IC already exists in the file.
+     * Checks if an IC number is already in the file.
+     * Returns true if found, false otherwise.
      */
     public boolean existsByIc(String targetIC) {
         ensureFileExists();

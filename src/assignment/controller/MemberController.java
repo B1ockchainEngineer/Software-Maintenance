@@ -32,6 +32,10 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    /**
+     * Main loop for the member management system.
+     * Shows the menu and handles user selection.
+     */
     public void manageMembers() {
         while (true) {
             ConsoleUtil.clearScreen();
@@ -101,6 +105,9 @@ public class MemberController {
         System.out.println("-------------------------------------------------------");
     }
 
+    /**
+     * Shows a menu to choose member type and registers a new member.
+     */
     private void add() {
         while (true) {
             ConsoleUtil.clearScreen();
@@ -146,6 +153,9 @@ public class MemberController {
     }
 
 
+    /**
+     * Collects details (IC, Name, HP) and saves the member.
+     */
     private void handleAddMember(Membership member) {
         String memberName, memberHP, memberIC;
         boolean validName;
@@ -214,6 +224,10 @@ public class MemberController {
         } while (true);
     }
 
+    /**
+     * Handles the logic to delete a member.
+     * Asks for ID and confirms deletion.
+     */
     public void delete() {
         Scanner scanner = new Scanner(System.in);
 
@@ -266,6 +280,9 @@ public class MemberController {
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Displays all members or filters them by type.
+     */
     public void view() {
         int option;
         ConsoleUtil.logo();
@@ -311,6 +328,9 @@ public class MemberController {
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Searches for a member by their 3-digit ID.
+     */
     public void search() {
         Scanner scanner = new Scanner(System.in);
         ConsoleUtil.logo();
@@ -351,6 +371,9 @@ public class MemberController {
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Allows editing of member details (Name, HP, IC, Type).
+     */
     public void edit() {
         String rawId;
         List<Membership> memberList = memberService.getAllMembers();
@@ -524,6 +547,9 @@ public class MemberController {
         System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
     }
 
+    /**
+     * Filters and shows members of a specific type (Normal, Gold, Premium).
+     */
     private void displayMembersByType(String membershipType) {
         System.out.println("---------------------------------------------------------------------------------------");
         System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
