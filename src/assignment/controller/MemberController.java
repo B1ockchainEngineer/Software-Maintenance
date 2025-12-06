@@ -1,5 +1,6 @@
 package assignment.controller;
 
+import assignment.enums.MemberEditMenu;
 import assignment.enums.TierMenu;
 import assignment.enums.MemberMenu;
 import assignment.model.GoldMember;
@@ -8,9 +9,9 @@ import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
 import assignment.service.MemberService;
 import assignment.util.ConsoleUtil;
+import assignment.util.MemberUtil;
 import assignment.util.ValidationUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -92,7 +93,6 @@ public class MemberController {
 
     private void printTierMenu(){
 
-        System.out.println("[ REGISTER MEMBER ]");
         System.out.println("-------------------------------------------------------");
         for (TierMenu menu : TierMenu.values()){
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
@@ -104,6 +104,7 @@ public class MemberController {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
+            System.out.println("[ REGISTER MEMBER ]");
             printTierMenu();
             System.out.print("YOUR CHOICE: ");
 
@@ -117,6 +118,7 @@ public class MemberController {
             }
 
             switch (userChoice) {
+                case BACK_TO_MEMBER_MENU -> { return; }
                 case NORMAL_MEMBER -> {
                     NormalMember normalMember = new NormalMember();
                     normalMember.setMemberType("Normal");
@@ -132,8 +134,6 @@ public class MemberController {
                     premiumMember.setMemberType("Premium");
                     handleAddMember(premiumMember);
                 }
-                case BACK_TO_MEMBER_MENU -> { return; }
-                default -> System.out.println("<<<INVALID OPTION>>>");
             }
 
             System.out.print("ADD MORE MEMBER? (Y = YES , N = NO): ");
@@ -168,7 +168,7 @@ public class MemberController {
             do {
                 do {
                     System.out.print("ENTER MEMBER IC: ");
-                    memberIC = ValidationUtil.icValidation();
+                    memberIC = MemberUtil.icValidation();
                 } while (memberIC == null);
                 if (memberService.icExists(memberIC)) {
                     System.out.println("<<<IC already exists in the file. Please reenter!>>>");
@@ -181,7 +181,7 @@ public class MemberController {
             do {
                 System.out.print("ENTER MEMBER NAME: ");
                 memberName = scanner.nextLine();
-                validName = ValidationUtil.nameValidation(memberName);
+                validName = MemberUtil.nameValidation(memberName);
             } while (!validName);
 
             // HP
@@ -203,7 +203,7 @@ public class MemberController {
 
             System.out.println("---------------------------------------------------");
             System.out.println("ARE YOU CONFIRM THE MEMBER DETAILS ABOVE ARE CORRECT ?");
-            char yesNo = ValidationUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
+            char yesNo = MemberUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
 
             if (yesNo == 'Y') {
                 memberService.addMember(member);
@@ -260,7 +260,7 @@ public class MemberController {
                 System.out.println("MEMBER TYPE >> " + target.getMemberType());
                 System.out.println("-------------------------------------------------------");
                 // Use confirm validation to eliminate redundancy
-                char confirm = ValidationUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
+                char confirm = MemberUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
 
                 if (confirm == 'Y') {
                     boolean deleted = memberService.deleteMemberById(memberIdToDelete);
@@ -280,6 +280,7 @@ public class MemberController {
     }
 
     public void view() {
+        int option;
         ConsoleUtil.logo();
         System.out.println("[ VIEW ALL MEMBERS ]");
         System.out.println("-------------------------------------------------------");
@@ -293,7 +294,14 @@ public class MemberController {
                     System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
                 }
                 System.out.print("ENTER YOUR CHOICE > ");
-                int option = ValidationUtil.intValidation(0, 3);
+
+                option = ValidationUtil.intValidation(0, 3);
+
+                if (option == -9999) {
+                    ConsoleUtil.systemPause();
+                    continue;
+                }
+
                 TierMenu choice = TierMenu.getByOption(option);
 
                 if (choice == null) {
@@ -303,10 +311,10 @@ public class MemberController {
                 }
 
                 switch (choice) {
+                    case BACK_TO_MEMBER_MENU -> { return; }
                     case NORMAL_MEMBER -> displayMembersByType("Normal");
                     case GOLD_MEMBER   -> displayMembersByType("Gold");
                     case PREMIUM_MEMBER -> displayMembersByType("Premium");
-                    case BACK_TO_MEMBER_MENU -> { return; }
                     default -> System.out.println("<<<INVALID OPTION>>>");
                 }
             }
@@ -359,6 +367,7 @@ public class MemberController {
     public void edit() {
         String rawId;
         List<Membership> memberList = memberService.getAllMembers();
+        int typeOption;
 
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
@@ -385,43 +394,46 @@ public class MemberController {
         System.out.println();
         System.out.println("CURRENT MEMBER DETAILS:");
         System.out.println("-------------------------------------------------------");
-        System.out.println("MEMBER ID >> M-" + memberFound.getId());
-        System.out.println("MEMBER IC >> " + memberFound.getIc());
-        System.out.println("MEMBER NAME >> " + memberFound.getName());
-        System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
-        System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
+        displayMemberDetails(memberFound);
         System.out.println("-------------------------------------------------------");
         System.out.println();
 
         boolean done = false;
         while (!done) {
             System.out.println("WHAT DO YOU WANT TO EDIT?");
-            System.out.println("1. MEMBER NAME");
-            System.out.println("2. MEMBER HP");
-            System.out.println("3. MEMBER IC");
-            System.out.println("4. MEMBER TYPE");
-            System.out.println("0. BACK");
+            printEditMenu();
             System.out.print("YOUR CHOICE: ");
 
-            int choice;
-            do {
-                choice = ValidationUtil.intValidation(0, 4);
-            } while (choice == -9999);
+            int option = ValidationUtil.intValidation(0, 4);
 
-            switch (choice) {
-                case 1 -> { // Edit name
+            if (option == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            MemberEditMenu userEditChoice = MemberEditMenu.getByOption(option);
+
+            if (userEditChoice == null) {
+                System.out.println("<<<INVALID OPTION>>>");
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (userEditChoice) {
+                case BACK_TO_PREVIOUS_MENU -> done = true;  // Back
+                case MEMBER_NAME -> { // Edit name
                     String newName;
                     boolean validName;
                     do {
                         System.out.print("ENTER NEW MEMBER NAME: ");
                         newName = scanner.nextLine();
-                        validName = ValidationUtil.nameValidation(newName);
+                        validName = MemberUtil.nameValidation(newName);
                     } while (!validName);
 
                     memberFound.setName(newName);
                     System.out.println("<<< MEMBER NAME UPDATED >>>");
                 }
-                case 2 -> { // Edit HP
+                case MEMBER_HP -> { // Edit HP
                     String newHp;
                     do {
                         System.out.print("ENTER NEW MEMBER HP (10–11 digits): ");
@@ -436,11 +448,11 @@ public class MemberController {
                     memberFound.setMemberHp(newHp);
                     System.out.println("<<< MEMBER HP UPDATED >>>");
                 }
-                case 3 -> { // Edit IC
+                case MEMBER_IC -> { // Edit IC
                     String newIc;
                     do {
                         System.out.print("ENTER NEW MEMBER IC: ");
-                        newIc = ValidationUtil.icValidation();
+                        newIc = MemberUtil.icValidation();
                         if (newIc == null) continue;
 
                         // check IC used by another member
@@ -454,35 +466,47 @@ public class MemberController {
                     memberFound.setIc(newIc);
                     System.out.println("<<< MEMBER IC UPDATED >>>");
                 }
-                case 4 -> { // Edit member type
+                case MEMBER_TYPE -> { // Edit member type
                     System.out.println("SELECT NEW MEMBER TYPE:");
-                    System.out.println("1. NORMAL");
-                    System.out.println("2. GOLD");
-                    System.out.println("3. PREMIUM");
+                    printTierMenu();
                     System.out.print("YOUR CHOICE: ");
 
-                    int typeOpt = ValidationUtil.intValidation(1, 3);
-                    switch (typeOpt) {
-                        case 1 -> memberFound.setMemberType("Normal");
-                        case 2 -> memberFound.setMemberType("Gold");
-                        case 3 -> memberFound.setMemberType("Premium");
+                    do {
+                        typeOption = ValidationUtil.intValidation(1, 3);
+                    } while (typeOption == -9999);
+
+                    TierMenu userChoice = TierMenu.getByOption(typeOption);
+
+                    if (userChoice == null) {
+                        System.out.println("<<<INVALID OPTION>>>");
+                        ConsoleUtil.systemPause();
+                        continue;
                     }
-                    System.out.println("<<< MEMBER TYPE UPDATED >>>");
+
+                    switch (userChoice) {
+                        case NORMAL_MEMBER -> {
+                            NormalMember normalMember = new NormalMember();
+                            normalMember.setMemberType("Normal");
+                        }
+                        case GOLD_MEMBER   -> {
+                            GoldMember goldMember = new GoldMember();
+                            goldMember.setMemberType("Gold");
+                        }
+                        case PREMIUM_MEMBER -> {
+                            PremiumMember premiumMember = new PremiumMember();
+                            premiumMember.setMemberType("Premium");
+                        }
+                    }
                 }
-                case 0 -> done = true;
             }
 
             if (!done) {
                 System.out.println("-------------------------------------------------------");
                 System.out.println("UPDATED MEMBER DETAILS:");
-                System.out.println("MEMBER ID >> M-" + memberFound.getId());
-                System.out.println("MEMBER IC >> " + memberFound.getIc());
-                System.out.println("MEMBER NAME >> " + memberFound.getName());
-                System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
-                System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
+                displayMemberDetails(memberFound);
                 System.out.println("-------------------------------------------------------");
 
-                char more = ValidationUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
+                char more = MemberUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
                 if (more == 'N') {
                     done = true;
                 }
@@ -501,6 +525,22 @@ public class MemberController {
         ConsoleUtil.clearScreen();
     }
 
+    private void printEditMenu(){
+
+        System.out.println("-------------------------------------------------------");
+        for (MemberEditMenu menu : MemberEditMenu.values()){
+            System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
+        }
+        System.out.println("-------------------------------------------------------");
+    }
+
+    private void displayMemberDetails(Membership memberFound){
+        System.out.println("MEMBER ID >> M-" + memberFound.getId());
+        System.out.println("MEMBER IC >> " + memberFound.getIc());
+        System.out.println("MEMBER NAME >> " + memberFound.getName());
+        System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
+        System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
+    }
 
     private void displayMembersByType(String membershipType) {
         System.out.println("---------------------------------------------------------------------------------------");

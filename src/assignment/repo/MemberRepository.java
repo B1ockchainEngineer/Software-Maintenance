@@ -178,24 +178,6 @@ public class MemberRepository {
         }
         return false;
     }
-
-
-    public boolean existsById(String generatedIC) {
-        ensureFileExists();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(MEMBER_FILE_PATH))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\t");
-                if (parts[3].equals(generatedIC)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading members file", e);
-        }
-        return false;
-    }
 }
 
 
