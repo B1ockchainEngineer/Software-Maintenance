@@ -55,7 +55,7 @@ public class MemberConfig {
         public static final String DELETE_FAILED =
                 "Failed to delete member from file.";
         public static final String DELETE_CANCELLED_OR_NOT_FOUND =
-                "MEMBER WITH ID M-%d NOT FOUND OR DELETION CANCELLED.";
+                "MEMBER WITH ID M-%d NOT FOUND.";
         public static final String INVALID_MEMBER_ID_FORMAT =
                 "<<<Invalid input. Please enter a valid member ID or 'E' to cancel.>>>";
         public static final String IC_ALREADY_EXISTS_OTHER =

@@ -16,7 +16,6 @@ import assignment.view.MemberView;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 
 /**
@@ -216,14 +215,13 @@ public class MemberController {
      * Asks for ID and confirms deletion.
      */
     public void delete() {
-        Scanner scanner = new Scanner(System.in);
 
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_DELETE_MEMBER);
         System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER MEMBER ID TO DELETE (ENTER 'E' TO CANCEL): M-");
-        String input = scanner.nextLine().trim();
+        String input = ValidationUtil.scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
             ConsoleUtil.clearScreen();
@@ -317,13 +315,12 @@ public class MemberController {
      * Searches for a member by their 3-digit ID.
      */
     public void search() {
-        Scanner scanner = new Scanner(System.in);
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_SEARCH_MEMBER);
         System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER MEMBER ID TO SEARCH (3 DIGIT ONLY) OR 'E' TO CANCEL: M-");
-        String input = scanner.nextLine().trim();
+        String input = ValidationUtil.scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
             ConsoleUtil.clearScreen();
