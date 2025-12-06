@@ -67,6 +67,33 @@ public class MemberUtil {
         }
     }
 
+    public static String hpValidation() {
+        String data = ValidationUtil.scanner.nextLine().trim();
+
+        if (!data.matches("\\d+")) {
+            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+            return null;
+        }
+
+        if (!data.startsWith("01")) {
+            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+            return null;
+        }
+
+        if (data.startsWith("011")) {
+            if (data.length() == 11) {
+                return data;
+            }
+        } else {
+            if (data.length() == 10) {
+                return data;
+            }
+        }
+
+        System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+        return null;
+    }
+
     public static char confirmValidation(String question){
         char yesNo;
         do {

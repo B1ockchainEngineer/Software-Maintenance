@@ -188,14 +188,8 @@ public class MemberController {
             // HP
             do {
                 System.out.print("ENTER MEMBER HP: ");
-                memberHP = scanner.nextLine();
-
-                if (memberHP.matches("\\d{10,11}")) {
-                    break;
-                } else {
-                    System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
-                }
-            } while (true);
+                memberHP = MemberUtil.hpValidation();
+            } while (memberHP == null);
             // Set values on the object
 
             member.setIc(memberIC);
@@ -211,11 +205,7 @@ public class MemberController {
 
                 System.out.println(MemberConfig.SuccessfulMessage.MEMBER_ADDED);
                 System.out.println("---------------------------------------------------");
-                System.out.println("MEMBER ID >> " + member.getId());
-                System.out.println("MEMBER IC >> " + member.getIc());
-                System.out.println("MEMBER NAME >> " + member.getName());
-                System.out.println("MEMBER HP >> " + member.getMemberHp());
-                System.out.println("MEMBER TYPE >> " + member.getMemberType());
+                displayMemberDetails(member);
                 System.out.println("---------------------------------------------------");
                 System.out.println();
 
@@ -254,11 +244,7 @@ public class MemberController {
                 System.out.println(String.format(MemberConfig.ErrorMessage.DELETE_CANCELLED_OR_NOT_FOUND, memberIdToDelete));
             } else {
                 System.out.println("Member Details to Delete:");
-                System.out.println("MEMBER ID >> " + target.getId());
-                System.out.println("MEMBER IC >> " + target.getIc());
-                System.out.println("MEMBER NAME >> " + target.getName());
-                System.out.println("MEMBER HP >> " + target.getMemberHp());
-                System.out.println("MEMBER TYPE >> " + target.getMemberType());
+                displayMemberDetails(target);
                 System.out.println("-------------------------------------------------------");
                 // Use confirm validation to eliminate redundancy
                 char confirm = MemberUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
@@ -437,13 +423,8 @@ public class MemberController {
                     String newHp;
                     do {
                         System.out.print("ENTER NEW MEMBER HP (10–11 digits): ");
-                        newHp = scanner.nextLine();
-                        if (newHp.matches("\\d{10,11}")) {
-                            break;
-                        } else {
-                            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
-                        }
-                    } while (true);
+                        newHp = MemberUtil.hpValidation();
+                    } while (newHp == null);
 
                     memberFound.setMemberHp(newHp);
                     System.out.println(MemberConfig.SuccessfulMessage.MEMBER_HP_UPDATED);

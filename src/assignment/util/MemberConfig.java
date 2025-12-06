@@ -45,7 +45,7 @@ public class MemberConfig {
         public static final String IC_ALREADY_EXISTS =
                 "<<<IC already exists in the file. Please reenter!>>>";
         public static final String INVALID_HP =
-                "<<<Invalid input. Please enter a 10 or 11-digit number!>>>";
+                "<<<Invalid HP. Must start with '01'. Enter 11 digits for 011 prefix, or 10 digits for others.>>>";
         public static final String INVALID_OPTION =
                 "<<<INVALID OPTION>>>";
         public static final String INVALID_CHOICE =
