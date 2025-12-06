@@ -300,7 +300,6 @@ public class MemberController {
 
     public void search() {
         Scanner scanner = new Scanner(System.in);
-
         ConsoleUtil.logo();
         System.out.println("[ SEARCH MEMBER BY ID ]");
         System.out.println("-------------------------------------------------------");
@@ -340,41 +339,39 @@ public class MemberController {
     }
 
     public void edit() {
+        String rawId;
+
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
         System.out.println("[ EDIT MEMBER ]");
         System.out.println("-------------------------------------------------------");
+        do {
+            System.out.print("ENTER MEMBER ID (e.g. 741 ): M-");
+            rawId = ValidationUtil.digitOnlyValidation(3);
+        } while (rawId == null);
 
-        System.out.print("ENTER MEMBER ID (e.g. 741 or M-741): ");
-        String rawId = scanner.nextLine().trim();
-
-        int memberId;
-        try {
-            if (rawId.toUpperCase().startsWith("M-")) {
-                memberId = Integer.parseInt(rawId.substring(2));
-            } else {
-                memberId = Integer.parseInt(rawId);
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("<<< INVALID MEMBER ID FORMAT >>>");
-            ConsoleUtil.systemPause();
-            return;
-        }
+        int memberId = Integer.parseInt(rawId);
 
         // Ask service to find the member
-        Membership member = memberService.findMemberById(memberId);
+        Membership memberFound = memberService.findMemberById(memberId);
 
-        if (member == null) {
+        if (memberFound == null) {
             System.out.println("<<< MEMBER NOT FOUND >>>");
             ConsoleUtil.systemPause();
             return;
         }
 
         // Show current details
+        System.out.println();
         System.out.println("CURRENT MEMBER DETAILS:");
         System.out.println("-------------------------------------------------------");
-        printMemberDetails(member);
+        System.out.println("MEMBER ID >> M-" + memberFound.getId());
+        System.out.println("MEMBER IC >> " + memberFound.getIc());
+        System.out.println("MEMBER NAME >> " + memberFound.getName());
+        System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
+        System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
         System.out.println("-------------------------------------------------------");
+        System.out.println();
 
         boolean done = false;
         while (!done) {
@@ -386,7 +383,10 @@ public class MemberController {
             System.out.println("0. BACK");
             System.out.print("YOUR CHOICE: ");
 
-            int choice = ValidationUtil.intValidation(0, 4);
+            int choice;
+            do {
+                choice = ValidationUtil.intValidation(0, 4);
+            } while (choice == -9999);
 
             switch (choice) {
                 case 1 -> { // Edit name
@@ -398,7 +398,7 @@ public class MemberController {
                         validName = ValidationUtil.nameValidation(newName);
                     } while (!validName);
 
-                    member.setName(newName);
+                    memberFound.setName(newName);
                     System.out.println("<<< MEMBER NAME UPDATED >>>");
                 }
                 case 2 -> { // Edit HP
@@ -413,7 +413,7 @@ public class MemberController {
                         }
                     } while (true);
 
-                    member.setMemberHp(newHp);
+                    memberFound.setMemberHp(newHp);
                     System.out.println("<<< MEMBER HP UPDATED >>>");
                 }
                 case 3 -> { // Edit IC
@@ -424,14 +424,14 @@ public class MemberController {
                         if (newIc == null) continue;
 
                         // check IC used by another member
-                        if (memberService.icExists(newIc, member.getIc())) {
+                        if (memberService.icExists(newIc, memberFound.getIc())) {
                             System.out.println("<<<IC already exists for another member. Please reenter!>>>");
                         } else {
                             break;
                         }
                     } while (true);
 
-                    member.setIc(newIc);
+                    memberFound.setIc(newIc);
                     System.out.println("<<< MEMBER IC UPDATED >>>");
                 }
                 case 4 -> { // Edit member type
@@ -443,9 +443,9 @@ public class MemberController {
 
                     int typeOpt = ValidationUtil.intValidation(1, 3);
                     switch (typeOpt) {
-                        case 1 -> member.setMemberType("Normal");
-                        case 2 -> member.setMemberType("Gold");
-                        case 3 -> member.setMemberType("Premium");
+                        case 1 -> memberFound.setMemberType("Normal");
+                        case 2 -> memberFound.setMemberType("Gold");
+                        case 3 -> memberFound.setMemberType("Premium");
                     }
                     System.out.println("<<< MEMBER TYPE UPDATED >>>");
                 }
@@ -455,7 +455,11 @@ public class MemberController {
             if (!done) {
                 System.out.println("-------------------------------------------------------");
                 System.out.println("UPDATED MEMBER DETAILS:");
-                printMemberDetails(member);
+                System.out.println("MEMBER ID >> M-" + memberFound.getId());
+                System.out.println("MEMBER IC >> " + memberFound.getIc());
+                System.out.println("MEMBER NAME >> " + memberFound.getName());
+                System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
+                System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
                 System.out.println("-------------------------------------------------------");
 
                 System.out.print("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO): ");
@@ -467,7 +471,7 @@ public class MemberController {
         }
 
         // Persist all changes via service
-        memberService.saveAllMembers();
+        memberService.saveMemberInfo(memberFound);
         System.out.println("<<< MEMBER DETAILS SAVED >>>");
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();

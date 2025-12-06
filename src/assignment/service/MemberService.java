@@ -45,8 +45,8 @@ public class MemberService {
     }
 
     // Save the entire list back to file
-    public void saveAllMembers() {
-        memberRepo.saveAllMembers(memberRepo.loadAllMembers());
+    public void saveMemberInfo(Membership editMember) {
+        memberRepo.saveEditMember(editMember);
     }
 
     /**

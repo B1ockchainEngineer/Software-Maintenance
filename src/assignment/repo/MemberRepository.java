@@ -97,22 +97,17 @@ public class MemberRepository {
      * Saves the particular member's info back into the file.
      */
 
-    public void saveAllMembers(List<Membership> members) {
+    public void saveEditMember(Membership member) {
         ensureFileExists();
 
-        try (FileWriter fw = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
-            for (Membership member : members) {
-                String line =
-                        member.getName() + "\t" +
-                                member.getIc() + "\t" +
-                                member.getMemberHp() + "\t" +
-                                member.getId() + "\t" +
-                                member.getMemberType() + "\t" +
-                                member.getDiscountRate() +
-                                System.lineSeparator();
-
-                fw.write(line);
-            }
+        try (FileWriter writer = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
+            writer.write(member.getName() + "\t");
+            writer.write(member.getIc() + "\t");
+            writer.write(member.getMemberHp() + "\t");
+            writer.write(member.getId() + "\t");
+            writer.write(member.getMemberType() + "\t");
+            writer.write(member.calDiscount() + "\t");
+            writer.write("\n");
         } catch (IOException e) {
             System.out.println("<<< ERROR SAVING MEMBERS: " + e.getMessage() + " >>>");
         }
