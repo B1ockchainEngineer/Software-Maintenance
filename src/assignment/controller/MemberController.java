@@ -1,8 +1,8 @@
 package assignment.controller;
 
 import assignment.enums.MemberEditMenu;
-import assignment.enums.TierMenu;
 import assignment.enums.MemberMenu;
+import assignment.enums.TierMenu;
 import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
@@ -12,6 +12,7 @@ import assignment.util.ConsoleUtil;
 import assignment.util.MemberConfig;
 import assignment.util.MemberUtil;
 import assignment.util.ValidationUtil;
+import assignment.view.MemberView;
 
 import java.util.List;
 import java.util.Random;
@@ -26,10 +27,12 @@ public class MemberController {
 
     private final Scanner scanner = new Scanner(System.in);
     private final MemberService memberService;
+    private final MemberView memberView;
 
     // Constructor injection
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
+        this.memberView = new MemberView();
     }
 
     /**
@@ -40,7 +43,7 @@ public class MemberController {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            printMemberMenu();
+            memberView.printMemberMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int memberOpt = ValidationUtil.intValidation(0, 5);
@@ -87,24 +90,6 @@ public class MemberController {
         }
     }
 
-    private void printMemberMenu() {
-        System.out.println(MemberConfig.TITLE_MEMBER_SYSTEM);
-        System.out.println("-------------------------------------------------------");
-        for (MemberMenu menu : MemberMenu.values()) {
-            System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    private void printTierMenu(){
-
-        System.out.println("-------------------------------------------------------");
-        for (TierMenu menu : TierMenu.values()){
-            System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
     /**
      * Shows a menu to choose member type and registers a new member.
      */
@@ -113,7 +98,7 @@ public class MemberController {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             System.out.println(MemberConfig.TITLE_REGISTER_MEMBER);
-            printTierMenu();
+            memberView.printTierMenu();
             System.out.print("YOUR CHOICE: ");
 
             int option = ValidationUtil.intValidation(0, 4);
@@ -215,7 +200,7 @@ public class MemberController {
 
                 System.out.println(MemberConfig.SuccessfulMessage.MEMBER_ADDED);
                 System.out.println("---------------------------------------------------");
-                displayMemberDetails(member);
+                memberView.displayMemberDetails(member);
                 System.out.println("---------------------------------------------------");
                 System.out.println();
 
@@ -258,7 +243,7 @@ public class MemberController {
                 System.out.println(String.format(MemberConfig.ErrorMessage.DELETE_CANCELLED_OR_NOT_FOUND, memberIdToDelete));
             } else {
                 System.out.println("Member Details to Delete:");
-                displayMemberDetails(target);
+                memberView.displayMemberDetails(target);
                 System.out.println("-------------------------------------------------------");
                 // Use confirm validation to eliminate redundancy
                 char confirm = MemberUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
@@ -294,9 +279,7 @@ public class MemberController {
         } else {
             while (true){
                 System.out.println("FILTER MEMBER BY MEMBERSHIP TYPE:");
-                for (TierMenu menu : TierMenu.values()){
-                    System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
-                }
+                memberView.printTierMenu();
                 System.out.print("ENTER YOUR CHOICE > ");
 
                 option = ValidationUtil.intValidation(0, 3);
@@ -316,9 +299,9 @@ public class MemberController {
 
                 switch (choice) {
                     case BACK_TO_MEMBER_MENU -> { return; }
-                    case NORMAL_MEMBER -> displayMembersByType(MemberConfig.MEMBER_TYPE_NORMAL);
-                    case GOLD_MEMBER   -> displayMembersByType(MemberConfig.MEMBER_TYPE_GOLD);
-                    case PREMIUM_MEMBER -> displayMembersByType(MemberConfig.MEMBER_TYPE_PREMIUM);
+                    case NORMAL_MEMBER -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_NORMAL);
+                    case GOLD_MEMBER   -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_GOLD);
+                    case PREMIUM_MEMBER -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_PREMIUM);
                     default -> System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 }
             }
@@ -404,14 +387,14 @@ public class MemberController {
         System.out.println();
         System.out.println("CURRENT MEMBER DETAILS:");
         System.out.println("-------------------------------------------------------");
-        displayMemberDetails(memberFound);
+        memberView.displayMemberDetails(memberFound);
         System.out.println("-------------------------------------------------------");
         System.out.println();
 
         boolean done = false;
         while (!done) {
             System.out.println("WHAT DO YOU WANT TO EDIT?");
-            printEditMenu();
+            memberView.printEditMenu();
             System.out.print("YOUR CHOICE: ");
 
             int option = ValidationUtil.intValidation(0, 4);
@@ -472,7 +455,7 @@ public class MemberController {
                 }
                 case MEMBER_TYPE -> { // Edit member type
                     System.out.println("SELECT NEW MEMBER TYPE:");
-                    printTierMenu();
+                    memberView.printTierMenu();
                     System.out.print("YOUR CHOICE: ");
 
                     do {
@@ -508,7 +491,7 @@ public class MemberController {
             if (!done) {
                 System.out.println("-------------------------------------------------------");
                 System.out.println("UPDATED MEMBER DETAILS:");
-                displayMemberDetails(memberFound);
+                memberView.displayMemberDetails(memberFound);
                 System.out.println("-------------------------------------------------------");
 
                 char more = MemberUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
@@ -529,65 +512,6 @@ public class MemberController {
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
-
-    private void printEditMenu(){
-
-        System.out.println("-------------------------------------------------------");
-        for (MemberEditMenu menu : MemberEditMenu.values()){
-            System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    private void displayMemberDetails(Membership memberFound){
-        System.out.println("MEMBER ID >> M-" + memberFound.getId());
-        System.out.println("MEMBER IC >> " + memberFound.getIc());
-        System.out.println("MEMBER NAME >> " + memberFound.getName());
-        System.out.println("MEMBER HP >> " + memberFound.getMemberHp());
-        System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
-    }
-
-    /**
-     * Filters and shows members of a specific type (Normal, Gold, Premium).
-     */
-    private void displayMembersByType(String membershipType) {
-        System.out.println("---------------------------------------------------------------------------------------");
-        System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
-                "MEMBER ID", "MEMBER NAME", "MEMBER HP", "MEMBER TYPE", "MEMBER IC");
-        System.out.println("---------------------------------------------------------------------------------------");
-
-        boolean foundMembers = false;
-
-        for (Membership member : memberService.getAllMembers()) {
-            if (membershipType.equals(MemberConfig.MEMBER_TYPE_NORMAL) && member instanceof NormalMember) {
-                printMemberDetails(member);
-                foundMembers = true;
-            } else if (membershipType.equals(MemberConfig.MEMBER_TYPE_GOLD) && member instanceof GoldMember) {
-                printMemberDetails(member);
-                foundMembers = true;
-            } else if (membershipType.equals(MemberConfig.MEMBER_TYPE_PREMIUM) && member instanceof PremiumMember) {
-                printMemberDetails(member);
-                foundMembers = true;
-            }
-        }
-
-        if (!foundMembers) {
-            System.out.println(String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType));
-        }
-        System.out.println("---------------------------------------------------------------------------------------");
-    }
-
-    private void printMemberDetails(Membership member) {
-        String memberId = "M-" + member.getId();
-
-        System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
-                memberId,
-                member.getName(),
-                member.getMemberHp(),
-                member.getMemberType(),
-                member.getIc());
-    }
-
 
 }
 

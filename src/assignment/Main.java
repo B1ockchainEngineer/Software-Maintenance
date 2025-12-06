@@ -1,5 +1,6 @@
 package assignment;
 
+import assignment.view.MainView;
 import assignment.controller.SalesController;
 import assignment.controller.StockController;
 import assignment.controller.MemberController;
@@ -32,6 +33,8 @@ public class Main {
     private final LoginController loginController;
     private final SignupController signupController;
 
+    private final MainView mainView;
+
     // Current logged-in staff
     private Staff currentStaff;
 
@@ -43,6 +46,8 @@ public class Main {
 
     // Initialise repository, services and controllers and wire them to this Main
     public Main() {
+        this.mainView = new MainView();
+
         // Stock-related setup
         StockRepository stockRepo = new StockRepository();
         StockService stockService = new StockService(stockRepo);
@@ -68,67 +73,11 @@ public class Main {
         this.memberController = new MemberController(memberService);
     }
 
-    // --- Menu Presentation (Uses Enums) ---
-
-    public void logMenu() {
-        System.out.println("[ LOGIN MENU ]");
-        System.out.println("-------------------------------------------------------");
-        System.out.println("Welcome to TAR CAFE Management System");
-        System.out.println("Please select an option:");
-        System.out.println("-------------------------------------------------------");
-        for (LogMenu menu : LogMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    public void menu() {
-        System.out.println("[ MAIN MENU ]");
-        System.out.println("-------------------------------------------------------");
-        if (currentStaff != null) {
-            System.out.println("Logged in as: " + currentStaff.getName().toUpperCase());
-            System.out.println("-------------------------------------------------------");
-        }
-        System.out.println("Please select an option:");
-        System.out.println("-------------------------------------------------------");
-        for (MainMenu menu : MainMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    public void stockMenu() {
-        System.out.println("[ FOOD AND BEVERAGE MANAGEMENT SYSTEM ]");
-        System.out.println("-------------------------------------------------------");
-        for (StockMenu menu : StockMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    public void salesMenu() {
-        System.out.println("[ SALES MANAGEMENT SYSTEM ]");
-        System.out.println("-------------------------------------------------------");
-        for (SalesMenu menu : SalesMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
-    public void createOrderMenu() {
-        System.out.println("[ ORDERING MANAGEMENT]");
-        System.out.println("-------------------------------------------------------");
-        for (OrderMenu menu : OrderMenu.values()) {
-            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
-        }
-        System.out.println("-------------------------------------------------------");
-    }
-
     public void entry() {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            logMenu();
+            mainView.printLoginMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             // Input Validation using ValidationUtil (range 1 to 3)
@@ -167,10 +116,7 @@ public class Main {
                     // EXIT
                     ConsoleUtil.clearScreen();
                     ConsoleUtil.logo();
-                    System.out.println("\n========================================");
-                    System.out.println("  THANK YOU FOR USING TAR CAFE SYSTEM");
-                    System.out.println("========================================");
-                    System.out.println("EXITING THE PROGRAM...\n");
+                    mainView.printExitMessage();
                     System.exit(0);
                     break;
             }
@@ -181,7 +127,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            menu();
+            mainView.printMainMenu(currentStaff);
             System.out.print("ENTER YOUR SELECTION: ");
 
             // Max option is 4 (STOCK_MANAGEMENT)
@@ -222,7 +168,7 @@ public class Main {
                         loginController.logout();
                         currentStaff = null;
                     }
-                    System.out.println("\nRETURNING TO LOGIN MENU...");
+                    mainView.printLoggedOutMessage();
                     ConsoleUtil.systemPause();
                     return; // Return to entry loop
                 }
@@ -235,7 +181,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            stockMenu();
+            mainView.printStockMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int stockOpt = ValidationUtil.intValidation(0, 3);
@@ -258,7 +204,7 @@ public class Main {
                 case DELETE_PRODUCT -> stockController.delete();
                 case VIEW_PRODUCT_LIST -> stockController.view();
                 case BACK_TO_MAIN -> {
-                    System.out.println("BACK TO MAIN MENU...");
+                    mainView.printBackToMainMessage();
                     ConsoleUtil.systemPause();
                     return;
                 }
@@ -271,7 +217,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            salesMenu();
+            mainView.printSalesMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int salesOpt = ValidationUtil.intValidation(0, 2);
@@ -297,7 +243,7 @@ public class Main {
                     transactionRecord();
                 }
                 case BACK_TO_MAIN -> {
-                    System.out.println("BACK TO MAIN MENU...");
+                    mainView.printBackToMainMessage();
                     ConsoleUtil.systemPause();
                     return; // Exit sales loop
                 }
@@ -310,7 +256,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            createOrderMenu();
+            mainView.printCreateOrderMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int orderOpt = ValidationUtil.intValidation(0, 5);
@@ -337,59 +283,19 @@ public class Main {
                     salesController.makePayment();
                 }
                 case BACK_TO_PREVIOUS -> {
-                    System.out.println("BACK TO PREVIOUS PAGE...");
+                    mainView.printBackToPreviousMessage();
                     return; // Exit order loop
                 }
             }
         }
     }
 
-    public static void transactionRecord() {
+    public void transactionRecord() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        System.out.println("[ TRANSACTION REPORT ]");
-        System.out.println("-------------------------------------------------------");
-
         TransactionRepository transactionRepo = new TransactionRepository();
         java.util.List<TransactionRepository.Transaction> transactions = transactionRepo.loadAllTransactions();
-
-        if (transactions.isEmpty()) {
-            System.out.println("NO TRANSACTIONS FOUND.");
-        } else {
-            System.out.printf("%-10s %-15s %-15s %-15s %-15s\n", "NO.", "SUBTOTAL", "DISCOUNT", "TAX", "TOTAL");
-            System.out.println("-------------------------------------------------------");
-
-            int transactionNo = 1;
-            double grandTotalSubtotal = 0.0;
-            double grandTotalDiscount = 0.0;
-            double grandTotalTax = 0.0;
-            double grandTotal = 0.0;
-
-            for (TransactionRepository.Transaction transaction : transactions) {
-                System.out.printf("%-10d RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n",
-                        transactionNo++,
-                        transaction.getSubtotal(),
-                        transaction.getDiscount(),
-                        transaction.getTax(),
-                        transaction.getTotal());
-
-                grandTotalSubtotal += transaction.getSubtotal();
-                grandTotalDiscount += transaction.getDiscount();
-                grandTotalTax += transaction.getTax();
-                grandTotal += transaction.getTotal();
-            }
-
-            System.out.println("-------------------------------------------------------");
-            System.out.printf("%-10s RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n",
-                    "TOTAL:",
-                    grandTotalSubtotal,
-                    grandTotalDiscount,
-                    grandTotalTax,
-                    grandTotal);
-            System.out.println("-------------------------------------------------------");
-            System.out.println("TOTAL TRANSACTIONS: " + transactions.size());
-        }
-
+        mainView.printTransactionReport(transactions);
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
