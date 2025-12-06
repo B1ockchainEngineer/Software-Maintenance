@@ -10,6 +10,8 @@ import assignment.service.MemberService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -35,7 +37,7 @@ public class MemberController {
             printMemberMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
-            int memberOpt = ValidationUtil.intValidation(0, 4);
+            int memberOpt = ValidationUtil.intValidation(0, 5);
 
             if (memberOpt == -9999) {
                 ConsoleUtil.systemPause();
@@ -115,9 +117,21 @@ public class MemberController {
             }
 
             switch (userChoice) {
-                case NORMAL_MEMBER -> handleAddMember(new NormalMember());
-                case GOLD_MEMBER   -> handleAddMember(new GoldMember());
-                case PREMIUM_MEMBER -> handleAddMember(new PremiumMember());
+                case NORMAL_MEMBER -> {
+                    NormalMember normalMember = new NormalMember();
+                    normalMember.setMemberType("Normal");
+                    handleAddMember(normalMember);
+                }
+                case GOLD_MEMBER   -> {
+                    GoldMember goldMember = new GoldMember();
+                    goldMember.setMemberType("Gold");
+                    handleAddMember(goldMember);
+                }
+                case PREMIUM_MEMBER -> {
+                    PremiumMember premiumMember = new PremiumMember();
+                    premiumMember.setMemberType("Premium");
+                    handleAddMember(premiumMember);
+                }
                 case BACK_TO_MEMBER_MENU -> { return; }
                 default -> System.out.println("<<<INVALID OPTION>>>");
             }
@@ -134,9 +148,14 @@ public class MemberController {
     private void handleAddMember(Membership member) {
         String memberName, memberHP, memberIC;
         boolean validName;
+        int randomNumber;
 
         Random random = new Random();
-        member.setId(random.nextInt(898) + 100);
+        do {
+            randomNumber = random.nextInt(898) + 100;
+        } while (memberService.checkIdExists(randomNumber));
+
+        member.setId(randomNumber);
 
         System.out.println("MEMBER ID >> M-" + member.getId());
         System.out.println("[THIS IS YOUR MEMBER ID]");
@@ -151,8 +170,7 @@ public class MemberController {
                     System.out.print("ENTER MEMBER IC: ");
                     memberIC = ValidationUtil.icValidation();
                 } while (memberIC == null);
-
-                if (memberService.icExists("members.txt", memberIC)) {
+                if (memberService.icExists(memberIC)) {
                     System.out.println("<<<IC already exists in the file. Please reenter!>>>");
                 } else {
                     break;
@@ -177,8 +195,8 @@ public class MemberController {
                     System.out.println("<<<Invalid input. Please enter a 10 or 11-digit number!>>>");
                 }
             } while (true);
-
             // Set values on the object
+
             member.setIc(memberIC);
             member.setName(memberName);
             member.setMemberHp(memberHP);
@@ -340,6 +358,7 @@ public class MemberController {
 
     public void edit() {
         String rawId;
+        List<Membership> memberList = memberService.getAllMembers();
 
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
@@ -354,6 +373,7 @@ public class MemberController {
 
         // Ask service to find the member
         Membership memberFound = memberService.findMemberById(memberId);
+        int memberIndexNo = memberService.findMemberIndexById(memberList, memberId);
 
         if (memberFound == null) {
             System.out.println("<<< MEMBER NOT FOUND >>>");
@@ -424,8 +444,8 @@ public class MemberController {
                         if (newIc == null) continue;
 
                         // check IC used by another member
-                        if (memberService.icExists(newIc, memberFound.getIc())) {
-                            System.out.println("<<<IC already exists for another member. Please reenter!>>>");
+                        if (memberService.icExists(newIc)){
+                            System.out.println("<<<IC already exists for another m1ember. Please reenter!>>>");
                         } else {
                             break;
                         }
@@ -462,16 +482,20 @@ public class MemberController {
                 System.out.println("MEMBER TYPE >> " + memberFound.getMemberType());
                 System.out.println("-------------------------------------------------------");
 
-                System.out.print("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO): ");
-                char more = Character.toUpperCase(ValidationUtil.charValidation());
+                char more = ValidationUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
                 if (more == 'N') {
                     done = true;
                 }
             }
         }
 
+        memberList.get(memberIndexNo).setName(memberFound.getName());
+        memberList.get(memberIndexNo).setIc(memberFound.getIc());
+        memberList.get(memberIndexNo).setMemberHp(memberFound.getMemberHp());
+        memberList.get(memberIndexNo).setMemberType(memberFound.getMemberType());
+
         // Persist all changes via service
-        memberService.saveMemberInfo(memberFound);
+        memberService.saveMemberInfo(memberList);
         System.out.println("<<< MEMBER DETAILS SAVED >>>");
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();

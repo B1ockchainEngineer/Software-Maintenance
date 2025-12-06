@@ -46,19 +46,18 @@ public class MemberRepository {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
 
-                if (parts.length >= 6) {
+                if (parts.length >= 5) {
                     // memberName and memberIC wrong position
                     String memberName = parts[0];
                     String memberIC = parts[1];
                     String memberHP = parts[2];
                     int memberId = Integer.parseInt(parts[3]);
                     String membershipType = parts[4];
-                    double discountRate = Double.parseDouble(parts[5]);
 
                     Membership member = switch (membershipType) {
-                        case "Normal" -> new NormalMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
-                        case "Gold" -> new GoldMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
-                        case "Premium" -> new PremiumMember(memberName, memberIC, memberId, memberHP, membershipType, discountRate);
+                        case "Normal" -> new NormalMember(memberName, memberIC, memberId, memberHP, membershipType);
+                        case "Gold" -> new GoldMember(memberName, memberIC, memberId, memberHP, membershipType);
+                        case "Premium" -> new PremiumMember(memberName, memberIC, memberId, memberHP, membershipType);
                         default -> null;
                     };
 
@@ -86,7 +85,7 @@ public class MemberRepository {
             writer.write(member.getMemberHp() + "\t");
             writer.write(member.getId() + "\t");
             writer.write(member.getMemberType() + "\t");
-            writer.write(member.calDiscount() + "\t");
+            //Deleted discount rate, take it by reading its type
             writer.write("\n");
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error writing member record", e);
@@ -97,17 +96,21 @@ public class MemberRepository {
      * Saves the particular member's info back into the file.
      */
 
-    public void saveEditMember(Membership member) {
+    public void saveAllMembers(List<Membership> members) {
         ensureFileExists();
 
-        try (FileWriter writer = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
-            writer.write(member.getName() + "\t");
-            writer.write(member.getIc() + "\t");
-            writer.write(member.getMemberHp() + "\t");
-            writer.write(member.getId() + "\t");
-            writer.write(member.getMemberType() + "\t");
-            writer.write(member.calDiscount() + "\t");
-            writer.write("\n");
+        try (FileWriter fw = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
+            for (Membership member : members) {
+                String line =
+                        member.getName() + "\t" +
+                                member.getIc() + "\t" +
+                                member.getMemberHp() + "\t" +
+                                member.getId() + "\t" +
+                                member.getMemberType() + "\t" +
+                                System.lineSeparator();
+
+                fw.write(line);
+            }
         } catch (IOException e) {
             System.out.println("<<< ERROR SAVING MEMBERS: " + e.getMessage() + " >>>");
         }
@@ -139,7 +142,7 @@ public class MemberRepository {
                     }
                 }
 
-                writer.write(line + System.getProperty("line.separator"));
+                writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error deleting member", e);
@@ -166,7 +169,25 @@ public class MemberRepository {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
-                if (parts.length >= 2 && parts[1].equals(targetIC)) {
+                if (parts[1].equals(targetIC)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error reading members file", e);
+        }
+        return false;
+    }
+
+
+    public boolean existsById(String generatedIC) {
+        ensureFileExists();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(MEMBER_FILE_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split("\t");
+                if (parts[3].equals(generatedIC)) {
                     return true;
                 }
             }

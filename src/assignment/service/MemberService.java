@@ -2,6 +2,8 @@ package assignment.service;
 
 import assignment.model.Membership;
 import assignment.repo.MemberRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +37,15 @@ public class MemberService {
         return true;
     }
 
+    public boolean checkIdExists (int id) {
+        for (Membership member : memberRepo.loadAllMembers()) {
+            if (member.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Membership findMemberById(int memberId) {
         for (Membership member : memberRepo.loadAllMembers()) {
             if (member.getId() == memberId) {
@@ -44,9 +55,18 @@ public class MemberService {
         return null;
     }
 
+    public int findMemberIndexById(List<Membership> memberList ,int memberId) {
+        for (int i=0; i < memberList.size(); i++) {
+            if (memberList.get(i).getId() == memberId) {
+                return i;
+            }
+        }
+        return -9999;
+    }
+
     // Save the entire list back to file
-    public void saveMemberInfo(Membership editMember) {
-        memberRepo.saveEditMember(editMember);
+    public void saveMemberInfo(List<Membership> updatedMemberList) {
+        memberRepo.saveAllMembers(updatedMemberList);
     }
 
     /**
@@ -56,7 +76,7 @@ public class MemberService {
         return memberRepo.deleteById(memberId);
     }
 
-    public boolean icExists(String filePath, String targetIC) {
+    public boolean icExists(String targetIC) {
         return memberRepo.existsByIc(targetIC);
     }
 }
