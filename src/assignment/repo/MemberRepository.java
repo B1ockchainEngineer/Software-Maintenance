@@ -4,6 +4,8 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
+import assignment.util.MemberConfig;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,16 +22,16 @@ import java.util.logging.Logger;
  */
 public class MemberRepository {
 
-    private static final String MEMBER_FILE_PATH = "members.txt";
+
     private static final Logger LOGGER = Logger.getLogger(MemberRepository.class.getName());
 
     private void ensureFileExists() {
-        File file = new File(MEMBER_FILE_PATH);
+        File file = new File(MemberConfig.MEMBER_FILE_PATH);
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating member file", e);
+                LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_CREATE_ERROR, e);
             }
         }
     }
@@ -41,7 +43,7 @@ public class MemberRepository {
         ensureFileExists();
         List<Membership> members = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(MEMBER_FILE_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(MemberConfig.MEMBER_FILE_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
@@ -67,7 +69,7 @@ public class MemberRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading members file", e);
+            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
 
         return members;
@@ -79,7 +81,7 @@ public class MemberRepository {
     public void appendMember(Membership member) {
         ensureFileExists();
 
-        try (FileWriter writer = new FileWriter(MEMBER_FILE_PATH, true)) {
+        try (FileWriter writer = new FileWriter(MemberConfig.MEMBER_FILE_PATH, true)) {
             writer.write(member.getName() + "\t");
             writer.write(member.getIc() + "\t");
             writer.write(member.getMemberHp() + "\t");
@@ -88,7 +90,7 @@ public class MemberRepository {
             //Deleted discount rate, take it by reading its type
             writer.write("\n");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writing member record", e);
+            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_WRITE_ERROR, e);
         }
     }
 
@@ -99,7 +101,7 @@ public class MemberRepository {
     public void saveAllMembers(List<Membership> members) {
         ensureFileExists();
 
-        try (FileWriter fw = new FileWriter(MEMBER_FILE_PATH, false)) { // overwrite file
+        try (FileWriter fw = new FileWriter(MemberConfig.MEMBER_FILE_PATH, false)) { // overwrite file
             for (Membership member : members) {
                 String line =
                         member.getName() + "\t" +
@@ -112,7 +114,7 @@ public class MemberRepository {
                 fw.write(line);
             }
         } catch (IOException e) {
-            System.out.println("<<< ERROR SAVING MEMBERS: " + e.getMessage() + " >>>");
+            System.out.println(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
         }
     }
 
@@ -122,8 +124,8 @@ public class MemberRepository {
      */
     public boolean deleteById(int memberIdToDelete) {
         ensureFileExists();
-        File inputFile = new File(MEMBER_FILE_PATH);
-        File tempFile = new File("dltTemp.txt");
+        File inputFile = new File(MemberConfig.MEMBER_FILE_PATH);
+        File tempFile = new File(MemberConfig.TEMP_DELETE_FILE_PATH);
 
         boolean found = false;
 
@@ -145,13 +147,13 @@ public class MemberRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting member", e);
+            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_DELETE_ERROR, e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe("Error finalizing member deletion.");
+                LOGGER.severe(MemberConfig.ErrorMessage.FILE_DELETE_ERROR);
             }
         } else {
             tempFile.delete();
@@ -165,7 +167,7 @@ public class MemberRepository {
     public boolean existsByIc(String targetIC) {
         ensureFileExists();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(MEMBER_FILE_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(MemberConfig.MEMBER_FILE_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
@@ -174,7 +176,7 @@ public class MemberRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading members file", e);
+            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
         return false;
     }

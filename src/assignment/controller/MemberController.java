@@ -9,6 +9,7 @@ import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
 import assignment.service.MemberService;
 import assignment.util.ConsoleUtil;
+import assignment.util.MemberConfig;
 import assignment.util.MemberUtil;
 import assignment.util.ValidationUtil;
 
@@ -47,7 +48,7 @@ public class MemberController {
 
             MemberMenu selection = MemberMenu.getByOption(memberOpt);
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION>>>");
+                System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -83,7 +84,7 @@ public class MemberController {
     }
 
     private void printMemberMenu() {
-        System.out.println("[ MEMBER MANAGEMENT SYSTEM ]");
+        System.out.println(MemberConfig.TITLE_MEMBER_SYSTEM);
         System.out.println("-------------------------------------------------------");
         for (MemberMenu menu : MemberMenu.values()) {
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
@@ -104,7 +105,7 @@ public class MemberController {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            System.out.println("[ REGISTER MEMBER ]");
+            System.out.println(MemberConfig.TITLE_REGISTER_MEMBER);
             printTierMenu();
             System.out.print("YOUR CHOICE: ");
 
@@ -112,7 +113,7 @@ public class MemberController {
             TierMenu userChoice = TierMenu.getByOption(option);
 
             if (userChoice == null) {
-                System.out.println("<<<INVALID OPTION>>>");
+                System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -171,7 +172,7 @@ public class MemberController {
                     memberIC = MemberUtil.icValidation();
                 } while (memberIC == null);
                 if (memberService.icExists(memberIC)) {
-                    System.out.println("<<<IC already exists in the file. Please reenter!>>>");
+                    System.out.println(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS);
                 } else {
                     break;
                 }
@@ -192,7 +193,7 @@ public class MemberController {
                 if (memberHP.matches("\\d{10,11}")) {
                     break;
                 } else {
-                    System.out.println("<<<Invalid input. Please enter a 10 or 11-digit number!>>>");
+                    System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
                 }
             } while (true);
             // Set values on the object
@@ -208,7 +209,7 @@ public class MemberController {
             if (yesNo == 'Y') {
                 memberService.addMember(member);
 
-                System.out.println("NEW MEMBER ADDED TO THE SYSTEM...");
+                System.out.println(MemberConfig.SuccessfulMessage.MEMBER_ADDED);
                 System.out.println("---------------------------------------------------");
                 System.out.println("MEMBER ID >> " + member.getId());
                 System.out.println("MEMBER IC >> " + member.getIc());
@@ -227,7 +228,7 @@ public class MemberController {
         Scanner scanner = new Scanner(System.in);
 
         ConsoleUtil.logo();
-        System.out.println("[ DELETE MEMBER ]");
+        System.out.println(MemberConfig.TITLE_DELETE_MEMBER);
         System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER MEMBER ID TO DELETE (ENTER 'E' TO CANCEL): M-");
@@ -250,7 +251,7 @@ public class MemberController {
             }
 
             if (target == null) {
-                System.out.println("MEMBER WITH ID M-" + memberIdToDelete + " NOT FOUND OR DELETION CANCELLED.");
+                System.out.println(String.format(MemberConfig.ErrorMessage.DELETE_CANCELLED_OR_NOT_FOUND, memberIdToDelete));
             } else {
                 System.out.println("Member Details to Delete:");
                 System.out.println("MEMBER ID >> " + target.getId());
@@ -265,15 +266,15 @@ public class MemberController {
                 if (confirm == 'Y') {
                     boolean deleted = memberService.deleteMemberById(memberIdToDelete);
                     if (deleted) {
-                        System.out.println("MEMBER WITH ID M-" + memberIdToDelete + " HAS BEEN DELETED.");
+                        System.out.println(String.format(MemberConfig.SuccessfulMessage.MEMBER_DELETED, memberIdToDelete));
                     } else {
-                        System.out.println("Failed to delete member from file.");
+                        System.out.println(MemberConfig.ErrorMessage.DELETE_FAILED);
                     }
                 }
             }
 
         } catch (NumberFormatException e) {
-            System.out.println("<<<Invalid input. Please enter a valid member ID or 'E' to cancel.>>>");
+            System.out.println(MemberConfig.ErrorMessage.INVALID_MEMBER_ID_FORMAT);
         }
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
@@ -282,11 +283,11 @@ public class MemberController {
     public void view() {
         int option;
         ConsoleUtil.logo();
-        System.out.println("[ VIEW ALL MEMBERS ]");
+        System.out.println(MemberConfig.TITLE_VIEW_MEMBERS);
         System.out.println("-------------------------------------------------------");
 
         if (memberService.getAllMembers().isEmpty()) {
-            System.out.println("THERE IS NO MEMBER TO DISPLAY...");
+            System.out.println(MemberConfig.ErrorMessage.NO_MEMBER_TO_DISPLAY);
         } else {
             while (true){
                 System.out.println("FILTER MEMBER BY MEMBERSHIP TYPE:");
@@ -305,7 +306,7 @@ public class MemberController {
                 TierMenu choice = TierMenu.getByOption(option);
 
                 if (choice == null) {
-                    System.out.println("<<<INVALID OPTION>>>");
+                    System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                     ConsoleUtil.systemPause();
                     continue;
                 }
@@ -315,7 +316,7 @@ public class MemberController {
                     case NORMAL_MEMBER -> displayMembersByType("Normal");
                     case GOLD_MEMBER   -> displayMembersByType("Gold");
                     case PREMIUM_MEMBER -> displayMembersByType("Premium");
-                    default -> System.out.println("<<<INVALID OPTION>>>");
+                    default -> System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 }
             }
         }
@@ -327,7 +328,7 @@ public class MemberController {
     public void search() {
         Scanner scanner = new Scanner(System.in);
         ConsoleUtil.logo();
-        System.out.println("[ SEARCH MEMBER BY ID ]");
+        System.out.println(MemberConfig.TITLE_SEARCH_MEMBER);
         System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER MEMBER ID TO SEARCH (3 DIGIT ONLY) OR 'E' TO CANCEL: M-");
@@ -346,17 +347,17 @@ public class MemberController {
             for (Membership member : memberService.getAllMembers()) {
                 if (member.getId() == memberIdToSearch) {
                     found = true;
-                    System.out.println("\tMEMBER FOUND !");
+                    System.out.println(MemberConfig.SuccessfulMessage.MEMBER_FOUND);
                     System.out.println(member);
                     break;
                 }
             }
 
             if (!found) {
-                System.out.println("\tMEMBER NOT FOUND...");
+                System.out.println(MemberConfig.ErrorMessage.MEMBER_NOT_FOUND);
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid member ID or 'E' to cancel.");
+            System.out.println(MemberConfig.ErrorMessage.INVALID_MEMBER_ID_FORMAT);
         }
 
         ConsoleUtil.systemPause();
@@ -371,7 +372,7 @@ public class MemberController {
 
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        System.out.println("[ EDIT MEMBER ]");
+        System.out.println(MemberConfig.TITLE_EDIT_MEMBER);
         System.out.println("-------------------------------------------------------");
         do {
             System.out.print("ENTER MEMBER ID (e.g. 741 ): M-");
@@ -385,7 +386,7 @@ public class MemberController {
         int memberIndexNo = memberService.findMemberIndexById(memberList, memberId);
 
         if (memberFound == null) {
-            System.out.println("<<< MEMBER NOT FOUND >>>");
+            System.out.println(MemberConfig.ErrorMessage.MEMBER_NOT_FOUND);
             ConsoleUtil.systemPause();
             return;
         }
@@ -414,7 +415,7 @@ public class MemberController {
             MemberEditMenu userEditChoice = MemberEditMenu.getByOption(option);
 
             if (userEditChoice == null) {
-                System.out.println("<<<INVALID OPTION>>>");
+                System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -431,7 +432,7 @@ public class MemberController {
                     } while (!validName);
 
                     memberFound.setName(newName);
-                    System.out.println("<<< MEMBER NAME UPDATED >>>");
+                    System.out.println(MemberConfig.SuccessfulMessage.MEMBER_NAME_UPDATED);
                 }
                 case MEMBER_HP -> { // Edit HP
                     String newHp;
@@ -441,12 +442,12 @@ public class MemberController {
                         if (newHp.matches("\\d{10,11}")) {
                             break;
                         } else {
-                            System.out.println("<<<Invalid input. Please enter a 10 or 11-digit number!>>>");
+                            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
                         }
                     } while (true);
 
                     memberFound.setMemberHp(newHp);
-                    System.out.println("<<< MEMBER HP UPDATED >>>");
+                    System.out.println(MemberConfig.SuccessfulMessage.MEMBER_HP_UPDATED);
                 }
                 case MEMBER_IC -> { // Edit IC
                     String newIc;
@@ -457,14 +458,14 @@ public class MemberController {
 
                         // check IC used by another member
                         if (memberService.icExists(newIc)){
-                            System.out.println("<<<IC already exists for another m1ember. Please reenter!>>>");
+                            System.out.println(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS_OTHER);
                         } else {
                             break;
                         }
                     } while (true);
 
                     memberFound.setIc(newIc);
-                    System.out.println("<<< MEMBER IC UPDATED >>>");
+                    System.out.println(MemberConfig.SuccessfulMessage.MEMBER_IC_UPDATED);
                 }
                 case MEMBER_TYPE -> { // Edit member type
                     System.out.println("SELECT NEW MEMBER TYPE:");
@@ -478,7 +479,7 @@ public class MemberController {
                     TierMenu userChoice = TierMenu.getByOption(typeOption);
 
                     if (userChoice == null) {
-                        System.out.println("<<<INVALID OPTION>>>");
+                        System.out.println(MemberConfig.ErrorMessage.INVALID_OPTION);
                         ConsoleUtil.systemPause();
                         continue;
                     }
@@ -520,7 +521,7 @@ public class MemberController {
 
         // Persist all changes via service
         memberService.saveMemberInfo(memberList);
-        System.out.println("<<< MEMBER DETAILS SAVED >>>");
+        System.out.println(MemberConfig.SuccessfulMessage.MEMBER_SAVED);
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
@@ -564,7 +565,7 @@ public class MemberController {
         }
 
         if (!foundMembers) {
-            System.out.println("NO " + membershipType + " MEMBERS FOUND.");
+            System.out.println(String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType));
         }
         System.out.println("---------------------------------------------------------------------------------------");
     }

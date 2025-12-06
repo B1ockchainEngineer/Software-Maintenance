@@ -31,26 +31,27 @@ public class MemberUtil {
             LocalDate now = LocalDate.now();
             LocalDate minBirthDateForIC = now.minusYears(12); // anyone born on/after this date +1 day is <12 years old today
 
-            // First try 2000 + yy (21st century)
-            try {
-                LocalDate birthDate20 = LocalDate.of(2000 + yy, mm, dd);
+                // First try 2000 + yy (21st century)
+                try {
+                    LocalDate birthDate20 = LocalDate.of(2000 + yy, mm, dd);
 
-                // If this person is at least 12 years old today to be accepted as 20xx (they can have IC)
-                if (!birthDate20.isAfter(minBirthDateForIC)) {
-                    return input;
+                    // If this person is at least 12 years old today to be accepted as 20xx (they can have IC)
+                    if (!birthDate20.isAfter(minBirthDateForIC)) {
+                        return input;
+                    }
+
+                } catch (DateTimeException ignored) {
+                    // Invalid date in 20xx, so force to 19xx
                 }
 
-            } catch (DateTimeException ignored) {
-                // Invalid date in 20xx, so force to 19xx
-            }
+                // Change to 1900 + yy (20th century)
+                LocalDate birthDate19 = LocalDate.of(1900 + yy, mm, dd);
+                return input;
 
-            // Change to 1900 + yy (20th century)
-            LocalDate birthDate19 = LocalDate.of(1900 + yy, mm, dd);
-            return input;
+            } catch (DateTimeException e) {
+                System.out.println("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
+                return null;
 
-        } catch (DateTimeException e) {
-            System.out.println("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
-            return null;
         } catch (Exception e) {
             System.out.println("<<< INVALID IC FORMAT >>>\n");
             return null;
@@ -77,4 +78,7 @@ public class MemberUtil {
 
         return yesNo;
     }
+
+
+
 }
