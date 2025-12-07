@@ -9,7 +9,7 @@ import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
 import assignment.service.MemberService;
 import assignment.util.ConsoleUtil;
-import assignment.util.MemberConfig;
+import assignment.util.config.MemberConfig;
 import assignment.util.MemberUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.MemberView;

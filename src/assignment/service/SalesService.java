@@ -1,19 +1,56 @@
 package assignment.service;
 
 import assignment.model.Stock;
+import assignment.repo.OrderRepository;
 import assignment.repo.StockRepository;
 import java.util.List;
 
 public class SalesService {
     private final StockRepository stockRepo;
-    // nextOrderNo should ideally be loaded from a file/persistence layer
-    // to ensure uniqueness across application restarts, but we initialize to 1 here.
-    private static int nextOrderNo = 1;
+    private final OrderRepository orderRepo;
+    private int nextOrderNo;
 
-    public SalesService(StockRepository stockRepo) {
+    public SalesService(StockRepository stockRepo, OrderRepository orderRepo) {
         this.stockRepo = stockRepo;
+        this.orderRepo = orderRepo;
         // Ensure stock is loaded into memory when service is initialized
         this.stockRepo.loadStockFromFile();
+        // Load orders from file and restore cart
+        restoreCartFromOrders();
+        // Load last order number from file to ensure uniqueness across restarts
+        this.nextOrderNo = orderRepo.getLastOrderNo() + 1;
+    }
+
+    /**
+     * Restores the cart from saved orders in the file.
+     * This ensures orders persist across application restarts.
+     * 
+     * Note: Stock quantities are NOT adjusted here because:
+     * - When orders are added, stock is deducted and saved to stock.txt immediately
+     * - stock.txt already contains the correct (deducted) quantities
+     * - We just need to restore orders to the cart, stock is already correct
+     */
+    private void restoreCartFromOrders() {
+        List<Stock> savedOrders = orderRepo.loadAllOrders();
+        
+        if (savedOrders.isEmpty()) {
+            return; // No orders to restore
+        }
+
+        // Restore each order to the cart
+        // Stock quantities are already correct in stock.txt (deducted when orders were placed)
+        for (Stock order : savedOrders) {
+            // Find the corresponding stock item to verify it exists
+            Stock stockItem = findStockItem(order.getStockID());
+            
+            if (stockItem != null) {
+                // Add order to cart
+                stockRepo.getCart().add(order);
+                // Stock quantity is already correct (was saved when order was originally placed)
+            }
+        }
+        
+        // No need to save stock - it's already correct in the file
     }
 
     public List<Stock> getAvailableStock() {
@@ -69,10 +106,14 @@ public class SalesService {
                 foundStock.getPrice()
         );
         stockRepo.getCart().add(cartItem);
-        nextOrderNo++;
-
-        // 3. Persist the stock change immediately
+        
+        // 3. Persist the order to file
+        orderRepo.appendOrder(cartItem);
+        
+        // 4. Persist the stock change immediately
         stockRepo.saveStockToFile();
+        
+        nextOrderNo++;
 
         return true;
     }
@@ -95,6 +136,9 @@ public class SalesService {
 
         if (indexToRemove != -1) {
             Stock removedItem = cart.remove(indexToRemove);
+
+            // Delete order from file
+            orderRepo.deleteOrder(removedItem.getOrderNo());
 
             // Refund the stock quantity (Business Rule)
             Stock stockItem = findStockItem(removedItem.getStockID());
@@ -144,7 +188,10 @@ public class SalesService {
             return false; // Invalid type
         }
 
-        // Persist the changes
+        // Update order in file
+        orderRepo.updateOrder(cartItem);
+        
+        // Persist the stock changes
         stockRepo.saveStockToFile();
         return true;
     }

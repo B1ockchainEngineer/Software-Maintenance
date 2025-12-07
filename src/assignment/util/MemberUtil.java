@@ -4,7 +4,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 
 
-import assignment.util.ValidationUtil;
+import assignment.util.config.MemberConfig;
 
 public class MemberUtil {
     /**

@@ -1,4 +1,4 @@
-package assignment.util;
+package assignment.util.config;
 
 public class MemberConfig {
     private MemberConfig() {
@@ -6,8 +6,10 @@ public class MemberConfig {
     }
 
     // ================== FILE & PATH CONFIG ==================
-    public static final String MEMBER_FILE_PATH = "members.txt";
-    public static final String TEMP_DELETE_FILE_PATH = "dltTemp.txt";
+    public static final String DATA_DIR = "data/";
+    public static final String TEMP_DIR = DATA_DIR + "temp/";
+    public static final String MEMBER_FILE_PATH = DATA_DIR + "members.txt";
+    public static final String TEMP_DELETE_FILE_PATH = TEMP_DIR + "dltTemp.txt";
     
     // ================== UI LABELS / TITLES ==================
     public static final String TITLE_MEMBER_SYSTEM = "[ MEMBER MANAGEMENT SYSTEM ]";

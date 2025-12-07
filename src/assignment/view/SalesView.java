@@ -1,7 +1,8 @@
 package assignment.view;
 
+import assignment.model.PaymentResult;
 import assignment.model.Stock;
-import assignment.service.PaymentService;
+import assignment.util.config.TransactionConfig;
 import java.util.List;
 
 /**
@@ -124,7 +125,7 @@ public class SalesView {
     }
 
     public void printPaymentMenu() {
-        System.out.println("[ MAKE PAYMENT ]");
+        System.out.println(TransactionConfig.TITLE_PAYMENT_MENU);
         System.out.println("-------------------------------------------------------");
     }
 
@@ -145,25 +146,36 @@ public class SalesView {
         System.out.println("-------------------------------------------------------");
     }
 
-    public void printPaymentSummary(PaymentService.PaymentResult result) {
+    public void printPaymentSummary(PaymentResult result) {
         System.out.println("\n-------------------------------------------------------");
-        System.out.println("PAYMENT SUMMARY");
+        System.out.println(TransactionConfig.TITLE_PAYMENT_SUMMARY);
         System.out.println("-------------------------------------------------------");
-        System.out.printf("SUBTOTAL:        RM%.2f\n", result.getSubtotal());
-        System.out.printf("DISCOUNT:        RM%.2f\n", result.getDiscount());
-        System.out.printf("TAX (6%%):        RM%.2f\n", result.getTax());
+        System.out.printf("%-15s RM%.2f\n", TransactionConfig.LABEL_PAYMENT_SUBTOTAL, result.getSubtotal());
+        System.out.printf("%-15s RM%.2f\n", TransactionConfig.LABEL_PAYMENT_DISCOUNT, result.getDiscount());
+        System.out.printf("%-15s RM%.2f\n", TransactionConfig.LABEL_PAYMENT_TAX, result.getTax());
         System.out.println("-------------------------------------------------------");
-        System.out.printf("TOTAL:           RM%.2f\n", result.getTotal());
+        System.out.printf("%-15s RM%.2f\n", TransactionConfig.LABEL_PAYMENT_TOTAL, result.getTotal());
         System.out.println("-------------------------------------------------------");
     }
 
     public void printPaymentSuccess() {
-        System.out.println("\nPAYMENT PROCESSED SUCCESSFULLY!");
-        System.out.println("Items have been saved to PaidItem.txt");
-        System.out.println("Transaction has been recorded in Transaction.txt");
+        System.out.println("\n" + TransactionConfig.MSG_PAYMENT_SUCCESS);
+        System.out.println(TransactionConfig.MSG_PAYMENT_SAVED);
     }
 
     public void printPaymentFailure() {
-        System.out.println("<<<PAYMENT FAILED.>>>");
+        System.out.println(TransactionConfig.MSG_PAYMENT_FAILED);
+    }
+
+    public void printPaymentCancelled() {
+        System.out.println(TransactionConfig.MSG_PAYMENT_CANCELLED);
+    }
+
+    public void printPaymentConfirmationPrompt() {
+        System.out.print(TransactionConfig.PROMPT_CONFIRM_PAYMENT);
+    }
+
+    public void printPaymentConfirmationCancelled() {
+        System.out.println(TransactionConfig.MSG_PAYMENT_CONFIRMATION_CANCELLED);
     }
 }

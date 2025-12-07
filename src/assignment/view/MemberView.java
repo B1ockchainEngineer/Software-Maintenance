@@ -7,7 +7,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
-import assignment.util.MemberConfig;
+import assignment.util.config.MemberConfig;
 
 import java.util.List;
 

@@ -4,8 +4,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
-import assignment.util.MemberConfig;
-
+import assignment.util.config.MemberConfig;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,6 +29,7 @@ public class MemberRepository {
      * Creates a new file if it does not exist.
      */
     private void ensureFileExists() {
+        ensureDirectoriesExist();
         File file = new File(MemberConfig.MEMBER_FILE_PATH);
         if (!file.exists()) {
             try {
@@ -37,6 +37,17 @@ public class MemberRepository {
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_CREATE_ERROR, e);
             }
+        }
+    }
+
+    private void ensureDirectoriesExist() {
+        File dataDir = new File(MemberConfig.DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+        File tempDir = new File(MemberConfig.TEMP_DIR);
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
         }
     }
 

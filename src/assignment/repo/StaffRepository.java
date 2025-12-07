@@ -18,11 +18,13 @@ import java.util.logging.Logger;
  * Repository responsible for all file I/O for staff data (staff.txt).
  */
 public class StaffRepository {
-
-    private static final String STAFF_FILE_PATH = "staff.txt";
+    private static final String DATA_DIR = "data/";
+    private static final String TEMP_DIR = DATA_DIR + "temp/";
+    private static final String STAFF_FILE_PATH = DATA_DIR + "staff.txt";
     private static final Logger LOGGER = Logger.getLogger(StaffRepository.class.getName());
 
     private void ensureFileExists() {
+        ensureDirectoriesExist();
         File file = new File(STAFF_FILE_PATH);
         if (!file.exists()) {
             try {
@@ -30,6 +32,17 @@ public class StaffRepository {
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error creating staff file", e);
             }
+        }
+    }
+
+    private void ensureDirectoriesExist() {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+        File tempDir = new File(TEMP_DIR);
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
         }
     }
 
@@ -92,7 +105,7 @@ public class StaffRepository {
     public boolean deleteByIc(String targetIc) {
         ensureFileExists();
         File inputFile = new File(STAFF_FILE_PATH);
-        File tempFile = new File("dltStaffTemp.txt");
+        File tempFile = new File(TEMP_DIR + "dltStaffTemp.txt");
 
         boolean found = false;
 
@@ -191,7 +204,7 @@ public class StaffRepository {
     public boolean updateStaff(Staff updatedStaff) {
         ensureFileExists();
         File inputFile = new File(STAFF_FILE_PATH);
-        File tempFile = new File("updateStaffTemp.txt");
+        File tempFile = new File(TEMP_DIR + "updateStaffTemp.txt");
 
         boolean found = false;
 
@@ -244,7 +257,7 @@ public class StaffRepository {
     public boolean deleteById(int staffId) {
         ensureFileExists();
         File inputFile = new File(STAFF_FILE_PATH);
-        File tempFile = new File("dltStaffTemp.txt");
+        File tempFile = new File(TEMP_DIR + "dltStaffTemp.txt");
 
         boolean found = false;
 

@@ -41,7 +41,8 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.entry();
+//        main.entry();
+        main.run();
     }
 
     // Initialise repository, services and controllers and wire them to this Main
@@ -54,11 +55,12 @@ public class Main {
         this.stockController = new StockController(stockService);
 
         // Sales-related setup
-        SalesService salesService = new SalesService(stockRepo);
-        PaidItemRepository paidItemRepo = new PaidItemRepository();
+        OrderRepository orderRepo = new OrderRepository();
+        SalesService salesService = new SalesService(stockRepo, orderRepo);
         TransactionRepository transactionRepo = new TransactionRepository();
-        PaymentService paymentService = new PaymentService(stockRepo, paidItemRepo, transactionRepo);
-        this.salesController = new SalesController(salesService, paymentService);
+        TransactionService transactionService = new TransactionService(transactionRepo);
+        PaymentService paymentService = new PaymentService(stockRepo, orderRepo);
+        this.salesController = new SalesController(salesService, paymentService, transactionService);
 
         // Staff-related setup
         StaffRepository staffRepo = new StaffRepository();
@@ -240,7 +242,7 @@ public class Main {
                     runOrder();
                 }
                 case TRANSACTION_REPORT -> {
-                    transactionRecord();
+                    salesController.viewTransactionReport();
                 }
                 case BACK_TO_MAIN -> {
                     mainView.printBackToMainMessage();
@@ -290,14 +292,5 @@ public class Main {
         }
     }
 
-    public void transactionRecord() {
-        ConsoleUtil.clearScreen();
-        ConsoleUtil.logo();
-        TransactionRepository transactionRepo = new TransactionRepository();
-        java.util.List<TransactionRepository.Transaction> transactions = transactionRepo.loadAllTransactions();
-        mainView.printTransactionReport(transactions);
-        ConsoleUtil.systemPause();
-        ConsoleUtil.clearScreen();
-    }
 
 }

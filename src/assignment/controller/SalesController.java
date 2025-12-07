@@ -1,10 +1,15 @@
 package assignment.controller;
 
+import assignment.model.PaymentResult;
 import assignment.model.Stock;
+import assignment.model.Transaction;
 import assignment.service.PaymentService;
 import assignment.service.SalesService;
+import assignment.service.TransactionService;
 import assignment.util.ConsoleUtil;
+import assignment.util.config.TransactionConfig;
 import assignment.util.ValidationUtil;
+import assignment.view.MainView;
 import assignment.view.SalesView;
 import java.io.IOException;
 import java.util.List;
@@ -12,12 +17,16 @@ import java.util.List;
 public class SalesController {
     private final SalesService salesService;
     private final PaymentService paymentService;
+    private final TransactionService transactionService;
     private final SalesView salesView;
+    private final MainView mainView;
 
-    public SalesController(SalesService salesService, PaymentService paymentService) {
+    public SalesController(SalesService salesService, PaymentService paymentService, TransactionService transactionService) {
         this.salesService = salesService;
         this.paymentService = paymentService;
+        this.transactionService = transactionService;
         this.salesView = new SalesView();
+        this.mainView = new MainView();
     }
 
     public void addOrder() throws IOException {
@@ -248,7 +257,7 @@ public class SalesController {
         List<Stock> cart = salesService.getCartItems();
 
         if (cart.isEmpty()) {
-            System.out.println("<<<CART IS EMPTY. PLEASE ADD ITEMS BEFORE PAYMENT.>>>");
+            System.out.println(TransactionConfig.MSG_CART_EMPTY);
             ConsoleUtil.systemPause();
             ConsoleUtil.clearScreen();
             return;
@@ -257,29 +266,66 @@ public class SalesController {
         salesView.displayCartItems(cart);
 
         // Ask for member discount
-        System.out.print("ENTER MEMBER ID FOR DISCOUNT (OR PRESS '0' FOR NO DISCOUNT): M-");
+        System.out.print(TransactionConfig.PROMPT_MEMBER_ID);
         String memberInput = ValidationUtil.scanner.nextLine().trim();
+
+        // Check if user wants to exit
+        if (memberInput.equalsIgnoreCase("X")) {
+            salesView.printPaymentCancelled();
+            ConsoleUtil.systemPause();
+            ConsoleUtil.clearScreen();
+            return;
+        }
 
         double discountRate = 0.0;
         if (!memberInput.equals("0") && !memberInput.isEmpty()) {
             // TODO: Look up member and get discount rate from MemberService
             // For now, we'll ask for discount rate if member ID is provided
-            System.out.print("ENTER DISCOUNT RATE (e.g., 0.1 for 10%): ");
+            System.out.print(TransactionConfig.PROMPT_DISCOUNT_RATE);
             String discountInput = ValidationUtil.scanner.nextLine().trim();
             if (!discountInput.isEmpty()) {
                 try {
                     discountRate = Double.parseDouble(discountInput);
                 } catch (NumberFormatException e) {
-                    System.out.println("<<<Invalid discount rate. Proceeding without discount.>>>");
+                    System.out.println(TransactionConfig.ERROR_INVALID_DISCOUNT_RATE);
                 }
             }
         }
 
-        // Process payment
-        PaymentService.PaymentResult result = paymentService.processPayment(discountRate);
+        // Calculate and show payment summary (without processing)
+        PaymentResult summary = paymentService.calculatePaymentSummary(discountRate);
+        
+        if (summary == null) {
+            salesView.printPaymentFailure();
+            ConsoleUtil.systemPause();
+            ConsoleUtil.clearScreen();
+            return;
+        }
 
-        if (result != null) {
-            salesView.printPaymentSummary(result);
+        // Display payment summary
+        salesView.printPaymentSummary(summary);
+
+        // Ask for confirmation
+        salesView.printPaymentConfirmationPrompt();
+        char confirm = ValidationUtil.charValidation();
+
+        if (confirm != 'Y') {
+            salesView.printPaymentConfirmationCancelled();
+            ConsoleUtil.systemPause();
+            ConsoleUtil.clearScreen();
+            return;
+        }
+
+        // Create transaction and save it
+        Transaction transaction = paymentService.createTransaction(discountRate);
+        
+        if (transaction != null) {
+            // Save transaction through service layer
+            transactionService.saveTransaction(transaction);
+            
+            // Clear cart after successful save
+            paymentService.clearCart();
+            
             salesView.printPaymentSuccess();
         } else {
             salesView.printPaymentFailure();
@@ -287,5 +333,53 @@ public class SalesController {
 
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
+    }
+
+    public void viewTransactionReport() {
+        List<Transaction> transactions = transactionService.getAllTransactions();
+
+        while (true) {
+            ConsoleUtil.clearScreen();
+            ConsoleUtil.logo();
+            
+            // Step 1: Show transaction summary
+            mainView.printTransactionSummary(transactions);
+
+            if (transactions.isEmpty()) {
+                ConsoleUtil.systemPause();
+                ConsoleUtil.clearScreen();
+                return;
+            }
+
+            // Step 2: Ask user to select transaction
+            mainView.printTransactionSelectionPrompt(transactions.size());
+            int selection = ValidationUtil.intValidation(0, transactions.size());
+
+            if (selection == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            if (selection == 0) {
+                // User wants to exit
+                ConsoleUtil.clearScreen();
+                return;
+            }
+
+            // Step 3: Show selected transaction details
+            if (selection >= 1 && selection <= transactions.size()) {
+                Transaction selectedTransaction = transactions.get(selection - 1);
+                
+                ConsoleUtil.clearScreen();
+                ConsoleUtil.logo();
+                mainView.printTransactionDetails(selectedTransaction, selection);
+                
+                ConsoleUtil.systemPause();
+                // Loop back to show summary again
+            } else {
+                mainView.printInvalidTransactionNumber();
+                ConsoleUtil.systemPause();
+            }
+        }
     }
 }

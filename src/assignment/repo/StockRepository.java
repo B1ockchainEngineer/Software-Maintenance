@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 
 public class StockRepository {
     private static final Logger LOGGER = Logger.getLogger(StockRepository.class.getName());
-    private static final String STOCK_FILE_PATH = "stock.txt";
+    private static final String DATA_DIR = "data/";
+    private static final String TEMP_DIR = DATA_DIR + "temp/";
+    private static final String STOCK_FILE_PATH = DATA_DIR + "stock.txt";
     // In-memory data structures for fast lookups (Sales logic needs this)
     private static List<Stock> stocklist = new ArrayList<>();
     private static List<Stock> cart = new ArrayList<>();
@@ -52,6 +54,7 @@ public class StockRepository {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error reading stock file. Creating new file if necessary", e);
             // Attempt to create file if it doesn't exist
+            ensureDirectoriesExist();
             try {
                 new File(STOCK_FILE_PATH).createNewFile();
             } catch (IOException ex) {
@@ -61,6 +64,17 @@ public class StockRepository {
             LOGGER.log(Level.SEVERE, "Error parsing stock data in file", e);
         }
         return stocklist;
+    }
+
+    private void ensureDirectoriesExist() {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+        File tempDir = new File(TEMP_DIR);
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
+        }
     }
 
     // Finds the largest Stock ID currently in the file
@@ -109,6 +123,7 @@ public class StockRepository {
 
     // Writes a new stock item to the file
     public void addStockToFile(Stock newStock) throws IOException {
+        ensureDirectoriesExist();
         File stockFile = new File(STOCK_FILE_PATH);
         if (!stockFile.exists()) {
             stockFile.createNewFile();
@@ -125,8 +140,9 @@ public class StockRepository {
 
     // Deletes a product by ID by rewriting the file
     public void deleteProductFromFile(int productIDToDelete) {
+        ensureDirectoriesExist();
         File inputFile = new File(STOCK_FILE_PATH);
-        File tempFile = new File("dltStkTemp.txt");
+        File tempFile = new File(TEMP_DIR + "dltStkTemp.txt");
 
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -164,8 +180,9 @@ public class StockRepository {
 
     // Saves the current state of the in-memory stocklist back to the file
     public void saveStockToFile() {
+        ensureDirectoriesExist();
         File inputFile = new File(STOCK_FILE_PATH);
-        File tempFile = new File("stkUpdateTemp.txt");
+        File tempFile = new File(TEMP_DIR + "stkUpdateTemp.txt");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             for (Stock stock : stocklist) {
