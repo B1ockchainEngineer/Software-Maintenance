@@ -38,8 +38,6 @@ public class TransactionConfig {
     
     // ================== FILE FORMAT MARKERS ==================
     public static final String FILE_MARKER_TRANSACTION = "transaction";
-    public static final String FILE_MARKER_TRANSACTION_OLD = "TRANSACTION"; // Backward compatibility
-    public static final String FILE_MARKER_ITEM = "ITEM";
     
     // ================== FILE & PATH CONFIG ==================
     public static final String DATA_DIR = "data/";
@@ -63,7 +61,6 @@ public class TransactionConfig {
     public static final String MSG_PAYMENT_SAVED = "Transaction and items have been saved to transaction.txt";
     public static final String MSG_PAYMENT_FAILED = "<<<PAYMENT FAILED.>>>";
     public static final String MSG_PAYMENT_CANCELLED = "PAYMENT CANCELLED";
-    public static final String MSG_PAYMENT_CONFIRMATION_CANCELLED = "PAYMENT CANCELLED BY USER";
     public static final String MSG_CART_EMPTY = "<<<CART IS EMPTY. PLEASE ADD ITEMS BEFORE PAYMENT.>>>";
     
     // ================== PAYMENT PROMPTS ==================

@@ -41,8 +41,7 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-//        main.entry();
-        main.run();
+        main.entry();
     }
 
     // Initialise repository, services and controllers and wire them to this Main
@@ -60,7 +59,6 @@ public class Main {
         TransactionRepository transactionRepo = new TransactionRepository();
         TransactionService transactionService = new TransactionService(transactionRepo);
         PaymentService paymentService = new PaymentService(stockRepo, orderRepo);
-        this.salesController = new SalesController(salesService, paymentService, transactionService);
 
         // Staff-related setup
         StaffRepository staffRepo = new StaffRepository();
@@ -69,10 +67,12 @@ public class Main {
         this.loginController = new LoginController(staffService);
         this.signupController = new SignupController(staffService);
 
-        // Member-related setup
+        // Member-related setup (used by both SalesController for discounts and MemberController for management)
         MemberRepository memberRepo = new MemberRepository();
         MemberService memberService = new MemberService(memberRepo);
         this.memberController = new MemberController(memberService);
+        
+        this.salesController = new SalesController(salesService, paymentService, transactionService, memberService);
     }
 
     public void entry() {

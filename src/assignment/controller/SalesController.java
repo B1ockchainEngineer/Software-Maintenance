@@ -1,8 +1,10 @@
 package assignment.controller;
 
+import assignment.model.Membership;
 import assignment.model.PaymentResult;
 import assignment.model.Stock;
 import assignment.model.Transaction;
+import assignment.service.MemberService;
 import assignment.service.PaymentService;
 import assignment.service.SalesService;
 import assignment.service.TransactionService;
@@ -18,13 +20,15 @@ public class SalesController {
     private final SalesService salesService;
     private final PaymentService paymentService;
     private final TransactionService transactionService;
+    private final MemberService memberService;
     private final SalesView salesView;
     private final MainView mainView;
 
-    public SalesController(SalesService salesService, PaymentService paymentService, TransactionService transactionService) {
+    public SalesController(SalesService salesService, PaymentService paymentService, TransactionService transactionService, MemberService memberService) {
         this.salesService = salesService;
         this.paymentService = paymentService;
         this.transactionService = transactionService;
+        this.memberService = memberService;
         this.salesView = new SalesView();
         this.mainView = new MainView();
     }
@@ -141,10 +145,51 @@ public class SalesController {
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Lists all orders from the cart.
+     * @param emptyMessage Custom message to display when cart is empty (null for default)
+     * @param showHeader Whether to show "ALL ORDERS:" header (default: true)
+     * @return true if orders exist and were displayed, false if cart is empty
+     */
+    private boolean listAllOrders(String emptyMessage, boolean showHeader) {
+        List<Stock> cartItems = salesService.getCartItems();
+        
+        if (cartItems.isEmpty()) {
+            String message = (emptyMessage != null) ? emptyMessage : "<<<NO ORDERS FOUND IN THE CART!>>>";
+            System.out.println(message);
+            ConsoleUtil.systemPause();
+            ConsoleUtil.clearScreen();
+            return false;
+        }
+
+        // Display all orders with their numbers
+        if (showHeader) {
+            System.out.println("ALL ORDERS:");
+        }
+        salesView.displayCartItems(cartItems);
+        if (showHeader) {
+            System.out.println();
+        }
+        return true;
+    }
+
+    /**
+     * Lists all orders from the cart with default settings.
+     * @return true if orders exist and were displayed, false if cart is empty
+     */
+    private boolean listAllOrders() {
+        return listAllOrders(null, true);
+    }
+
     public void removeOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
         salesView.printRemoveOrderMenu();
+
+        // Display all orders from the cart
+        if (!listAllOrders()) {
+            return; // Cart is empty, exit early
+        }
 
         System.out.print("ENTER ORDER NO TO REMOVE: ");
         int orderNoRemove = ValidationUtil.intValidation(1, 10000);
@@ -184,6 +229,11 @@ public class SalesController {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
         salesView.printEditOrderMenu();
+
+        // Display all orders from the cart
+        if (!listAllOrders()) {
+            return; // Cart is empty, exit early
+        }
 
         System.out.print("ENTER ORDER NO TO EDIT: ");
         int orderNoEdit = ValidationUtil.intValidation(1, 10000);
@@ -236,11 +286,33 @@ public class SalesController {
             if (quantityChange == -9999) {
                 System.out.println("<<<Invalid quantity input.>>>");
             } else {
-                boolean success = salesService.editOrderQuantity(orderNoEdit, quantityChange, choice);
-                if (success) {
-                    salesView.printEditSuccess((choice == 1 ? "REDUCED" : "ADDED"), salesService.findCartItemByOrderNo(orderNoEdit).getQty());
+                // Check if reducing full quantity (same as deleting)
+                if (choice == 1 && quantityChange == cartItem.getQty()) {
+                    // Ask for confirmation to delete
+                    System.out.println("-------------------------------------------------------");
+                    System.out.println("REDUCING FULL QUANTITY WILL DELETE THE ORDER");
+                    salesView.printRemoveConfirmation(cartItem);
+                    System.out.print("DO YOU WANT TO DELETE THIS ORDER (Y = YES, N = NO): ");
+                    char confirm = ValidationUtil.charValidation();
+                    
+                    if (confirm == 'Y') {
+                        // Call delete function
+                        if (salesService.removeOrder(orderNoEdit)) {
+                            salesView.printRemoveSuccess();
+                        } else {
+                            salesView.printRemoveFailure();
+                        }
+                    } else {
+                        salesView.printRemoveCancelled();
+                    }
                 } else {
-                    salesView.printEditFailure();
+                    // Normal edit operation
+                    boolean success = salesService.editOrderQuantity(orderNoEdit, quantityChange, choice);
+                    if (success) {
+                        salesView.printEditSuccess((choice == 1 ? "REDUCED" : "ADDED"), salesService.findCartItemByOrderNo(orderNoEdit).getQty());
+                    } else {
+                        salesView.printEditFailure();
+                    }
                 }
             }
         }
@@ -254,16 +326,10 @@ public class SalesController {
         ConsoleUtil.logo();
         salesView.printPaymentMenu();
 
-        List<Stock> cart = salesService.getCartItems();
-
-        if (cart.isEmpty()) {
-            System.out.println(TransactionConfig.MSG_CART_EMPTY);
-            ConsoleUtil.systemPause();
-            ConsoleUtil.clearScreen();
-            return;
+        // Display all orders from the cart (no header for payment screen)
+        if (!listAllOrders(TransactionConfig.MSG_CART_EMPTY, false)) {
+            return; // Cart is empty, exit early
         }
-
-        salesView.displayCartItems(cart);
 
         // Ask for member discount
         System.out.print(TransactionConfig.PROMPT_MEMBER_ID);
@@ -279,16 +345,25 @@ public class SalesController {
 
         double discountRate = 0.0;
         if (!memberInput.equals("0") && !memberInput.isEmpty()) {
-            // TODO: Look up member and get discount rate from MemberService
-            // For now, we'll ask for discount rate if member ID is provided
-            System.out.print(TransactionConfig.PROMPT_DISCOUNT_RATE);
-            String discountInput = ValidationUtil.scanner.nextLine().trim();
-            if (!discountInput.isEmpty()) {
-                try {
-                    discountRate = Double.parseDouble(discountInput);
-                } catch (NumberFormatException e) {
-                    System.out.println(TransactionConfig.ERROR_INVALID_DISCOUNT_RATE);
+            // Parse member ID and check if member exists
+            try {
+                int memberId = Integer.parseInt(memberInput);
+                Membership member = memberService.findMemberById(memberId);
+                
+                if (member == null) {
+                    System.out.println("<<<MEMBER NOT FOUND!>>>");
+                    System.out.println("Proceeding with no discount...");
+                    discountRate = 0.0;
+                } else {
+                    // Get discount rate from member's type
+                    discountRate = member.calDiscount();
+                    System.out.println("Member found: " + member.getName() + " (" + member.getMemberType() + ")");
+                    System.out.printf("Discount rate: %.1f%%\n", discountRate * 100);
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("<<<INVALID MEMBER ID FORMAT!>>>");
+                System.out.println("Proceeding with no discount...");
+                discountRate = 0.0;
             }
         }
 

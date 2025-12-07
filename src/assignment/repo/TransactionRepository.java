@@ -48,7 +48,7 @@ public class TransactionRepository {
             
             // Write all items for this transaction
             for (Stock item : items) {
-                writer.write(TransactionConfig.FILE_MARKER_ITEM + "\t");
+                writer.write("ITEM\t");
                 writer.write(item.getStockID() + "\t");
                 writer.write(item.getStockName() + "\t");
                 writer.write(item.getQty() + "\t");
@@ -120,18 +120,18 @@ public class TransactionRepository {
     private boolean isTransactionHeader(String[] parts) {
         return parts.length >= 5 && 
                (parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION) || 
-                parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION_OLD));
+                parts[0].equals("TRANSACTION")); // Backward compatibility
     }
 
     private boolean isItemLine(String[] parts) {
-        return parts.length >= 5 && parts[0].equals(TransactionConfig.FILE_MARKER_ITEM);
+        return parts.length >= 5 && parts[0].equals("ITEM");
     }
 
     private boolean isOldFormatTransaction(String[] parts) {
         return parts.length >= 4 && 
-               !parts[0].equals(TransactionConfig.FILE_MARKER_ITEM) && 
+               !parts[0].equals("ITEM") && 
                !parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION) && 
-               !parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION_OLD);
+               !parts[0].equals("TRANSACTION");
     }
 
     private void parseTransactionHeader(String[] parts, TransactionBuilder builder) {

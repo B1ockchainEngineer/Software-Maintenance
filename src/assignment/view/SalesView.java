@@ -176,6 +176,6 @@ public class SalesView {
     }
 
     public void printPaymentConfirmationCancelled() {
-        System.out.println(TransactionConfig.MSG_PAYMENT_CONFIRMATION_CANCELLED);
+        System.out.println(TransactionConfig.MSG_PAYMENT_CANCELLED);
     }
 }

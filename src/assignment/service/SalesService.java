@@ -8,7 +8,6 @@ import java.util.List;
 public class SalesService {
     private final StockRepository stockRepo;
     private final OrderRepository orderRepo;
-    private int nextOrderNo;
 
     public SalesService(StockRepository stockRepo, OrderRepository orderRepo) {
         this.stockRepo = stockRepo;
@@ -16,14 +15,14 @@ public class SalesService {
         // Ensure stock is loaded into memory when service is initialized
         this.stockRepo.loadStockFromFile();
         // Load orders from file and restore cart
+        // Order numbers are assigned based on position (1, 2, 3, ...)
         restoreCartFromOrders();
-        // Load last order number from file to ensure uniqueness across restarts
-        this.nextOrderNo = orderRepo.getLastOrderNo() + 1;
     }
 
     /**
      * Restores the cart from saved orders in the file.
      * This ensures orders persist across application restarts.
+     * Order numbers are assigned based on position in file (1, 2, 3, ...).
      * 
      * Note: Stock quantities are NOT adjusted here because:
      * - When orders are added, stock is deducted and saved to stock.txt immediately
@@ -31,6 +30,7 @@ public class SalesService {
      * - We just need to restore orders to the cart, stock is already correct
      */
     private void restoreCartFromOrders() {
+        // loadAllOrders() already assigns orderNo based on position (1, 2, 3, ...)
         List<Stock> savedOrders = orderRepo.loadAllOrders();
         
         if (savedOrders.isEmpty()) {
@@ -44,7 +44,7 @@ public class SalesService {
             Stock stockItem = findStockItem(order.getStockID());
             
             if (stockItem != null) {
-                // Add order to cart
+                // Add order to cart (orderNo already assigned by loadAllOrders based on position)
                 stockRepo.getCart().add(order);
                 // Stock quantity is already correct (was saved when order was originally placed)
             }
@@ -82,6 +82,7 @@ public class SalesService {
 
     /**
      * Attempts to add an item to the cart, updating stock immediately.
+     * Order number is calculated as: current cart size + 1
      * @param itemID The ID of the product.
      * @param quantity The amount to order.
      * @return true if successful, false otherwise.
@@ -97,7 +98,10 @@ public class SalesService {
         // 1. Update stocklist (deduct quantity) - In-memory change
         foundStock.setQty(foundStock.getQty() - quantity);
 
-        // 2. Add item to cart
+        // 2. Calculate order number based on current cart size (position-based)
+        int nextOrderNo = stockRepo.getCart().size() + 1;
+        
+        // 3. Add item to cart
         Stock cartItem = new Stock(
                 nextOrderNo,
                 foundStock.getStockID(),
@@ -107,26 +111,26 @@ public class SalesService {
         );
         stockRepo.getCart().add(cartItem);
         
-        // 3. Persist the order to file
+        // 4. Persist the order to file (orderNo not stored in file, determined by position)
         orderRepo.appendOrder(cartItem);
         
-        // 4. Persist the stock change immediately
+        // 5. Persist the stock change immediately
         stockRepo.saveStockToFile();
-        
-        nextOrderNo++;
 
         return true;
     }
 
     /**
      * Removes an order from the cart and refunds the quantity back to the stock.
-     * @param orderNoRemove The order number to remove.
+     * After deletion, order numbers are reassigned based on position (1, 2, 3, ...).
+     * @param orderNoRemove The order number (position) to remove.
      * @return true if successful, false otherwise.
      */
     public boolean removeOrder(int orderNoRemove) {
         List<Stock> cart = stockRepo.getCart();
         int indexToRemove = -1;
 
+        // Find the order by orderNo (which represents position)
         for (int i = 0; i < cart.size(); i++) {
             if (cart.get(i).getOrderNo() == orderNoRemove) {
                 indexToRemove = i;
@@ -137,8 +141,13 @@ public class SalesService {
         if (indexToRemove != -1) {
             Stock removedItem = cart.remove(indexToRemove);
 
-            // Delete order from file
-            orderRepo.deleteOrder(removedItem.getOrderNo());
+            // Delete order from file (by position)
+            orderRepo.deleteOrder(orderNoRemove);
+
+            // Reassign order numbers for remaining orders (1, 2, 3, ...)
+            for (int i = 0; i < cart.size(); i++) {
+                cart.get(i).setOrderNo(i + 1);
+            }
 
             // Refund the stock quantity (Business Rule)
             Stock stockItem = findStockItem(removedItem.getStockID());
@@ -148,6 +157,11 @@ public class SalesService {
 
             // Persist the refund change
             stockRepo.saveStockToFile();
+            
+            // Note: File is already correct after deleteOrder() (order removed from file)
+            // We just need to reassign orderNos in memory to match file positions
+            // This is already done above with the loop
+            
             return true;
         }
         return false;
