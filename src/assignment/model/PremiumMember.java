@@ -10,8 +10,8 @@ public class PremiumMember extends Membership {
     public PremiumMember() {
     }
 
-    public PremiumMember(String name, String ic, int id, String memberHp, String memberType, double discountRate) {
-        super(name, ic, id, memberHp, memberType, discountRate);
+    public PremiumMember(String name, String ic, int id, String memberHp, String memberType) {
+        super(name, ic, id, memberHp, memberType);
     }
 
     public static void setPremiumRate(double premiumRate) {

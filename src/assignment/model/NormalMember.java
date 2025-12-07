@@ -10,8 +10,8 @@ public class NormalMember extends Membership {
     public NormalMember() {
     }
 
-    public NormalMember(String name, String ic, int id, String memberHp, String memberType, double discountRate) {
-        super(name, ic, id, memberHp, memberType, discountRate);
+    public NormalMember(String name, String ic, int id, String memberHp, String memberType) {
+        super(name, ic, id, memberHp, memberType);
     }
 
     public static void setNormalRate(double normalRate) {
