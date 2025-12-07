@@ -1,6 +1,5 @@
 package assignment;
 
-import assignment.view.MainView;
 import assignment.controller.SalesController;
 import assignment.controller.StockController;
 import assignment.controller.MemberController;
@@ -133,7 +132,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printLoginMenu();
+            logMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             // Input Validation using ValidationUtil (range 1 to 3)
@@ -186,7 +185,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printMainMenu(currentStaff);
+            menu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             // Max option is 4 (STOCK_MANAGEMENT)
@@ -240,7 +239,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printStockMenu();
+            stockMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int stockOpt = ValidationUtil.intValidation(0, 3);
@@ -263,7 +262,7 @@ public class Main {
                 case DELETE_PRODUCT -> stockController.delete();
                 case VIEW_PRODUCT_LIST -> stockController.view();
                 case BACK_TO_MAIN -> {
-                    mainView.printBackToMainMessage();
+                    System.out.println("BACK TO MAIN MENU...");
                     ConsoleUtil.systemPause();
                     return;
                 }
@@ -276,7 +275,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printSalesMenu();
+            salesMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int salesOpt = ValidationUtil.intValidation(0, 2);
@@ -302,7 +301,7 @@ public class Main {
                     transactionRecord();
                 }
                 case BACK_TO_MAIN -> {
-                    mainView.printBackToMainMessage();
+                    System.out.println("BACK TO MAIN MENU...");
                     ConsoleUtil.systemPause();
                     return; // Exit sales loop
                 }
@@ -315,7 +314,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printCreateOrderMenu();
+            createOrderMenu();
             System.out.print("ENTER YOUR SELECTION: ");
 
             int orderOpt = ValidationUtil.intValidation(0, 5);
@@ -342,19 +341,59 @@ public class Main {
                     salesController.makePayment();
                 }
                 case BACK_TO_PREVIOUS -> {
-                    mainView.printBackToPreviousMessage();
+                    System.out.println("BACK TO PREVIOUS PAGE...");
                     return; // Exit order loop
                 }
             }
         }
     }
 
-    public void transactionRecord() {
+    public static void transactionRecord() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
+        System.out.println("[ TRANSACTION REPORT ]");
+        System.out.println("-------------------------------------------------------");
+        
         TransactionRepository transactionRepo = new TransactionRepository();
         java.util.List<TransactionRepository.Transaction> transactions = transactionRepo.loadAllTransactions();
-        mainView.printTransactionReport(transactions);
+        
+        if (transactions.isEmpty()) {
+            System.out.println("NO TRANSACTIONS FOUND.");
+        } else {
+            System.out.printf("%-10s %-15s %-15s %-15s %-15s\n", "NO.", "SUBTOTAL", "DISCOUNT", "TAX", "TOTAL");
+            System.out.println("-------------------------------------------------------");
+            
+            int transactionNo = 1;
+            double grandTotalSubtotal = 0.0;
+            double grandTotalDiscount = 0.0;
+            double grandTotalTax = 0.0;
+            double grandTotal = 0.0;
+            
+            for (TransactionRepository.Transaction transaction : transactions) {
+                System.out.printf("%-10d RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n",
+                        transactionNo++,
+                        transaction.getSubtotal(),
+                        transaction.getDiscount(),
+                        transaction.getTax(),
+                        transaction.getTotal());
+                
+                grandTotalSubtotal += transaction.getSubtotal();
+                grandTotalDiscount += transaction.getDiscount();
+                grandTotalTax += transaction.getTax();
+                grandTotal += transaction.getTotal();
+            }
+            
+            System.out.println("-------------------------------------------------------");
+            System.out.printf("%-10s RM%-14.2f RM%-14.2f RM%-14.2f RM%-14.2f\n", 
+                    "TOTAL:",
+                    grandTotalSubtotal,
+                    grandTotalDiscount,
+                    grandTotalTax,
+                    grandTotal);
+            System.out.println("-------------------------------------------------------");
+            System.out.println("TOTAL TRANSACTIONS: " + transactions.size());
+        }
+        
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }

@@ -1,7 +1,15 @@
 package assignment.model;
+<<<<<<< HEAD
 
 import assignment.repo.MemberRepository;
 import assignment.util.ConsoleUtil;
+=======
+
+import assignment.repo.MemberRepository;
+import assignment.util.ConsoleUtil;
+import assignment.util.ValidationUtil;
+
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +20,9 @@ import java.util.Scanner;
  */
 public abstract class Membership extends Person {
 
+    protected final List<Membership> memberList = new ArrayList<>();
+    private static final MemberRepository memberRepo = new MemberRepository();
+
     private String memberHp;
     private String memberType;
     private double discountRate = 0;
@@ -20,10 +31,11 @@ public abstract class Membership extends Person {
     public Membership() {
     }
 
-    public Membership(String name, String ic, int id, String memberHp, String memberType) {
+    public Membership(String name, String ic, int id, String memberHp, String memberType, double discountRate) {
         super(name, ic, id);
         this.memberHp = memberHp;
         this.memberType = memberType;
+        this.discountRate = discountRate;
         noOfMember++;
     }
 
@@ -78,6 +90,7 @@ public abstract class Membership extends Person {
 
             // IC
             do {
+<<<<<<< HEAD
                 System.out.print("ENTER MEMBER IC: ");
                 memberIC = scanner.nextLine();
                 if (memberIC.matches("\\d{12}")) {
@@ -86,6 +99,7 @@ public abstract class Membership extends Person {
                     } else {
                         break;
                     }
+=======
                 do {
                     System.out.print("ENTER MEMBER IC: ");
                     memberIC = ValidationUtil.icValidation();
@@ -93,6 +107,7 @@ public abstract class Membership extends Person {
 
                 if (icExists("members.txt", memberIC)) {
                     System.out.println("<<<IC already exists in the file. Please reenter!>>>");
+>>>>>>> 93b2678c1e7167896ea46aa3955f0958e6d6ea66
                 } else {
                     break;
                 }
@@ -343,6 +358,15 @@ public abstract class Membership extends Person {
                 + "\nTYPE OF MEMBERSHIP: " + getMemberType();
     }
 
+    public void loadMembersFromRepo() {
+        memberList.clear();
+        memberList.addAll(memberRepo.loadAllMembers());
+    }
+
+    private boolean icExists(String filePath, String targetIC) {
+        // filePath ignored; repository is the single source of truth
+        return memberRepo.existsByIc(targetIC);
+    }
 }
 
 

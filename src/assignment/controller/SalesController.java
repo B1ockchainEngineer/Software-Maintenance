@@ -5,20 +5,41 @@ import assignment.service.PaymentService;
 import assignment.service.SalesService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
-import assignment.view.SalesView;
 import java.io.IOException;
 import java.util.List;
 
 public class SalesController {
     private final SalesService salesService;
     private final PaymentService paymentService;
-    private final SalesView salesView;
 
     public SalesController(SalesService salesService, PaymentService paymentService) {
         this.salesService = salesService;
         this.paymentService = paymentService;
-        this.salesView = new SalesView();
     }
+
+    // --- Helper Method for Display ---
+
+    public void displayAvailableItems() {
+        System.out.println("-------------------------------------------------------");
+        System.out.println("            AVAILABLE ITEMS FOR PURCHASE");
+        System.out.println("-------------------------------------------------------");
+        System.out.printf("%-15s %-20s %-15s %-10s\n", "PRODUCT ID", "PRODUCT NAME", "PRICE (RM)", "QUANTITY");
+        System.out.println("-------------------------------------------------------");
+
+        List<Stock> availableStock = salesService.getAvailableStock();
+        for (Stock stockItem : availableStock) {
+            if (stockItem.getQty() > 0) {
+                System.out.printf("%-15d %-20s %-15.2f %-10d\n",
+                        stockItem.getStockID(),
+                        stockItem.getStockName(),
+                        stockItem.getPrice(),
+                        stockItem.getQty());
+            }
+        }
+        System.out.println("-------------------------------------------------------");
+    }
+
+    // --- Main Controller Methods ---
 
     public void addOrder() throws IOException {
         char nextOrder = 'N';
@@ -26,8 +47,9 @@ public class SalesController {
         do {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            salesView.printOrderMenu();
-            salesView.displayAvailableItems(salesService.getAvailableStock());
+            System.out.println("[ ORDERING SYSTEM ]");
+            System.out.println("-------------------------------------------------------");
+            displayAvailableItems();
 
             int itemID;
             Stock foundStock = null;
@@ -51,7 +73,10 @@ public class SalesController {
                     System.out.println("<<<The item ID is not matched or no quantity available, please enter the correct one!>>>");
                     itemID = -9999;
                 } else {
-                    salesView.printProductDetails(foundStock);
+                    System.out.printf("PRODUCT NAME: %s\n", foundStock.getStockName());
+                    System.out.printf("PRODUCT PRICE: RM%.2f\n", foundStock.getPrice());
+                    System.out.printf("AVAILABLE QUANTITY: %d\n", foundStock.getQty());
+                    System.out.println("-------------------------------------------------------");
                     break;
                 }
             } while (true);
@@ -77,9 +102,12 @@ public class SalesController {
                     // 3. Add to Cart (Business Logic Handled by Service)
                     boolean success = salesService.addToCart(itemID, quantity);
                     if (success) {
-                        salesView.printCartSummary(foundStock, quantity);
+                        System.out.println("-------------------------------------------------------");
+                        System.out.printf("TOTAL COST: RM%.2f\n", foundStock.getPrice() * quantity);
+                        System.out.println("-------------------------------------------------------");
+                        System.out.println("[ORDER ADDED]");
                     } else {
-                        salesView.printAddOrderFailure();
+                        System.out.println("<<<Failed to add order. Invalid item or quantity.>>>");
                     }
                     break; // Exit quantity input loop
                 }
@@ -109,7 +137,8 @@ public class SalesController {
     public void searchOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printSearchOrderMenu();
+        System.out.println("[ SEARCH AN ORDER ]");
+        System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER ORDER NO TO SEARCH: ");
         int orderNoSearch = ValidationUtil.intValidation(1, 10000);
@@ -123,9 +152,13 @@ public class SalesController {
         Stock item = salesService.findCartItemByOrderNo(orderNoSearch);
 
         if (item != null) {
-            salesView.displayOrderDetail(item);
+            System.out.println("ORDER NO " + item.getOrderNo());
+            System.out.println("PRODUCT NAME: " + item.getStockName());
+            System.out.println("QUANTITY: " + item.getQty());
+            System.out.printf("TOTAL COST: RM%.2f\n", item.calculateTotalCost());
+            System.out.println("-----------------------");
         } else {
-            salesView.printOrderNotFound();
+            System.out.println("The order is not found in the cart. Please try again.");
         }
 
         ConsoleUtil.systemPause();
@@ -135,7 +168,8 @@ public class SalesController {
     public void removeOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printRemoveOrderMenu();
+        System.out.println("[ REMOVE AN ORDER ]");
+        System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER ORDER NO TO REMOVE: ");
         int orderNoRemove = ValidationUtil.intValidation(1, 10000);
@@ -149,21 +183,24 @@ public class SalesController {
         Stock cartItem = salesService.findCartItemByOrderNo(orderNoRemove);
 
         if (cartItem == null) {
-            salesView.printOrderNotFound();
+            System.out.println("<<<The order is not found in the cart. Please try again.>>>");
         } else {
-            salesView.printRemoveConfirmation(cartItem);
+            System.out.println("-------------------------------------------------------");
+            System.out.println("ORDER DETAILS:");
+            System.out.println(cartItem.toString());
+            System.out.println("-------------------------------------------------------");
 
             System.out.print("DO YOU WANT TO DELETE THIS ORDER (Y = YES, N = NO): ");
             char confirm = ValidationUtil.charValidation();
 
             if (confirm == 'Y') {
                 if (salesService.removeOrder(orderNoRemove)) {
-                    salesView.printRemoveSuccess();
+                    System.out.println("ORDER REMOVED SUCCESSFULLY");
                 } else {
-                    salesView.printRemoveFailure();
+                    System.out.println("ORDER REMOVAL FAILED (Error in Service)");
                 }
             } else {
-                salesView.printRemoveCancelled();
+                System.out.println("ORDER REMOVAL CANCELLED");
             }
         }
 
@@ -174,7 +211,8 @@ public class SalesController {
     public void editOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printEditOrderMenu();
+        System.out.println("[ EDIT AN ORDER ]");
+        System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER ORDER NO TO EDIT: ");
         int orderNoEdit = ValidationUtil.intValidation(1, 10000);
@@ -204,8 +242,16 @@ public class SalesController {
             return;
         }
 
-        salesView.printEditOrderDetails(cartItem, stockItem);
-        salesView.printEditOrderSubMenu();
+        System.out.println("ORDER NO " + cartItem.getOrderNo());
+        System.out.println("-------------------------------------------------------");
+        System.out.println("PRODUCT NAME: " + cartItem.getStockName());
+        System.out.println("CURRENT QUANTITY IN ORDER: " + cartItem.getQty());
+        System.out.println("AVAILABLE QUANTITY IN INVENTORY: " + stockItem.getQty());
+        System.out.println("-------------------------------------------------------");
+        System.out.println("1. REDUCE QUANTITY");
+        System.out.println("2. ADD QUANTITY");
+        System.out.println("0. CANCEL");
+        System.out.println("-------------------------------------------------------");
 
         System.out.print("ENTER YOUR CHOICE: ");
         int choice = ValidationUtil.intValidation(0, 2);
@@ -229,9 +275,10 @@ public class SalesController {
             } else {
                 boolean success = salesService.editOrderQuantity(orderNoEdit, quantityChange, choice);
                 if (success) {
-                    salesView.printEditSuccess((choice == 1 ? "REDUCED" : "ADDED"), salesService.findCartItemByOrderNo(orderNoEdit).getQty());
+                    System.out.println("QUANTITY " + (choice == 1 ? "REDUCED" : "ADDED") + " SUCCESSFULLY");
+                    System.out.printf("NEW ORDER QUANTITY: %d\n", salesService.findCartItemByOrderNo(orderNoEdit).getQty());
                 } else {
-                    salesView.printEditFailure();
+                    System.out.println("<<<Invalid quantity. Check limits.>>>");
                 }
             }
         }
@@ -243,10 +290,11 @@ public class SalesController {
     public void makePayment() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printPaymentMenu();
+        System.out.println("[ MAKE PAYMENT ]");
+        System.out.println("-------------------------------------------------------");
 
         List<Stock> cart = salesService.getCartItems();
-
+        
         if (cart.isEmpty()) {
             System.out.println("<<<CART IS EMPTY. PLEASE ADD ITEMS BEFORE PAYMENT.>>>");
             ConsoleUtil.systemPause();
@@ -254,12 +302,26 @@ public class SalesController {
             return;
         }
 
-        salesView.displayCartItems(cart);
+        // Display cart items
+        System.out.println("CART ITEMS:");
+        System.out.println("-------------------------------------------------------");
+        System.out.printf("%-15s %-20s %-10s %-10s %-15s\n", "ORDER NO", "PRODUCT NAME", "QUANTITY", "PRICE", "TOTAL");
+        System.out.println("-------------------------------------------------------");
+        
+        for (Stock item : cart) {
+            System.out.printf("%-15d %-20s %-10d RM%-9.2f RM%-14.2f\n",
+                    item.getOrderNo(),
+                    item.getStockName(),
+                    item.getQty(),
+                    item.getPrice(),
+                    item.calculateTotalCost());
+        }
+        System.out.println("-------------------------------------------------------");
 
         // Ask for member discount
         System.out.print("ENTER MEMBER ID FOR DISCOUNT (OR PRESS '0' FOR NO DISCOUNT): M-");
         String memberInput = ValidationUtil.scanner.nextLine().trim();
-
+        
         double discountRate = 0.0;
         if (!memberInput.equals("0") && !memberInput.isEmpty()) {
             // TODO: Look up member and get discount rate from MemberService
@@ -277,12 +339,22 @@ public class SalesController {
 
         // Process payment
         PaymentService.PaymentResult result = paymentService.processPayment(discountRate);
-
+        
         if (result != null) {
-            salesView.printPaymentSummary(result);
-            salesView.printPaymentSuccess();
+            System.out.println("\n-------------------------------------------------------");
+            System.out.println("PAYMENT SUMMARY");
+            System.out.println("-------------------------------------------------------");
+            System.out.printf("SUBTOTAL:        RM%.2f\n", result.getSubtotal());
+            System.out.printf("DISCOUNT:        RM%.2f\n", result.getDiscount());
+            System.out.printf("TAX (6%%):        RM%.2f\n", result.getTax());
+            System.out.println("-------------------------------------------------------");
+            System.out.printf("TOTAL:           RM%.2f\n", result.getTotal());
+            System.out.println("-------------------------------------------------------");
+            System.out.println("\nPAYMENT PROCESSED SUCCESSFULLY!");
+            System.out.println("Items have been saved to PaidItem.txt");
+            System.out.println("Transaction has been recorded in Transaction.txt");
         } else {
-            salesView.printPaymentFailure();
+            System.out.println("<<<PAYMENT FAILED.>>>");
         }
 
         ConsoleUtil.systemPause();
