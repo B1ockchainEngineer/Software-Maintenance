@@ -4,6 +4,7 @@ import assignment.model.Staff;
 import assignment.service.StaffService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
+import assignment.util.PasswordUtil;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -40,15 +41,17 @@ public class LoginController {
                 continue;
             }
             
-            // Get Password (with masking option)
-            System.out.print("ENTER PASSWORD: ");
-            String password = ValidationUtil.scanner.nextLine();
+            // Get Password (with masking)
+            String password = PasswordUtil.readPassword("ENTER PASSWORD: ");
             
             if (password.isEmpty()) {
-                System.out.println("<<<PASSWORD CANNOT BE EMPTY!>>>");
+                System.out.println("\n<<<PASSWORD CANNOT BE EMPTY!>>>");
                 ConsoleUtil.systemPause();
                 continue;
             }
+            
+            // Check if IC exists first for better error messages
+            Staff foundByIc = staffService.findByIc(ic);
             
             // Attempt login
             Staff staff = staffService.login(ic, password);
@@ -57,7 +60,7 @@ public class LoginController {
                 // Login successful
                 LocalDateTime loginTime = LocalDateTime.now();
                 System.out.println("\n========================================");
-                System.out.println("  LOGIN SUCCESSFUL!");
+                System.out.println("  ✓ LOGIN SUCCESSFUL!");
                 System.out.println("========================================");
                 System.out.println("WELCOME, " + staff.getName().toUpperCase());
                 System.out.println("LOGIN TIME: " + loginTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -70,8 +73,15 @@ public class LoginController {
                 ConsoleUtil.systemPause();
                 return staff;
             } else {
-                // Login failed
-                System.out.println("\n<<<LOGIN FAILED! INVALID IC OR PASSWORD!>>>\n");
+                // Login failed - provide specific error message
+                if (foundByIc == null) {
+                    System.out.println("\n<<<LOGIN FAILED! IC NOT FOUND IN SYSTEM!>>>");
+                    System.out.println("Please check your IC number and try again.\n");
+                } else {
+                    System.out.println("\n<<<LOGIN FAILED! INCORRECT PASSWORD!>>>");
+                    System.out.println("The IC exists but the password is incorrect.\n");
+                }
+                
                 System.out.print("PRESS 'E' TO RETURN TO MENU OR ANY OTHER KEY TO RETRY: ");
                 String choice = ValidationUtil.scanner.nextLine();
                 
