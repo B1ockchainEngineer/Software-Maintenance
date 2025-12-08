@@ -7,6 +7,8 @@ import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.StaffView;
 
+import static assignment.util.SalesUtil.INVALID_INPUT;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class StaffController {
 
             int staffOpt = ValidationUtil.intValidation(0, 5);
 
-            if (staffOpt == -9999) {
+            if (staffOpt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -145,7 +147,7 @@ public class StaffController {
             System.out.print("ENTER STAFF ID TO UPDATE (OR '0' TO CANCEL): S-");
             int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
 
-            if (staffId == -9999 || staffId == 0) {
+            if (staffId == INVALID_INPUT || staffId == 0) {
                 return;
             }
 
@@ -383,7 +385,7 @@ public class StaffController {
             System.out.print("ENTER STAFF ID TO DELETE (OR '0' TO CANCEL): S-");
             int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
 
-            if (staffId == -9999) {
+            if (staffId == INVALID_INPUT) {
                 System.out.println("\n<<<INVALID INPUT!>>>\n");
                 return;
             }
@@ -495,7 +497,7 @@ public class StaffController {
             System.out.print("ENTER STAFF ID TO SEARCH (OR '0' TO CANCEL): S-");
             int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
 
-            if (staffId == -9999) {
+            if (staffId == INVALID_INPUT) {
                 System.out.println("\n<<<INVALID INPUT!>>>\n");
                 return;
             }

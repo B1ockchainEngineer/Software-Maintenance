@@ -2,6 +2,7 @@ package assignment.view;
 
 import assignment.enums.StaffMenu;
 import assignment.model.Staff;
+import assignment.util.config.AppConfig;
 import java.util.List;
 
 /**
@@ -12,65 +13,65 @@ public class StaffView {
 
     public void printStaffMenu(int totalStaff) {
         System.out.println("[ STAFF MANAGEMENT SYSTEM ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("Total Staff: " + totalStaff);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("Please select an option:");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         
         for (StaffMenu menu : StaffMenu.values()) {
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
         }
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printAddStaffHeader(int currentCount) {
         System.out.println("[ ADD NEW STAFF ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("Please fill in the following information:");
         System.out.println("(Press 'E' at any time to cancel)");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("Current Staff Count: " + currentCount);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println();
     }
 
     public void printNewStaffSummary(Staff newStaff) {
         System.out.println();
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("SUMMARY - Please review the information:");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.printf("STAFF ID:     S-%d%n", newStaff.getId());
         System.out.printf("NAME:         %s%n", newStaff.getName());
         System.out.printf("IC:           %s%n", newStaff.getStfIC());
         System.out.printf("AGE:          %d years%n", newStaff.getStfAge());
         System.out.printf("SALARY:       RM %,.2f%n", newStaff.getStfSalary());
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printStaffAddedSuccess(Staff newStaff, int newCount) {
         System.out.println();
-        System.out.println("========================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.println("  STAFF ADDED SUCCESSFULLY!");
-        System.out.println("========================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.printf("STAFF ID:     S-%d%n", newStaff.getId());
         System.out.printf("NAME:         %s%n", newStaff.getName());
         System.out.printf("IC:           %s%n", newStaff.getStfIC());
         System.out.printf("AGE:          %d years%n", newStaff.getStfAge());
         System.out.printf("SALARY:       RM %,.2f%n", newStaff.getStfSalary());
-        System.out.println("========================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.println("New Staff Count: " + newCount);
-        System.out.println("========================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.println();
     }
 
     public void printUpdateStaffMenu() {
         System.out.println("[ UPDATE STAFF INFORMATION ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("Find staff by:");
         System.out.println("1. Staff ID (e.g., S-123456)");
         System.out.println("2. Staff IC (e.g., 123456789012)");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void displayStaffDetails(Staff staff) {
@@ -79,15 +80,15 @@ public class StaffView {
 
     public void printDeleteStaffMenu(List<Staff> staffList) {
         System.out.println("[ DELETE STAFF ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("WARNING: This action cannot be undone!");
         System.out.println("-------------------------------------------------------\n");
         
         System.out.println("CURRENT STAFF LIST:");
-        System.out.println("=================================================================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.printf("%-10s %-25s %-15s %-10s%n", 
                 "STAFF ID", "STAFF NAME", "STAFF IC", "AGE");
-        System.out.println("=================================================================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         
         for (Staff staff : staffList) {
             System.out.printf("%-10s %-25s %-15s %-10d%n",
@@ -97,36 +98,36 @@ public class StaffView {
                     staff.getStfAge());
         }
         
-        System.out.println("=================================================================================");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.println("TOTAL STAFF: " + staffList.size());
         System.out.println("-------------------------------------------------------\n");
         
         System.out.println("Delete by:");
         System.out.println("1. Staff ID (e.g., S-123456)");
         System.out.println("2. Staff IC (e.g., 123456789012)");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printDeleteConfirmation(Staff staffToDelete) {
         System.out.println("[ DELETE STAFF - CONFIRMATION ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("WARNING: This action cannot be undone!");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("STAFF TO BE DELETED:");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println(staffToDelete.toString());
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printSearchStaffMenu(List<Staff> quickList) {
         System.out.println("[ SEARCH STAFF ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         
         if (!quickList.isEmpty() && quickList.size() <= 10) {
             System.out.println("QUICK REFERENCE - Current Staff List:");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             System.out.printf("%-10s %-20s %-15s%n", "STAFF ID", "STAFF NAME", "STAFF IC");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             for (Staff s : quickList) {
                 System.out.printf("%-10s %-20s %-15s%n", 
                         "S-" + s.getId(), s.getName(), s.getIc());
@@ -138,13 +139,13 @@ public class StaffView {
         System.out.println("1. Staff ID");
         System.out.println("2. Staff IC");
         System.out.println("3. Staff Name");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void displaySearchResults(List<Staff> results, String searchType) {
         if (results.isEmpty()) {
             System.out.println("[ SEARCH RESULTS ]");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             System.out.println("<<<NO STAFF FOUND WITH " + searchType + "!>>>");
             System.out.println();
             System.out.println("TIP: Try searching with:");
@@ -154,22 +155,22 @@ public class StaffView {
             System.out.println();
         } else {
             System.out.println("[ SEARCH RESULTS ]");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             System.out.println("Search criteria: " + searchType);
             System.out.println("Found: " + results.size() + " staff member(s)");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             System.out.println();
             int index = 1;
             for (Staff staff : results) {
                 System.out.println("[" + index + "]");
                 System.out.println(staff.toString());
                 if (index < results.size()) {
-                    System.out.println("-------------------------------------------------------");
+                    System.out.println(AppConfig.SEPARATOR_LINE);
                 }
                 index++;
             }
             System.out.println();
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
         }
     }
 
@@ -205,7 +206,7 @@ public class StaffView {
 
             // Display statistics
             System.out.println("STATISTICS:");
-            System.out.println("-------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LINE);
             System.out.printf("Total Staff Members: %d%n", staffList.size());
             System.out.printf("Average Age: %.1f years%n", avgAge);
             System.out.printf("Highest Salary: RM %.2f%n", maxSalary);
@@ -215,10 +216,10 @@ public class StaffView {
 
             // Display staff list
             System.out.println("STAFF LIST:");
-            System.out.println("=================================================================================");
+            System.out.println(AppConfig.SEPARATOR_LONG);
             System.out.printf("%-10s %-20s %-15s %-10s %-15s%n", 
                     "STAFF ID", "STAFF NAME", "STAFF IC", "AGE", "SALARY");
-            System.out.println("=================================================================================");
+            System.out.println(AppConfig.SEPARATOR_LONG);
 
             for (Staff staff : staffList) {
                 System.out.printf("%-10s %-20s %-15s %-10d RM%-14.2f%n",
@@ -229,7 +230,7 @@ public class StaffView {
                         staff.getStfSalary());
             }
 
-            System.out.println("=================================================================================");
+            System.out.println(AppConfig.SEPARATOR_LONG);
             System.out.println("TOTAL STAFF: " + staffList.size() + "\n");
         }
     }

@@ -1,7 +1,9 @@
 package assignment;
 
 import assignment.view.MainView;
-import assignment.controller.SalesController;
+import assignment.view.SalesView;
+import assignment.controller.OrderController;
+import assignment.controller.PaymentController;
 import assignment.controller.StockController;
 import assignment.controller.MemberController;
 import assignment.controller.StaffController;
@@ -21,19 +23,23 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static assignment.util.SalesUtil.INVALID_INPUT;
+
 public class Main {
 
     public static int totalPayment = 0; // Global accumulator
 
     // Controllers shared for this Main instance
     private final StockController stockController;
-    private final SalesController salesController;
+    private final OrderController orderController;
+    private final PaymentController paymentController;
     private final MemberController memberController;
     private final StaffController staffController;
     private final LoginController loginController;
     private final SignupController signupController;
 
     private final MainView mainView;
+    private final SalesView salesView;
 
     // Current logged-in staff
     private Staff currentStaff;
@@ -47,6 +53,7 @@ public class Main {
     // Initialise repository, services and controllers and wire them to this Main
     public Main() {
         this.mainView = new MainView();
+        this.salesView = new SalesView();
 
         // Stock-related setup
         StockRepository stockRepo = new StockRepository();
@@ -67,12 +74,14 @@ public class Main {
         this.loginController = new LoginController(staffService);
         this.signupController = new SignupController(staffService);
 
-        // Member-related setup (used by both SalesController for discounts and MemberController for management)
+        // Member-related setup (used by both PaymentController for discounts and MemberController for management)
         MemberRepository memberRepo = new MemberRepository();
         MemberService memberService = new MemberService(memberRepo);
         this.memberController = new MemberController(memberService);
         
-        this.salesController = new SalesController(salesService, paymentService, transactionService, memberService);
+        // Initialize controllers
+        this.orderController = new OrderController(salesService);
+        this.paymentController = new PaymentController(paymentService, transactionService, memberService, salesService);
     }
 
     public void entry() {
@@ -80,19 +89,19 @@ public class Main {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             mainView.printLoginMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
+            mainView.printSelectionPrompt();
 
             // Input Validation using ValidationUtil (range 1 to 3)
             int logMenuOpt = ValidationUtil.intValidation(1, 3);
 
-            if (logMenuOpt == -9999) {
+            if (logMenuOpt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
 
             LogMenu logSelection = LogMenu.getByOption(logMenuOpt);
             if (logSelection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                mainView.printInvalidOptionMessage();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -130,19 +139,19 @@ public class Main {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             mainView.printMainMenu(currentStaff);
-            System.out.print("ENTER YOUR SELECTION: ");
+            mainView.printSelectionPrompt();
 
             // Max option is 4 (STOCK_MANAGEMENT)
             int opt = ValidationUtil.intValidation(0, 4);
 
-            if (opt == -9999) {
+            if (opt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
 
             MainMenu selection = MainMenu.getByOption(opt);
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                mainView.printInvalidOptionMessage();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -184,11 +193,11 @@ public class Main {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             mainView.printStockMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
+            mainView.printSelectionPrompt();
 
             int stockOpt = ValidationUtil.intValidation(0, 3);
 
-            if (stockOpt == -9999) {
+            if (stockOpt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -196,7 +205,7 @@ public class Main {
             StockMenu selection = StockMenu.getByOption(stockOpt);
 
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                mainView.printInvalidOptionMessage();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -219,12 +228,12 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printSalesMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
+            salesView.printSalesMenu();
+            mainView.printSelectionPrompt();
 
             int salesOpt = ValidationUtil.intValidation(0, 2);
 
-            if (salesOpt == -9999) {
+            if (salesOpt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -232,7 +241,7 @@ public class Main {
             SalesMenu selection = SalesMenu.getByOption(salesOpt);
 
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                mainView.printInvalidOptionMessage();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -242,7 +251,7 @@ public class Main {
                     runOrder();
                 }
                 case TRANSACTION_REPORT -> {
-                    salesController.viewTransactionReport();
+                    paymentController.viewTransactionReport();
                 }
                 case BACK_TO_MAIN -> {
                     mainView.printBackToMainMessage();
@@ -254,16 +263,16 @@ public class Main {
     }
 
     public void runOrder() throws IOException {
-        // *** REFACACTORED: Delegates to SalesController ***
+        // *** REFACTORED: Delegates to OrderController and PaymentController ***
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            mainView.printCreateOrderMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
+            salesView.printOrderMenu();
+            mainView.printSelectionPrompt();
 
             int orderOpt = ValidationUtil.intValidation(0, 5);
 
-            if (orderOpt == -9999) {
+            if (orderOpt == INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -271,18 +280,18 @@ public class Main {
             OrderMenu selection = OrderMenu.getByOption(orderOpt);
 
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                mainView.printInvalidOptionMessage();
                 ConsoleUtil.systemPause();
                 continue;
             }
 
             switch (selection) {
-                case ADD_ORDER -> salesController.addOrder();
-                case EDIT_ORDER -> salesController.editOrder();
-                case SEARCH_ORDER -> salesController.searchOrder();
-                case REMOVE_ORDER -> salesController.removeOrder();
+                case ADD_ORDER -> orderController.addOrder();
+                case EDIT_ORDER -> orderController.editOrder();
+                case SEARCH_ORDER -> orderController.searchOrder();
+                case REMOVE_ORDER -> orderController.removeOrder();
                 case MAKE_PAYMENT -> {
-                    salesController.makePayment();
+                    paymentController.makePayment();
                 }
                 case BACK_TO_PREVIOUS -> {
                     mainView.printBackToPreviousMessage();

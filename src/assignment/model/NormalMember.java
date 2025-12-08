@@ -1,11 +1,13 @@
 package assignment.model;
 
+import assignment.util.config.MemberConfig;
+
 /**
  * Normal membership tier.
  */
 public class NormalMember extends Membership {
 
-    private static double normalRate = 0.05;
+    private static double normalRate = MemberConfig.DISCOUNT_RATE_NORMAL;
 
     public NormalMember() {
     }

@@ -1,11 +1,13 @@
 package assignment.model;
 
+import assignment.util.config.MemberConfig;
+
 /**
  * Premium membership tier.
  */
 public class PremiumMember extends Membership {
 
-    private static double premiumRate = 0.15;
+    private static double premiumRate = MemberConfig.DISCOUNT_RATE_PREMIUM;
 
     public PremiumMember() {
     }

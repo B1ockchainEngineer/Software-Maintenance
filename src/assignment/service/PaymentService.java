@@ -5,7 +5,7 @@ import assignment.model.Stock;
 import assignment.model.Transaction;
 import assignment.repo.OrderRepository;
 import assignment.repo.StockRepository;
-import assignment.util.config.TransactionConfig;
+import assignment.util.config.SalesConfig;
 import java.util.List;
 
 /**
@@ -51,16 +51,34 @@ public class PaymentService {
      */
     public double calculateTax(double subtotal, double discount) {
         double amountAfterDiscount = subtotal - discount;
-        return amountAfterDiscount * TransactionConfig.TAX_RATE;
+        return amountAfterDiscount * SalesConfig.TAX_RATE;
     }
 
     /**
-     * Calculates payment summary without processing the payment.
-     * Used to preview payment details before confirmation.
-     * @param discountRate The discount rate to apply (0.0 if no member discount)
-     * @return PaymentResult containing calculated payment details (payment not processed)
+     * Internal helper class to hold payment calculation results.
+     * Used to avoid code duplication between calculatePaymentSummary and createTransaction.
      */
-    public PaymentResult calculatePaymentSummary(double discountRate) {
+    private static class PaymentCalculation {
+        final double subtotal;
+        final double discount;
+        final double tax;
+        final double total;
+
+        PaymentCalculation(double subtotal, double discount, double tax, double total) {
+            this.subtotal = subtotal;
+            this.discount = discount;
+            this.tax = tax;
+            this.total = total;
+        }
+    }
+
+    /**
+     * Calculates all payment components (subtotal, discount, tax, total).
+     * This is the single source of truth for payment calculations.
+     * @param discountRate The discount rate to apply (0.0 if no member discount)
+     * @return PaymentCalculation containing all calculated values, or null if cart is empty
+     */
+    private PaymentCalculation calculatePayment(double discountRate) {
         List<Stock> cart = stockRepo.getCart();
         
         if (cart.isEmpty()) {
@@ -72,7 +90,23 @@ public class PaymentService {
         double tax = calculateTax(subtotal, discount);
         double total = subtotal - discount + tax;
 
-        return new PaymentResult(subtotal, discount, tax, total);
+        return new PaymentCalculation(subtotal, discount, tax, total);
+    }
+
+    /**
+     * Calculates payment summary without processing the payment.
+     * Used to preview payment details before confirmation.
+     * @param discountRate The discount rate to apply (0.0 if no member discount)
+     * @return PaymentResult containing calculated payment details (payment not processed)
+     */
+    public PaymentResult calculatePaymentSummary(double discountRate) {
+        PaymentCalculation calc = calculatePayment(discountRate);
+        
+        if (calc == null) {
+            return null; // No items to calculate
+        }
+
+        return new PaymentResult(calc.subtotal, calc.discount, calc.tax, calc.total);
     }
 
     /**
@@ -100,12 +134,13 @@ public class PaymentService {
             return null; // No items to process
         }
 
-        double subtotal = calculateSubtotal();
-        double discount = calculateDiscount(discountRate, subtotal);
-        double tax = calculateTax(subtotal, discount);
-        double total = subtotal - discount + tax;
+        PaymentCalculation calc = calculatePayment(discountRate);
+        
+        if (calc == null) {
+            return null; // No items to process
+        }
 
-        return new Transaction(subtotal, discount, tax, total, cart);
+        return new Transaction(calc.subtotal, calc.discount, calc.tax, calc.total, cart);
     }
 }
 

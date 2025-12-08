@@ -2,7 +2,8 @@ package assignment.repo;
 
 import assignment.model.Stock;
 import assignment.model.Transaction;
-import assignment.util.config.TransactionConfig;
+import assignment.util.config.AppConfig;
+import assignment.util.config.SalesConfig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  *   ...
  */
 public class TransactionRepository {
-    private static final String TRANSACTION_FILE_PATH = TransactionConfig.TRANSACTION_FILE_PATH;
+    private static final String TRANSACTION_FILE_PATH = SalesConfig.TRANSACTION_FILE_PATH;
     private static final Logger LOGGER = Logger.getLogger(TransactionRepository.class.getName());
 
     /**
@@ -39,7 +40,7 @@ public class TransactionRepository {
         ensureFileExists();
         try (FileWriter writer = new FileWriter(TRANSACTION_FILE_PATH, true)) {
             // Write transaction header
-            writer.write(TransactionConfig.FILE_MARKER_TRANSACTION + "\t");
+            writer.write(SalesConfig.FILE_MARKER_TRANSACTION + "\t");
             writer.write(subtotal + "\t");
             writer.write(discount + "\t");
             writer.write(tax + "\t");
@@ -119,7 +120,7 @@ public class TransactionRepository {
 
     private boolean isTransactionHeader(String[] parts) {
         return parts.length >= 5 && 
-               (parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION) || 
+               (parts[0].equals(SalesConfig.FILE_MARKER_TRANSACTION) ||
                 parts[0].equals("TRANSACTION")); // Backward compatibility
     }
 
@@ -130,7 +131,7 @@ public class TransactionRepository {
     private boolean isOldFormatTransaction(String[] parts) {
         return parts.length >= 4 && 
                !parts[0].equals("ITEM") && 
-               !parts[0].equals(TransactionConfig.FILE_MARKER_TRANSACTION) && 
+               !parts[0].equals(SalesConfig.FILE_MARKER_TRANSACTION) &&
                !parts[0].equals("TRANSACTION");
     }
 
@@ -173,7 +174,7 @@ public class TransactionRepository {
 
     private void ensureFileExists() {
         // Ensure data directory exists
-        File dataDir = new File(TransactionConfig.DATA_DIR);
+        File dataDir = new File(AppConfig.DATA_DIR);
         if (!dataDir.exists()) {
             dataDir.mkdirs();
         }

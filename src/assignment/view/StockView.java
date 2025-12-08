@@ -1,6 +1,7 @@
 package assignment.view;
 
 import assignment.model.Stock;
+import assignment.util.config.AppConfig;
 import java.util.List;
 
 /**
@@ -11,11 +12,11 @@ public class StockView {
 
     public void displayAvailableStock(List<Stock> stockList) {
         System.out.println("         [ VIEW ALL PRODUCTS IN STOCK ]");
-        System.out.println("------------------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LONG);
 
         // Header
         System.out.printf("%-10s      %-25s%-10s  %-10s\n", "PRODUCT ID", "PRODUCT NAME", "QUANTITY", "PRICE");
-        System.out.println("------------------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LONG);
 
         boolean found = false;
         for (Stock product : stockList) {
@@ -25,19 +26,19 @@ public class StockView {
                     product.getStockName(),
                     product.getQty(),
                     product.getPrice());
-            System.out.println("------------------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LONG);
             found = true;
         }
 
         if (!found) {
             System.out.println("No products found in the inventory file.");
-            System.out.println("------------------------------------------------------------------");
+            System.out.println(AppConfig.SEPARATOR_LONG);
         }
     }
 
     public void printAddStockHeader() {
         System.out.println("[ ADD NEW PRODUCT ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printProductID(int displayID) {
@@ -51,7 +52,7 @@ public class StockView {
 
     public void printAddSuccess() {
         System.out.println("\nNEW PRODUCT ADDED TO THE SYSTEM...");
-        System.out.println("---------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printAddFailure() {
@@ -60,14 +61,14 @@ public class StockView {
 
     public void printDeleteStockMenu() {
         System.out.println("[ DELETE A PRODUCT ]");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void displayStockDetails(Stock stock) {
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println("PRODUCT INFORMATION TO BE DELETED:");
         System.out.println(stock.toString());
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printDeleteSuccess(int inputID) {

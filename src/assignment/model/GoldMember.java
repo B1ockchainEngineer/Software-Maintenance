@@ -1,11 +1,13 @@
 package assignment.model;
 
+import assignment.util.config.MemberConfig;
+
 /**
  * Gold membership tier.
  */
 public class GoldMember extends Membership {
 
-    private static double goldRate = 0.10;
+    private static double goldRate = MemberConfig.DISCOUNT_RATE_GOLD;
 
     public GoldMember() {
     }

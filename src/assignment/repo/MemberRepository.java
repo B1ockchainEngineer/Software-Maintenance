@@ -4,6 +4,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
+import assignment.util.config.AppConfig;
 import assignment.util.config.MemberConfig;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -41,11 +42,11 @@ public class MemberRepository {
     }
 
     private void ensureDirectoriesExist() {
-        File dataDir = new File(MemberConfig.DATA_DIR);
+        File dataDir = new File(AppConfig.DATA_DIR);
         if (!dataDir.exists()) {
             dataDir.mkdirs();
         }
-        File tempDir = new File(MemberConfig.TEMP_DIR);
+        File tempDir = new File(AppConfig.TEMP_DIR);
         if (!tempDir.exists()) {
             tempDir.mkdirs();
         }

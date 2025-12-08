@@ -7,6 +7,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
+import assignment.util.config.AppConfig;
 import assignment.util.config.MemberConfig;
 
 import java.util.List;
@@ -19,27 +20,27 @@ public class MemberView {
 
     public void printMemberMenu() {
         System.out.println(MemberConfig.TITLE_MEMBER_SYSTEM);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         for (MemberMenu menu : MemberMenu.values()) {
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
         }
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printTierMenu() {
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         for (TierMenu menu : TierMenu.values()){
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
         }
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void printEditMenu() {
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         for (MemberEditMenu menu : MemberEditMenu.values()){
             System.out.printf("%d. %s%n", menu.getOption(), menu.getDescription());
         }
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
     public void displayMemberDetails(Membership memberFound) {
@@ -51,10 +52,10 @@ public class MemberView {
     }
 
     public void displayMembersByType(List<Membership> memberList, String membershipType) {
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
                 "MEMBER ID", "MEMBER NAME", "MEMBER HP", "MEMBER TYPE", "MEMBER IC");
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LONG);
 
         boolean foundMembers = false;
 
@@ -77,7 +78,7 @@ public class MemberView {
         if (!foundMembers) {
             System.out.println(String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType));
         }
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LONG);
     }
 
     private void printMemberDetails(Membership member) {

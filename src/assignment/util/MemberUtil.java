@@ -113,15 +113,8 @@ public class MemberUtil {
      * Returns 'Y' or 'N'.
      */
     public static char confirmValidation(String question){
-        char yesNo;
-        do {
-            System.out.print(question);
-            yesNo = ValidationUtil.charValidation();
-            if (yesNo != 'Y' && yesNo != 'N')
-                System.out.println("Invalid Option! Please Re-enter!");
-        } while (yesNo != 'Y' && yesNo != 'N');
-
-        return yesNo;
+        System.out.print(question);
+        return ValidationUtil.yesNoValidation("Invalid Option! Please Re-enter!");
     }
 
 

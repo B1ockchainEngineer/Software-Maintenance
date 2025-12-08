@@ -6,10 +6,8 @@ public class MemberConfig {
     }
 
     // ================== FILE & PATH CONFIG ==================
-    public static final String DATA_DIR = "data/";
-    public static final String TEMP_DIR = DATA_DIR + "temp/";
-    public static final String MEMBER_FILE_PATH = DATA_DIR + "members.txt";
-    public static final String TEMP_DELETE_FILE_PATH = TEMP_DIR + "dltTemp.txt";
+    public static final String MEMBER_FILE_PATH = AppConfig.DATA_DIR + "members.txt";
+    public static final String TEMP_DELETE_FILE_PATH = AppConfig.TEMP_DIR + "dltTemp.txt";
     
     // ================== UI LABELS / TITLES ==================
     public static final String TITLE_MEMBER_SYSTEM = "[ MEMBER MANAGEMENT SYSTEM ]";
@@ -23,6 +21,11 @@ public class MemberConfig {
     public static final String MEMBER_TYPE_NORMAL  = "Normal";
     public static final String MEMBER_TYPE_GOLD    = "Gold";
     public static final String MEMBER_TYPE_PREMIUM = "Premium";
+
+    // ================== DISCOUNT RATES ==================
+    public static final double DISCOUNT_RATE_NORMAL = 0.05;
+    public static final double DISCOUNT_RATE_GOLD = 0.10;
+    public static final double DISCOUNT_RATE_PREMIUM = 0.15;
 
     // ================== NESTED ERROR MESSAGE CLASS ==================
     public static final class ErrorMessage {
@@ -85,5 +88,10 @@ public class MemberConfig {
         public static final String MEMBER_SAVED =
                 "<<< MEMBER DETAILS SAVED >>>";
     }
+    
+    // ================== PAYMENT-RELATED MEMBER MESSAGES ==================
+    // These messages are used when member lookup fails during payment processing
+    public static final String MSG_MEMBER_NOT_FOUND_PAYMENT = "<<<MEMBER NOT FOUND!>>>\nProceeding with no discount...";
+    public static final String MSG_INVALID_MEMBER_ID_FORMAT_PAYMENT = "<<<INVALID MEMBER ID FORMAT!>>>\nProceeding with no discount...";
 }
 

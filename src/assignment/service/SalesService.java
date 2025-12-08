@@ -5,6 +5,8 @@ import assignment.repo.OrderRepository;
 import assignment.repo.StockRepository;
 import java.util.List;
 
+import static assignment.util.SalesUtil.*;
+
 public class SalesService {
     private final StockRepository stockRepo;
     private final OrderRepository orderRepo;
@@ -186,13 +188,13 @@ public class SalesService {
 
         if (quantityChange <= 0) return false;
 
-        if (type == 1) { // Reduce Quantity
+        if (type == REDUCE_QUANTITY) { // Reduce Quantity
             if (quantityChange > currentCartQty) return false; // Cannot reduce more than what's ordered
 
             cartItem.setQty(currentCartQty - quantityChange);
             stockItem.setQty(availableStock + quantityChange); // Refund stock
 
-        } else if (type == 2) { // Add Quantity
+        } else if (type == ADD_QUANTITY) { // Add Quantity
             if (quantityChange > availableStock) return false; // Insufficient stock
 
             cartItem.setQty(currentCartQty + quantityChange);

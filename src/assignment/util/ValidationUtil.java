@@ -3,8 +3,6 @@ package assignment.util;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import static assignment.util.ConsoleUtil.clearScreen;
-import java.time.LocalDate;
-import java.time.DateTimeException;
 
 public class ValidationUtil {
     // Shared Scanner instance for the whole application.
@@ -79,6 +77,25 @@ public class ValidationUtil {
         }
 
         return Character.toUpperCase(input);
+    }
+
+    /**
+     * Reads a Y/N answer and keeps prompting until a valid value is entered.
+     * The prompt should be printed by the caller. Returns 'Y' or 'N'.
+     *
+     * @param invalidMessage optional message to show when input is invalid
+     * @return uppercase 'Y' or 'N'
+     */
+    public static char yesNoValidation(String invalidMessage) {
+        String fallback = "Invalid option. Please enter Y or N.";
+        char input;
+        do {
+            input = charValidation();
+            if (input == 'Y' || input == 'N') {
+                return input;
+            }
+            System.out.println(invalidMessage != null ? invalidMessage : fallback);
+        } while (true);
     }
 
     public static double doubleValidation() {

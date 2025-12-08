@@ -5,8 +5,8 @@ import assignment.service.StockService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.StockView;
-import java.util.List;
-import java.util.Scanner;
+
+import static assignment.util.SalesUtil.INVALID_INPUT;
 
 public class StockController {
     private final StockService stockService;
@@ -75,7 +75,7 @@ public class StockController {
             do {
                 System.out.print("ENTER PRODUCT QUANTITY TO BE ADDED (Must be >= 1): ");
                 qty = ValidationUtil.intValidation(1, 100000);
-                if (qty == -9999) continue;
+                if (qty == INVALID_INPUT) continue;
                 newStock.setQty(qty);
                 break;
             } while (true);
@@ -85,7 +85,7 @@ public class StockController {
             do {
                 System.out.print("ENTER PRICE OF THE PRODUCT (Must be >= 1.00):  RM ");
                 price = ValidationUtil.doubleValidation();
-                if (price == -9999) continue;
+                if (price == INVALID_INPUT) continue;
                 if (price >= 1.0) {
                     newStock.setPrice(price);
                     break;
@@ -101,7 +101,7 @@ public class StockController {
             OUTER:
             while (true) {
                 System.out.print("\nDO YOU WANT TO ADD THIS PRODUCT? (Y = YES / N = NO): ");
-                char confirmation = ValidationUtil.charValidation();
+                char confirmation = ValidationUtil.yesNoValidation("<<<Invalid input. Please enter 'Y' for yes or 'N' for no.>>>");
 
                 switch (confirmation) {
                     case 'Y' -> {
@@ -116,8 +116,6 @@ public class StockController {
                         System.out.println("\nPRODUCT NOT ADDED. RETURNING TO THE MAIN MENU...");
                         break OUTER;
                     }
-                    default ->
-                            System.out.println("<<<Invalid input. Please enter 'Y' for yes or 'N' for no.>>>");
                 }
             }
 
@@ -159,7 +157,7 @@ public class StockController {
                 stockView.displayStockDetails(productToDelete);
 
                 System.out.print("ARE YOU SURE YOU WANT TO DELETE THIS PRODUCT? (Y = YES, N = CANCEL): ");
-                char confirm = ValidationUtil.charValidation();
+                char confirm = ValidationUtil.yesNoValidation("<<<Invalid input. Please enter 'Y' for yes or 'N' for no.>>>");
 
                 if (confirm == 'Y') {
                     if (stockService.deleteStock(inputID)) {

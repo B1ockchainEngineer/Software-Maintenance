@@ -2,6 +2,8 @@ package assignment.service;
 
 import assignment.model.Membership;
 import assignment.repo.MemberRepository;
+import assignment.util.SalesUtil;
+import assignment.util.config.MemberConfig;
 
 import java.util.List;
 
@@ -15,6 +17,46 @@ public class MemberService {
 
     public MemberService(MemberRepository memberRepo) {
         this.memberRepo = memberRepo;
+    }
+
+    /**
+     * Result class for discount rate calculation.
+     * Contains the discount rate, member information, and any error messages.
+     */
+    public static class DiscountResult {
+        private final double discountRate;
+        private final Membership member;
+        private final String errorMessage;
+
+        private DiscountResult(double discountRate, Membership member, String errorMessage) {
+            this.discountRate = discountRate;
+            this.member = member;
+            this.errorMessage = errorMessage;
+        }
+
+        public static DiscountResult success(double discountRate, Membership member) {
+            return new DiscountResult(discountRate, member, null);
+        }
+
+        public static DiscountResult error(double discountRate, String errorMessage) {
+            return new DiscountResult(discountRate, null, errorMessage);
+        }
+
+        public double getDiscountRate() {
+            return discountRate;
+        }
+
+        public Membership getMember() {
+            return member;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public boolean hasError() {
+            return errorMessage != null;
+        }
     }
 
     /**
@@ -65,7 +107,7 @@ public class MemberService {
 
     /**
      * Finds the index of a member in the list by ID.
-     * Returns the index number or -9999 if not found.
+     * Returns the index number or INVALID_INPUT if not found.
      */
     public int findMemberIndexById(List<Membership> memberList ,int memberId) {
         for (int i=0; i < memberList.size(); i++) {
@@ -73,7 +115,7 @@ public class MemberService {
                 return i;
             }
         }
-        return -9999;
+        return SalesUtil.INVALID_INPUT;
     }
 
     /**
@@ -98,6 +140,37 @@ public class MemberService {
      */
     public boolean icExists(String targetIC) {
         return memberRepo.existsByIc(targetIC);
+    }
+
+    /**
+     * Calculates the discount rate based on member input.
+     * Handles parsing, validation, and member lookup.
+     * 
+     * @param memberInput The member ID input string (can be "0", "X", or a numeric ID)
+     * @return DiscountResult containing discount rate, member info, and any error messages
+     */
+    public DiscountResult getDiscountRate(String memberInput) {
+        // Default: no discount
+        if (memberInput == null || memberInput.trim().isEmpty() || memberInput.equals("0")) {
+            return DiscountResult.success(0.0, null);
+        }
+
+        // Parse member ID
+        try {
+            int memberId = Integer.parseInt(memberInput.trim());
+            Membership member = findMemberById(memberId);
+
+            if (member == null) {
+                return DiscountResult.error(0.0, MemberConfig.MSG_MEMBER_NOT_FOUND_PAYMENT);
+            }
+
+            // Calculate discount rate from member's type
+            double discountRate = member.calDiscount();
+            return DiscountResult.success(discountRate, member);
+
+        } catch (NumberFormatException e) {
+            return DiscountResult.error(0.0, MemberConfig.MSG_INVALID_MEMBER_ID_FORMAT_PAYMENT);
+        }
     }
 }
 
