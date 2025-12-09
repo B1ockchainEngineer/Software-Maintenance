@@ -108,14 +108,7 @@ public class MemberUtil {
         return null;
     }
 
-    /**
-     * Asks a Yes/No question and gets user input.
-     * Returns 'Y' or 'N'.
-     */
-    public static char confirmValidation(String question){
-        System.out.print(question);
-        return ValidationUtil.yesNoValidation("Invalid Option! Please Re-enter!");
-    }
+
 
 
 

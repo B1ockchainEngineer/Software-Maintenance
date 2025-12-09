@@ -178,8 +178,7 @@ public class OrderController {
             ConsoleUtil.clearScreen();
 
             // Ask for next order
-            salesView.printFinishedOrderingPrompt();
-            nextOrder = SalesUtil.readYesNo();
+            nextOrder = ValidationUtil.confirmValidation(SalesConfig.PROMPT_FINISHED_ORDERING);
 
         } while (Character.toUpperCase(nextOrder) != 'Y');
 
@@ -239,8 +238,7 @@ public class OrderController {
         } else {
             salesView.printRemoveConfirmation(cartItem);
 
-            salesView.printDeleteOrderConfirmationPrompt();
-            char confirm = SalesUtil.readYesNo();
+            char confirm = ValidationUtil.confirmValidation(SalesConfig.PROMPT_DELETE_ORDER_CONFIRM);
 
             if (confirm == 'Y') {
                 if (salesService.removeOrder(orderNoRemove)) {
@@ -305,8 +303,7 @@ public class OrderController {
     private void handleFullQuantityDeletion(int orderNoEdit, Stock cartItem) {
         salesView.printFullQuantityDeleteWarning();
         salesView.printRemoveConfirmation(cartItem);
-        salesView.printDeleteOrderConfirmationPrompt();
-        char confirm = SalesUtil.readYesNo();
+        char confirm = ValidationUtil.confirmValidation(SalesConfig.PROMPT_DELETE_ORDER_CONFIRM);
         
         if (confirm == 'Y') {
             if (salesService.removeOrder(orderNoEdit)) {

@@ -86,16 +86,24 @@ public class ValidationUtil {
      * @param invalidMessage optional message to show when input is invalid
      * @return uppercase 'Y' or 'N'
      */
-    public static char yesNoValidation(String invalidMessage) {
-        String fallback = "Invalid option. Please enter Y or N.";
-        char input;
+    /**
+     * Prints a question and validates the Yes/No input.
+     * Consolidates confirmation logic from MemberUtil and SalesUtil.
+     *
+     * @param question The question to ask the user.
+     * @return 'Y' or 'N'
+     */
+    public static char confirmValidation(String question) {
+        char yesNo;
         do {
-            input = charValidation();
-            if (input == 'Y' || input == 'N') {
-                return input;
+            System.out.print(question);
+            yesNo = ValidationUtil.charValidation();
+            if (yesNo != 'Y' && yesNo != 'N') {
+                System.out.println("Invalid Option! Please Re-enter!");
             }
-            System.out.println(invalidMessage != null ? invalidMessage : fallback);
-        } while (true);
+        } while (yesNo != 'Y' && yesNo != 'N');
+
+        return yesNo;
     }
 
     public static double doubleValidation() {

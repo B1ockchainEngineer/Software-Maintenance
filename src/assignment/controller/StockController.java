@@ -100,8 +100,7 @@ public class StockController {
             // 4. Confirmation and Save
             OUTER:
             while (true) {
-                System.out.print("\nDO YOU WANT TO ADD THIS PRODUCT? (Y = YES / N = NO): ");
-                char confirmation = ValidationUtil.yesNoValidation("<<<Invalid input. Please enter 'Y' for yes or 'N' for no.>>>");
+                char confirmation = ValidationUtil.confirmValidation("\nDO YOU WANT TO ADD THIS PRODUCT? (Y = YES / N = NO): ");
 
                 switch (confirmation) {
                     case 'Y' -> {
@@ -156,8 +155,7 @@ public class StockController {
             if (productToDelete != null) {
                 stockView.displayStockDetails(productToDelete);
 
-                System.out.print("ARE YOU SURE YOU WANT TO DELETE THIS PRODUCT? (Y = YES, N = CANCEL): ");
-                char confirm = ValidationUtil.yesNoValidation("<<<Invalid input. Please enter 'Y' for yes or 'N' for no.>>>");
+                char confirm = ValidationUtil.confirmValidation("ARE YOU SURE YOU WANT TO DELETE THIS PRODUCT? (Y = YES, N = CANCEL): ");
 
                 if (confirm == 'Y') {
                     if (stockService.deleteStock(inputID)) {

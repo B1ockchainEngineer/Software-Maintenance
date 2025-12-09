@@ -131,8 +131,7 @@ public class MemberController {
                 case BACK_TO_MEMBER_MENU -> { return; }
             }
 
-            System.out.print("ADD MORE MEMBER? (Y = YES , N = NO): ");
-            char addAnother = ValidationUtil.yesNoValidation(null);
+            char addAnother = ValidationUtil.confirmValidation("ADD MORE MEMBER? (Y = YES , N = NO): ");
             if (addAnother == 'N') {
                 return;
             }
@@ -196,7 +195,7 @@ public class MemberController {
 
             System.out.println("---------------------------------------------------");
             System.out.println("ARE YOU CONFIRM THE MEMBER DETAILS ABOVE ARE CORRECT ?");
-            char yesNo = MemberUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
+            char yesNo = ValidationUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
 
             if (yesNo == 'Y') {
                 memberService.addMember(member);
@@ -248,7 +247,7 @@ public class MemberController {
                 memberView.displayMemberDetails(target);
                 System.out.println("-------------------------------------------------------");
                 // Use confirm validation to eliminate redundancy
-                char confirm = MemberUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
+                char confirm = ValidationUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
 
                 if (confirm == 'Y') {
                     boolean deleted = memberService.deleteMemberById(memberIdToDelete);
@@ -495,7 +494,7 @@ public class MemberController {
                 memberView.displayMemberDetails(memberFound);
                 System.out.println("-------------------------------------------------------");
 
-                char more = MemberUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
+                char more = ValidationUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
                 if (more == 'N') {
                     done = true;
                 }

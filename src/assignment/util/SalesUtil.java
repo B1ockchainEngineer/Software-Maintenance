@@ -31,12 +31,6 @@ public class SalesUtil {
         return quantity == REENTER_PRODUCT_CODE;
     }
 
-    /**
-     * Read a Y/N answer, re-prompting until the input is valid.
-     * Assumes the caller already printed the question/prompt.
-     */
-    public static char readYesNo() {
-        return ValidationUtil.yesNoValidation(SalesConfig.MSG_INVALID_CHOICE);
-    }
+
 }
 

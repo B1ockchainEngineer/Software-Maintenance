@@ -83,8 +83,7 @@ public class PaymentController {
         salesView.printPaymentSummary(summary);
 
         // Ask for confirmation
-        salesView.printPaymentConfirmationPrompt();
-        char confirm = SalesUtil.readYesNo();
+        char confirm = ValidationUtil.confirmValidation(SalesConfig.PROMPT_CONFIRM_PAYMENT);
 
         if (confirm != 'Y') {
             salesView.printPaymentConfirmationCancelled();
