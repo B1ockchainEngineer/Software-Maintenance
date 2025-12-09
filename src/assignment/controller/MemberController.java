@@ -14,7 +14,7 @@ import assignment.util.MemberUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.MemberView;
 
-import static assignment.util.SalesUtil.INVALID_INPUT;
+import assignment.util.SalesUtil;
 
 import java.util.List;
 import java.util.Random;
@@ -50,7 +50,7 @@ public class MemberController {
 
             int memberOpt = ValidationUtil.intValidation(0, 5);
 
-            if (memberOpt == INVALID_INPUT) {
+            if (memberOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -285,7 +285,7 @@ public class MemberController {
 
                 option = ValidationUtil.intValidation(0, 3);
 
-                if (option == INVALID_INPUT) {
+                if (option == SalesUtil.INVALID_INPUT) {
                     ConsoleUtil.systemPause();
                     continue;
                 }
@@ -399,7 +399,7 @@ public class MemberController {
 
             int option = ValidationUtil.intValidation(0, 4);
 
-            if (option == INVALID_INPUT) {
+            if (option == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -460,7 +460,7 @@ public class MemberController {
 
                     do {
                         typeOption = ValidationUtil.intValidation(1, 3);
-                    } while (typeOption == INVALID_INPUT);
+                    } while (typeOption == SalesUtil.INVALID_INPUT);
 
                     TierMenu userChoice = TierMenu.getByOption(typeOption);
 

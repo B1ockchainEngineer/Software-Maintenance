@@ -5,7 +5,7 @@ import assignment.repo.OrderRepository;
 import assignment.repo.StockRepository;
 import java.util.List;
 
-import static assignment.util.SalesUtil.*;
+import assignment.util.SalesUtil;
 
 public class SalesService {
     private final StockRepository stockRepo;
@@ -20,6 +20,52 @@ public class SalesService {
         // Order numbers are assigned based on position (1, 2, 3, ...)
         restoreCartFromOrders();
     }
+    
+    // ... code truncated ...
+
+    /**
+     * Edits the quantity of an existing order.
+     * @param orderNo The order number to edit.
+     * @param quantityChange The amount to add or reduce.
+     * @param type 1 for Reduce, 2 for Add.
+     * @return true if successful, false otherwise.
+     */
+    public boolean editOrderQuantity(int orderNo, int quantityChange, int type) {
+        Stock cartItem = findCartItemByOrderNo(orderNo);
+        if (cartItem == null) return false;
+
+        Stock stockItem = findStockItem(cartItem.getStockID());
+        if (stockItem == null) return false;
+
+        int currentCartQty = cartItem.getQty();
+        int availableStock = stockItem.getQty();
+
+        if (quantityChange <= 0) return false;
+
+        if (type == SalesUtil.REDUCE_QUANTITY) { // Reduce Quantity
+            if (quantityChange > currentCartQty) return false; // Cannot reduce more than what's ordered
+
+            cartItem.setQty(currentCartQty - quantityChange);
+            stockItem.setQty(availableStock + quantityChange); // Refund stock
+
+        } else if (type == SalesUtil.ADD_QUANTITY) { // Add Quantity
+            if (quantityChange > availableStock) return false; // Insufficient stock
+
+            cartItem.setQty(currentCartQty + quantityChange);
+            stockItem.setQty(availableStock - quantityChange); // Deduct stock
+
+        } else {
+            return false; // Invalid type
+        }
+
+        // Update order in file
+        orderRepo.updateOrder(cartItem);
+        
+        // Persist the stock changes
+        stockRepo.saveStockToFile();
+        return true;
+    }
+}
 
     /**
      * Restores the cart from saved orders in the file.
@@ -188,13 +234,13 @@ public class SalesService {
 
         if (quantityChange <= 0) return false;
 
-        if (type == REDUCE_QUANTITY) { // Reduce Quantity
+        if (type == SalesUtil.REDUCE_QUANTITY) { // Reduce Quantity
             if (quantityChange > currentCartQty) return false; // Cannot reduce more than what's ordered
 
             cartItem.setQty(currentCartQty - quantityChange);
             stockItem.setQty(availableStock + quantityChange); // Refund stock
 
-        } else if (type == ADD_QUANTITY) { // Add Quantity
+        } else if (type == SalesUtil.ADD_QUANTITY) { // Add Quantity
             if (quantityChange > availableStock) return false; // Insufficient stock
 
             cartItem.setQty(currentCartQty + quantityChange);

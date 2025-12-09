@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static assignment.util.SalesUtil.INVALID_INPUT;
+import assignment.util.SalesUtil;
 
 public class Main {
 
@@ -94,7 +94,7 @@ public class Main {
             // Input Validation using ValidationUtil (range 1 to 3)
             int logMenuOpt = ValidationUtil.intValidation(1, 3);
 
-            if (logMenuOpt == INVALID_INPUT) {
+            if (logMenuOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -144,7 +144,7 @@ public class Main {
             // Max option is 4 (STOCK_MANAGEMENT)
             int opt = ValidationUtil.intValidation(0, 4);
 
-            if (opt == INVALID_INPUT) {
+            if (opt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -197,7 +197,7 @@ public class Main {
 
             int stockOpt = ValidationUtil.intValidation(0, 3);
 
-            if (stockOpt == INVALID_INPUT) {
+            if (stockOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -233,7 +233,7 @@ public class Main {
 
             int salesOpt = ValidationUtil.intValidation(0, 2);
 
-            if (salesOpt == INVALID_INPUT) {
+            if (salesOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -272,7 +272,7 @@ public class Main {
 
             int orderOpt = ValidationUtil.intValidation(0, 5);
 
-            if (orderOpt == INVALID_INPUT) {
+            if (orderOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }

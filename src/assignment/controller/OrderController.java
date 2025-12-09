@@ -10,7 +10,7 @@ import assignment.view.SalesView;
 import java.io.IOException;
 import java.util.List;
 
-import static assignment.util.SalesUtil.*;
+
 
 /**
  * Controller for order management operations.
@@ -58,15 +58,15 @@ public class OrderController {
                 return new ProductIdResult(0, null, true, false);
             }
 
-            if (itemID == INVALID_INPUT) {
-                return new ProductIdResult(INVALID_INPUT, null, false, true);
+            if (itemID == SalesUtil.INVALID_INPUT) {
+                return new ProductIdResult(SalesUtil.INVALID_INPUT, null, false, true);
             }
 
             foundStock = salesService.findStockItem(itemID);
 
             if (foundStock == null || foundStock.getQty() == 0) {
                 salesView.printInvalidItemIdMessage();
-                itemID = INVALID_INPUT;
+                itemID = SalesUtil.INVALID_INPUT;
             } else {
                 salesView.printProductDetails(foundStock);
                 break;
@@ -90,8 +90,8 @@ public class OrderController {
             salesView.printQuantityPrompt();
             quantity = ValidationUtil.intValidation(0, 10000);
 
-            if (quantity == INVALID_INPUT) continue;
-            if (isReenterProduct(quantity)) {
+            if (quantity == SalesUtil.INVALID_INPUT) continue;
+            if (SalesUtil.isReenterProduct(quantity)) {
                 return true; // Re-enter product ID
             }
 
@@ -194,7 +194,7 @@ public class OrderController {
         salesView.printOrderNoSearchPrompt();
         int orderNoSearch = ValidationUtil.intValidation(1, 10000);
 
-        if (orderNoSearch == INVALID_INPUT) {
+        if (orderNoSearch == SalesUtil.INVALID_INPUT) {
             ConsoleUtil.systemPause();
             ConsoleUtil.clearScreen();
             return;
@@ -225,7 +225,7 @@ public class OrderController {
         salesView.printOrderNoRemovePrompt();
         int orderNoRemove = ValidationUtil.intValidation(1, 10000);
 
-        if (orderNoRemove == INVALID_INPUT) {
+        if (orderNoRemove == SalesUtil.INVALID_INPUT) {
             ConsoleUtil.systemPause();
             ConsoleUtil.clearScreen();
             return;
@@ -276,7 +276,7 @@ public class OrderController {
      * @return OrderValidationResult containing cartItem, stockItem, and validation status
      */
     private OrderValidationResult validateOrderForEdit(int orderNoEdit) {
-        if (orderNoEdit == INVALID_INPUT) {
+        if (orderNoEdit == SalesUtil.INVALID_INPUT) {
             return new OrderValidationResult(null, null, false);
         }
 
@@ -324,23 +324,23 @@ public class OrderController {
      * @param choice The edit choice (1 = reduce, 2 = add)
      */
     private void processQuantityChange(int orderNoEdit, Stock cartItem, Stock stockItem, int choice) {
-        int maxChange = (choice == REDUCE_QUANTITY) ? cartItem.getQty() : stockItem.getQty();
-        salesView.printQuantityChangePrompt(choice == REDUCE_QUANTITY, maxChange);
+        int maxChange = (choice == SalesUtil.REDUCE_QUANTITY) ? cartItem.getQty() : stockItem.getQty();
+        salesView.printQuantityChangePrompt(choice == SalesUtil.REDUCE_QUANTITY, maxChange);
         int quantityChange = ValidationUtil.intValidation(1, maxChange);
 
-        if (quantityChange == INVALID_INPUT) {
+        if (quantityChange == SalesUtil.INVALID_INPUT) {
             salesView.printInvalidQuantityInputMessage();
             return;
         }
 
         // Check if reducing full quantity (same as deleting)
-        if (choice == REDUCE_QUANTITY && quantityChange == cartItem.getQty()) {
+        if (choice == SalesUtil.REDUCE_QUANTITY && quantityChange == cartItem.getQty()) {
             handleFullQuantityDeletion(orderNoEdit, cartItem);
         } else {
             // Normal edit operation
             boolean success = salesService.editOrderQuantity(orderNoEdit, quantityChange, choice);
             if (success) {
-                String action = (choice == REDUCE_QUANTITY ? "REDUCED" : "ADDED");
+                String action = (choice == SalesUtil.REDUCE_QUANTITY ? "REDUCED" : "ADDED");
                 int newQty = salesService.findCartItemByOrderNo(orderNoEdit).getQty();
                 salesView.printEditSuccess(action, newQty);
             } else {
@@ -380,7 +380,7 @@ public class OrderController {
 
         if (choice == 0) {
             salesView.printEditCancelledMessage();
-        } else if (choice == INVALID_INPUT) {
+        } else if (choice == SalesUtil.INVALID_INPUT) {
             salesView.printInvalidChoiceMessage();
         } else {
             processQuantityChange(orderNoEdit, validation.cartItem, validation.stockItem, choice);

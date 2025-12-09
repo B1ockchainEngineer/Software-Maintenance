@@ -6,7 +6,7 @@ import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.StockView;
 
-import static assignment.util.SalesUtil.INVALID_INPUT;
+import assignment.util.SalesUtil;
 
 public class StockController {
     private final StockService stockService;
@@ -75,7 +75,7 @@ public class StockController {
             do {
                 System.out.print("ENTER PRODUCT QUANTITY TO BE ADDED (Must be >= 1): ");
                 qty = ValidationUtil.intValidation(1, 100000);
-                if (qty == INVALID_INPUT) continue;
+                if (qty == SalesUtil.INVALID_INPUT) continue;
                 newStock.setQty(qty);
                 break;
             } while (true);
@@ -85,7 +85,7 @@ public class StockController {
             do {
                 System.out.print("ENTER PRICE OF THE PRODUCT (Must be >= 1.00):  RM ");
                 price = ValidationUtil.doubleValidation();
-                if (price == INVALID_INPUT) continue;
+                if (price == SalesUtil.INVALID_INPUT) continue;
                 if (price >= 1.0) {
                     newStock.setPrice(price);
                     break;

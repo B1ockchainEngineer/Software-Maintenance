@@ -2,7 +2,7 @@ package assignment.util;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import static assignment.util.ConsoleUtil.clearScreen;
+import assignment.util.ConsoleUtil;
 
 public class ValidationUtil {
     // Shared Scanner instance for the whole application.
@@ -47,13 +47,13 @@ public class ValidationUtil {
         if (endingNum != 0) {
             if (input < startingNum || input > endingNum) {
                 System.out.println("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!\n");
-                clearScreen();
+                ConsoleUtil.clearScreen();
                 return -9999;
             }
         } else if (startingNum != 0) {
             if (input < startingNum) {
                 System.out.println("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!\n");
-                clearScreen();
+                ConsoleUtil.clearScreen();
                 return -9999;
             }
         }
