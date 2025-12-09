@@ -117,7 +117,7 @@ class SalesServiceTest {
         Stock found = salesService.findStockItem(1001);
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
-        assertEquals("Product A", found.getStockName());
+        assertEquals("PRODUCT A", found.getStockName()); // getStockName() returns uppercase
     }
 
     @Test

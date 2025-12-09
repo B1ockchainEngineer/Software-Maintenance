@@ -14,6 +14,7 @@ import assignment.util.ValidationUtil;
 import assignment.view.SalesView;
 import java.util.List;
 
+import static assignment.util.SalesUtil.INVALID_INPUT;
 
 
 /**

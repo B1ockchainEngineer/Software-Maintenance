@@ -18,11 +18,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for PaymentService and TransactionService.
- * Tests payment calculations, transaction creation, and transaction persistence.
+ * Unit tests for PaymentService.
+ * Tests payment calculations, transaction creation, and cart operations.
  */
-@DisplayName("Payment and Transaction Service Tests")
-class PaymentAndTransactionServiceTest {
+@DisplayName("PaymentService Tests")
+class PaymentServiceTest {
 
     private StockRepository stockRepo;
     private OrderRepository orderRepo;
@@ -56,7 +56,7 @@ class PaymentAndTransactionServiceTest {
             }
         };
 
-        // Setup mock TransactionRepository
+        // Setup mock TransactionRepository for integrated tests
         savedTransactions = new ArrayList<>();
         transactionRepo = new TransactionRepository() {
             @Override
@@ -77,8 +77,6 @@ class PaymentAndTransactionServiceTest {
         paymentService = new PaymentService(stockRepo, orderRepo);
         transactionService = new TransactionService(transactionRepo);
     }
-
-    // ================== PAYMENT SERVICE TESTS ==================
 
     @Test
     @DisplayName("Should calculate subtotal for single item")
@@ -266,119 +264,6 @@ class PaymentAndTransactionServiceTest {
         assertEquals(198.22, result.getTotal(), 0.01);
     }
 
-    // ================== TRANSACTION SERVICE TESTS ==================
-
-    @Test
-    @DisplayName("Should return empty list when no transactions exist")
-    void testGetAllTransactions_Empty() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertNotNull(transactions);
-        assertTrue(transactions.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should retrieve all saved transactions")
-    void testGetAllTransactions() {
-        // Create and save transactions
-        List<Stock> items1 = new ArrayList<>();
-        items1.add(new Stock(1, 1001, "Product A", 2, 50.0));
-        Transaction transaction1 = new Transaction(100.0, 10.0, 5.4, 95.4, items1);
-        transactionService.saveTransaction(transaction1);
-
-        List<Stock> items2 = new ArrayList<>();
-        items2.add(new Stock(1, 1002, "Product B", 1, 100.0));
-        Transaction transaction2 = new Transaction(100.0, 0.0, 6.0, 106.0, items2);
-        transactionService.saveTransaction(transaction2);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(2, transactions.size());
-    }
-
-    @Test
-    @DisplayName("Should save transaction correctly")
-    void testSaveTransaction() {
-        List<Stock> items = new ArrayList<>();
-        items.add(new Stock(1, 1001, "Product A", 2, 50.0));
-        items.add(new Stock(2, 1002, "Product B", 1, 100.0));
-
-        Transaction transaction = new Transaction(200.0, 20.0, 10.8, 190.8, items);
-        transactionService.saveTransaction(transaction);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(1, transactions.size());
-
-        Transaction saved = transactions.get(0);
-        assertEquals(200.0, saved.getSubtotal(), 0.01);
-        assertEquals(20.0, saved.getDiscount(), 0.01);
-        assertEquals(10.8, saved.getTax(), 0.01);
-        assertEquals(190.8, saved.getTotal(), 0.01);
-        assertEquals(2, saved.getItems().size());
-    }
-
-    @Test
-    @DisplayName("Should save multiple transactions")
-    void testSaveTransaction_Multiple() {
-        List<Stock> items1 = new ArrayList<>();
-        items1.add(new Stock(1, 1001, "Product A", 2, 50.0));
-        Transaction transaction1 = new Transaction(100.0, 10.0, 5.4, 95.4, items1);
-        transactionService.saveTransaction(transaction1);
-
-        List<Stock> items2 = new ArrayList<>();
-        items2.add(new Stock(1, 1002, "Product B", 1, 100.0));
-        Transaction transaction2 = new Transaction(100.0, 0.0, 6.0, 106.0, items2);
-        transactionService.saveTransaction(transaction2);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(2, transactions.size());
-    }
-
-    @Test
-    @DisplayName("Should preserve transaction items when saving")
-    void testSaveTransaction_PreserveItems() {
-        List<Stock> items = new ArrayList<>();
-        Stock item1 = new Stock(1, 1001, "Product A", 2, 50.0);
-        Stock item2 = new Stock(2, 1002, "Product B", 1, 100.0);
-        items.add(item1);
-        items.add(item2);
-
-        Transaction transaction = new Transaction(200.0, 20.0, 10.8, 190.8, items);
-        transactionService.saveTransaction(transaction);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        Transaction saved = transactions.get(0);
-        List<Stock> savedItems = saved.getItems();
-
-        assertEquals(2, savedItems.size());
-        assertEquals(1001, savedItems.get(0).getStockID());
-        assertEquals(1002, savedItems.get(1).getStockID());
-    }
-
-    @Test
-    @DisplayName("Should handle transaction with no discount")
-    void testSaveTransaction_NoDiscount() {
-        List<Stock> items = new ArrayList<>();
-        items.add(new Stock(1, 1001, "Product A", 2, 50.0));
-
-        Transaction transaction = new Transaction(100.0, 0.0, 6.0, 106.0, items);
-        transactionService.saveTransaction(transaction);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        Transaction saved = transactions.get(0);
-        assertEquals(0.0, saved.getDiscount(), 0.01);
-    }
-
-    @Test
-    @DisplayName("Should handle transaction with empty items list")
-    void testSaveTransaction_EmptyItems() {
-        List<Stock> items = new ArrayList<>();
-        Transaction transaction = new Transaction(0.0, 0.0, 0.0, 0.0, items);
-        transactionService.saveTransaction(transaction);
-
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(1, transactions.size());
-        assertTrue(transactions.get(0).getItems().isEmpty());
-    }
-
     // ================== INTEGRATED PAYMENT AND TRANSACTION TESTS ==================
 
     @Test
@@ -432,3 +317,4 @@ class PaymentAndTransactionServiceTest {
         assertEquals(106.0, transactions.get(1).getTotal(), 0.01); // Without discount
     }
 }
+

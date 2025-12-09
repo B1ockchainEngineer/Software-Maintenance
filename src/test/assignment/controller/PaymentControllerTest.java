@@ -34,6 +34,21 @@ class PaymentControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Create mock SalesService first (so PaymentService can reference it)
+        salesService = new SalesService(null, null) {
+            private final List<Stock> cart = new ArrayList<>();
+
+            {
+                cart.add(new Stock(1, 1001, "Product A", 2, 50.0));
+                cart.add(new Stock(2, 1002, "Product B", 1, 100.0));
+            }
+
+            @Override
+            public List<Stock> getCartItems() {
+                return cart;
+            }
+        };
+
         // Create mock PaymentService
         paymentService = new PaymentService(null, null) {
             private final List<Stock> cart = new ArrayList<>();
@@ -75,6 +90,8 @@ class PaymentControllerTest {
             @Override
             public void clearCart() {
                 cart.clear();
+                // Also clear the SalesService cart to match real behavior
+                salesService.getCartItems().clear();
             }
         };
 
@@ -103,21 +120,6 @@ class PaymentControllerTest {
                 // Mock: Return 10% discount for any valid input (Gold member)
                 GoldMember mockMember = new GoldMember("Test Member", "123456789012", 1, "0123456789", "Gold");
                 return DiscountResult.success(0.10, mockMember);
-            }
-        };
-
-        // Create mock SalesService
-        salesService = new SalesService(null, null) {
-            private final List<Stock> cart = new ArrayList<>();
-
-            {
-                cart.add(new Stock(1, 1001, "Product A", 2, 50.0));
-                cart.add(new Stock(2, 1002, "Product B", 1, 100.0));
-            }
-
-            @Override
-            public List<Stock> getCartItems() {
-                return cart;
             }
         };
 
