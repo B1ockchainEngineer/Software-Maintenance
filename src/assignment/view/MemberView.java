@@ -54,7 +54,8 @@ public class MemberView {
     public void displayMembersByType(List<Membership> memberList, String membershipType) {
         System.out.println(AppConfig.SEPARATOR_LONG);
         System.out.printf("%-9s | %-22s | %-11s | %-11s | %-12s%n",
-                "MEMBER ID", "MEMBER NAME", "MEMBER HP", "MEMBER TYPE", "MEMBER IC");
+                MemberConfig.HEADER_MEMBER_ID, MemberConfig.HEADER_MEMBER_NAME, 
+                MemberConfig.HEADER_MEMBER_HP, MemberConfig.HEADER_MEMBER_TYPE, MemberConfig.HEADER_MEMBER_IC);
         System.out.println(AppConfig.SEPARATOR_LONG);
 
         boolean foundMembers = false;

@@ -22,6 +22,49 @@ public class MemberConfig {
     public static final String MEMBER_TYPE_GOLD    = "Gold";
     public static final String MEMBER_TYPE_PREMIUM = "Premium";
 
+    // ================== UI PROMPTS ==================
+    public static final String PROMPT_ENTER_SELECTION = "ENTER YOUR SELECTION: ";
+    public static final String PROMPT_YOUR_CHOICE = "YOUR CHOICE: ";
+    public static final String PROMPT_ENTER_CHOICE_ARROW = "ENTER YOUR CHOICE > ";
+    public static final String PROMPT_PRESS_ENTER = "Press enter key to continue...";
+    public static final String PROMPT_FILTER_BY_TYPE = "FILTER MEMBER BY MEMBERSHIP TYPE:";
+    
+    // Add Member Prompts
+    public static final String PROMPT_ENTER_IC = "ENTER MEMBER IC: ";
+    public static final String PROMPT_ENTER_NAME = "ENTER MEMBER NAME: ";
+    public static final String PROMPT_ENTER_HP = "ENTER MEMBER HP: ";
+    public static final String PROMPT_ADD_MORE = "ADD MORE MEMBER? (Y = YES , N = NO): ";
+    public static final String PROMPT_CONFIRM_DETAILS = "ARE YOU CONFIRM THE MEMBER DETAILS ABOVE ARE CORRECT ?";
+    public static final String PROMPT_CONFIRM_OPTION = "ENTER YOUR OPTION (Y = YES, N = No): ";
+    public static final String MSG_YOUR_MEMBER_ID = "[THIS IS YOUR MEMBER ID]";
+    
+    // Delete/Search Prompts
+    public static final String PROMPT_DELETE_ID = "ENTER MEMBER ID TO DELETE (ENTER 'E' TO CANCEL): M-";
+    public static final String MSG_DETAILS_TO_DELETE = "Member Details to Delete:";
+    public static final String PROMPT_CONFIRM_DELETE = "CONFIRM DELETION? (Y = YES, N = No): ";
+    public static final String PROMPT_SEARCH_ID = "ENTER MEMBER ID TO SEARCH (3 DIGIT ONLY) OR 'E' TO CANCEL: M-";
+    
+    // Edit Prompts
+    public static final String PROMPT_EDIT_ID = "ENTER MEMBER ID (e.g. 741 ): M-";
+    public static final String MSG_CURRENT_DETAILS = "CURRENT MEMBER DETAILS:";
+    public static final String MSG_WHAT_TO_EDIT = "WHAT DO YOU WANT TO EDIT?";
+    public static final String PROMPT_NEW_NAME = "ENTER NEW MEMBER NAME: ";
+    public static final String PROMPT_NEW_HP = "ENTER NEW MEMBER HP (10–11 digits): ";
+    public static final String PROMPT_NEW_IC = "ENTER NEW MEMBER IC: ";
+    public static final String MSG_SELECT_NEW_TYPE = "SELECT NEW MEMBER TYPE:";
+    public static final String MSG_UPDATED_DETAILS = "UPDATED MEMBER DETAILS:";
+    public static final String PROMPT_EDIT_MORE = "EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):";
+    
+    // Headers / Labels
+    public static final String HEADER_MEMBER_ID = "MEMBER ID";
+    public static final String HEADER_MEMBER_NAME = "MEMBER NAME";
+    public static final String HEADER_MEMBER_HP = "MEMBER HP";
+    public static final String HEADER_MEMBER_TYPE = "MEMBER TYPE";
+    public static final String HEADER_MEMBER_IC = "MEMBER IC";
+    
+    public static final String MSG_BACK_TO_MAIN = "BACK TO MAIN MENU...";
+
+
     // ================== DISCOUNT RATES ==================
     public static final double DISCOUNT_RATE_NORMAL = 0.05;
     public static final double DISCOUNT_RATE_GOLD = 0.10;

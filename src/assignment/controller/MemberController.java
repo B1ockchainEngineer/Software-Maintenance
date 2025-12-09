@@ -46,7 +46,7 @@ public class MemberController {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             memberView.printMemberMenu();
-            System.out.print("ENTER YOUR SELECTION: ");
+            System.out.print(MemberConfig.PROMPT_ENTER_SELECTION);
 
             int memberOpt = ValidationUtil.intValidation(0, 5);
 
@@ -84,7 +84,7 @@ public class MemberController {
                     view();
                 }
                 case BACK_TO_MAIN -> {
-                    System.out.println("BACK TO MAIN MENU...");
+                    System.out.println(MemberConfig.MSG_BACK_TO_MAIN);
                     ConsoleUtil.systemPause();
                     return;
                 }
@@ -101,7 +101,7 @@ public class MemberController {
             ConsoleUtil.logo();
             System.out.println(MemberConfig.TITLE_REGISTER_MEMBER);
             memberView.printTierMenu();
-            System.out.print("YOUR CHOICE: ");
+            System.out.print(MemberConfig.PROMPT_YOUR_CHOICE);
 
             int option = ValidationUtil.intValidation(0, 4);
             TierMenu userChoice = TierMenu.getByOption(option);
@@ -131,7 +131,7 @@ public class MemberController {
                 case BACK_TO_MEMBER_MENU -> { return; }
             }
 
-            char addAnother = ValidationUtil.confirmValidation("ADD MORE MEMBER? (Y = YES , N = NO): ");
+            char addAnother = ValidationUtil.confirmValidation(MemberConfig.PROMPT_ADD_MORE);
             if (addAnother == 'N') {
                 return;
             }
@@ -155,16 +155,16 @@ public class MemberController {
         member.setId(randomNumber);
 
         System.out.println("MEMBER ID >> M-" + member.getId());
-        System.out.println("[THIS IS YOUR MEMBER ID]");
+        System.out.println(MemberConfig.MSG_YOUR_MEMBER_ID);
 
         do {
-            System.out.println("Press enter key to continue...");
+            System.out.println(MemberConfig.PROMPT_PRESS_ENTER);
             ValidationUtil.scanner.nextLine(); // consume newline
 
             // IC
             do {
                 do {
-                    System.out.print("ENTER MEMBER IC: ");
+                    System.out.print(MemberConfig.PROMPT_ENTER_IC);
                     memberIC = MemberUtil.icValidation();
                 } while (memberIC == null);
                 if (memberService.icExists(memberIC)) {
@@ -176,14 +176,14 @@ public class MemberController {
 
             // Name
             do {
-                System.out.print("ENTER MEMBER NAME: ");
+                System.out.print(MemberConfig.PROMPT_ENTER_NAME);
                 memberName = ValidationUtil.scanner.nextLine();
                 validName = MemberUtil.nameValidation(memberName);
             } while (!validName);
 
             // HP
             do {
-                System.out.print("ENTER MEMBER HP: ");
+                System.out.print(MemberConfig.PROMPT_ENTER_HP);
                 memberHP = MemberUtil.hpValidation();
             } while (memberHP == null);
             
@@ -193,17 +193,17 @@ public class MemberController {
             member.setName(memberName);
             member.setMemberHp(memberHP);
 
-            System.out.println("---------------------------------------------------");
-            System.out.println("ARE YOU CONFIRM THE MEMBER DETAILS ABOVE ARE CORRECT ?");
-            char yesNo = ValidationUtil.confirmValidation("ENTER YOUR OPTION (Y = YES, N = No): ");
+            System.out.println(AppConfig.SEPARATOR_LINE);
+            System.out.println(MemberConfig.PROMPT_CONFIRM_DETAILS);
+            char yesNo = ValidationUtil.confirmValidation(MemberConfig.PROMPT_CONFIRM_OPTION);
 
             if (yesNo == 'Y') {
                 memberService.addMember(member);
 
                 System.out.println(MemberConfig.SuccessfulMessage.MEMBER_ADDED);
-                System.out.println("---------------------------------------------------");
+                System.out.println(AppConfig.SEPARATOR_LINE);
                 memberView.displayMemberDetails(member);
-                System.out.println("---------------------------------------------------");
+                System.out.println(AppConfig.SEPARATOR_LINE);
                 System.out.println();
 
                 break;
@@ -219,9 +219,9 @@ public class MemberController {
 
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_DELETE_MEMBER);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
 
-        System.out.print("ENTER MEMBER ID TO DELETE (ENTER 'E' TO CANCEL): M-");
+        System.out.print(MemberConfig.PROMPT_DELETE_ID);
         String input = ValidationUtil.scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
@@ -243,11 +243,11 @@ public class MemberController {
             if (target == null) {
                 System.out.println(String.format(MemberConfig.ErrorMessage.DELETE_CANCELLED_OR_NOT_FOUND, memberIdToDelete));
             } else {
-                System.out.println("Member Details to Delete:");
+                System.out.println(MemberConfig.MSG_DETAILS_TO_DELETE);
                 memberView.displayMemberDetails(target);
-                System.out.println("-------------------------------------------------------");
+                System.out.println(AppConfig.SEPARATOR_LINE);
                 // Use confirm validation to eliminate redundancy
-                char confirm = ValidationUtil.confirmValidation("CONFIRM DELETION? (Y = YES, N = No): ");
+                char confirm = ValidationUtil.confirmValidation(MemberConfig.PROMPT_CONFIRM_DELETE);
 
                 if (confirm == 'Y') {
                     boolean deleted = memberService.deleteMemberById(memberIdToDelete);
@@ -273,15 +273,15 @@ public class MemberController {
         int option;
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_VIEW_MEMBERS);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
 
         if (memberService.getAllMembers().isEmpty()) {
             System.out.println(MemberConfig.ErrorMessage.NO_MEMBER_TO_DISPLAY);
         } else {
             while (true){
-                System.out.println("FILTER MEMBER BY MEMBERSHIP TYPE:");
+                System.out.println(MemberConfig.PROMPT_FILTER_BY_TYPE);
                 memberView.printTierMenu();
-                System.out.print("ENTER YOUR CHOICE > ");
+                System.out.print(MemberConfig.PROMPT_ENTER_CHOICE_ARROW);
 
                 option = ValidationUtil.intValidation(0, 3);
 
@@ -318,9 +318,9 @@ public class MemberController {
     public void search() {
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_SEARCH_MEMBER);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
 
-        System.out.print("ENTER MEMBER ID TO SEARCH (3 DIGIT ONLY) OR 'E' TO CANCEL: M-");
+        System.out.print(MemberConfig.PROMPT_SEARCH_ID);
         String input = ValidationUtil.scanner.nextLine().trim();
 
         if (input.equalsIgnoreCase("E")) {
@@ -365,9 +365,9 @@ public class MemberController {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
         System.out.println(MemberConfig.TITLE_EDIT_MEMBER);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         do {
-            System.out.print("ENTER MEMBER ID (e.g. 741 ): M-");
+            System.out.print(MemberConfig.PROMPT_EDIT_ID);
             rawId = ValidationUtil.digitOnlyValidation(3);
         } while (rawId == null);
 
@@ -385,17 +385,17 @@ public class MemberController {
 
         // Show current details
         System.out.println();
-        System.out.println("CURRENT MEMBER DETAILS:");
-        System.out.println("-------------------------------------------------------");
+        System.out.println(MemberConfig.MSG_CURRENT_DETAILS);
+        System.out.println(AppConfig.SEPARATOR_LINE);
         memberView.displayMemberDetails(memberFound);
-        System.out.println("-------------------------------------------------------");
+        System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println();
 
         boolean done = false;
         while (!done) {
-            System.out.println("WHAT DO YOU WANT TO EDIT?");
+            System.out.println(MemberConfig.MSG_WHAT_TO_EDIT);
             memberView.printEditMenu();
-            System.out.print("YOUR CHOICE: ");
+            System.out.print(MemberConfig.PROMPT_YOUR_CHOICE);
 
             int option = ValidationUtil.intValidation(0, 4);
 
@@ -417,7 +417,7 @@ public class MemberController {
                     String newName;
                     boolean validName;
                     do {
-                        System.out.print("ENTER NEW MEMBER NAME: ");
+                        System.out.print(MemberConfig.PROMPT_NEW_NAME);
                         newName = ValidationUtil.scanner.nextLine();
                         validName = MemberUtil.nameValidation(newName);
                     } while (!validName);
@@ -428,7 +428,7 @@ public class MemberController {
                 case MEMBER_HP -> { // Edit HP
                     String newHp;
                     do {
-                        System.out.print("ENTER NEW MEMBER HP (10–11 digits): ");
+                        System.out.print(MemberConfig.PROMPT_NEW_HP);
                         newHp = MemberUtil.hpValidation();
                     } while (newHp == null);
 
@@ -438,7 +438,7 @@ public class MemberController {
                 case MEMBER_IC -> { // Edit IC
                     String newIc;
                     do {
-                        System.out.print("ENTER NEW MEMBER IC: ");
+                        System.out.print(MemberConfig.PROMPT_NEW_IC);
                         newIc = MemberUtil.icValidation();
                         if (newIc == null) continue;
 
@@ -454,9 +454,9 @@ public class MemberController {
                     System.out.println(MemberConfig.SuccessfulMessage.MEMBER_IC_UPDATED);
                 }
                 case MEMBER_TYPE -> { // Edit member type
-                    System.out.println("SELECT NEW MEMBER TYPE:");
+                    System.out.println(MemberConfig.MSG_SELECT_NEW_TYPE);
                     memberView.printTierMenu();
-                    System.out.print("YOUR CHOICE: ");
+                    System.out.print(MemberConfig.PROMPT_YOUR_CHOICE);
 
                     do {
                         typeOption = ValidationUtil.intValidation(1, 3);
@@ -489,12 +489,12 @@ public class MemberController {
             }
 
             if (!done) {
-                System.out.println("-------------------------------------------------------");
-                System.out.println("UPDATED MEMBER DETAILS:");
+                System.out.println(AppConfig.SEPARATOR_LINE);
+                System.out.println(MemberConfig.MSG_UPDATED_DETAILS);
                 memberView.displayMemberDetails(memberFound);
-                System.out.println("-------------------------------------------------------");
+                System.out.println(AppConfig.SEPARATOR_LINE);
 
-                char more = ValidationUtil.confirmValidation("EDIT MORE FIELDS FOR THIS MEMBER? (Y = YES, N = NO):");
+                char more = ValidationUtil.confirmValidation(MemberConfig.PROMPT_EDIT_MORE);
                 if (more == 'N') {
                     done = true;
                 }
