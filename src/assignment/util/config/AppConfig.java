@@ -22,4 +22,3 @@ public class AppConfig {
     public static final String SEPARATOR_SHORT = "-----------------------";
     public static final String SEPARATOR_LONG = "===============================================================";
 }
-
