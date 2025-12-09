@@ -4,21 +4,25 @@ import assignment.model.Stock;
 import assignment.service.StockService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
+import assignment.util.config.StockConfig;
 import assignment.view.StockView;
 
 import assignment.util.SalesUtil;
+import java.util.List;
 
+/**
+ * Controller for stock/inventory management flows.
+ * Handles menu presentation and delegates work to StockService.
+ */
 public class StockController {
+
     private final StockService stockService;
     private final StockView stockView;
 
-
+    // Constructor injection
     public StockController(StockService stockService) {
         this.stockService = stockService;
         this.stockView = new StockView();
-        // Scanner is fine here, as it's primarily used for non-validated string inputs (like confirmation)
-        // Scanner removed to prevent conflicts
-
     }
 
     public void view() {
@@ -56,12 +60,12 @@ public class StockController {
                 }
 
                 if (inputName.trim().isEmpty()) {
-                    System.out.println("<<<INVALID PRODUCT NAME! Please enter a valid name.>>>");
+                    System.out.println(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
                     continue;
                 }
 
                 if (!stockService.isStockNameUnique(inputName)) {
-                    System.out.println("<<<The item name already exists, try another name!>>>");
+                    System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
                 } else {
                     newStock.setStockName(inputName);
                     break;
@@ -73,9 +77,13 @@ public class StockController {
             // 2. Get Quantity
             int qty;
             do {
-                System.out.print("ENTER PRODUCT QUANTITY TO BE ADDED (Must be >= 1): ");
-                qty = ValidationUtil.intValidation(1, 100000);
-                if (qty == SalesUtil.INVALID_INPUT) continue;
+                System.out.print(String.format("ENTER PRODUCT QUANTITY (Must be %d-%d): ", 
+                    StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY));
+                qty = ValidationUtil.intValidation(StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY);
+                if (qty == -9999) {
+                    System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY);
+                    continue;
+                }
                 newStock.setQty(qty);
                 break;
             } while (true);
@@ -83,14 +91,14 @@ public class StockController {
             // 3. Get Price
             double price;
             do {
-                System.out.print("ENTER PRICE OF THE PRODUCT (Must be >= 1.00):  RM ");
+                System.out.print(String.format("ENTER PRICE (Must be >= RM %.2f): RM ", StockConfig.MIN_PRICE));
                 price = ValidationUtil.doubleValidation();
-                if (price == SalesUtil.INVALID_INPUT) continue;
-                if (price >= 1.0) {
+                if (price == -9999) continue;
+                if (price >= StockConfig.MIN_PRICE) {
                     newStock.setPrice(price);
                     break;
                 } else {
-                    System.out.println("<<<PRICE CANNOT BE LESS THAN RM 1.00!!!>>>");
+                    System.out.println(StockConfig.ErrorMessage.INVALID_PRICE);
                 }
             } while (true);
 
@@ -105,9 +113,10 @@ public class StockController {
                 switch (confirmation) {
                     case 'Y' -> {
                         if (stockService.addNewStock(newStock)) {
-                            stockView.printAddSuccess();
+                            System.out.println(StockConfig.SuccessfulMessage.PRODUCT_ADDED);
+                            System.out.println("---------------------------------------------------");
                         } else {
-                            stockView.printAddFailure();
+                            System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
                         }
                         break OUTER;
                     }
@@ -115,6 +124,8 @@ public class StockController {
                         System.out.println("\nPRODUCT NOT ADDED. RETURNING TO THE MAIN MENU...");
                         break OUTER;
                     }
+                    default ->
+                            System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
                 }
             }
 
@@ -139,6 +150,9 @@ public class StockController {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             stockView.printDeleteStockMenu();
+
+            // Show current stock list so staff can see IDs before deleting
+            stockView.displayAvailableStock(stockService.getAllStock());
             continueDelete = true;
 
             System.out.print("ENTER PRODUCT ID TO BE DELETED [OR '0' TO EXIT]: ");
@@ -153,21 +167,28 @@ public class StockController {
             Stock productToDelete = stockService.getStockByID(inputID);
 
             if (productToDelete != null) {
+                // Safety: block deletion if quantity > 0 to avoid accidental loss of in-use stock
+                if (productToDelete.getQty() > 0) {
+                    System.out.println("<<< CANNOT DELETE: PRODUCT STILL HAS QUANTITY > 0. PLEASE ADJUST STOCK TO 0 BEFORE DELETING. >>>");
+                    ConsoleUtil.systemPause();
+                    continue;
+                }
+
                 stockView.displayStockDetails(productToDelete);
 
                 char confirm = ValidationUtil.confirmValidation("ARE YOU SURE YOU WANT TO DELETE THIS PRODUCT? (Y = YES, N = CANCEL): ");
 
                 if (confirm == 'Y') {
                     if (stockService.deleteStock(inputID)) {
-                        stockView.printDeleteSuccess(inputID);
+                        System.out.println(String.format(StockConfig.SuccessfulMessage.PRODUCT_DELETED, inputID));
                     } else {
-                        stockView.printDeleteFailure();
+                        System.out.println(StockConfig.ErrorMessage.DELETE_FAILED);
                     }
                 } else {
                     System.out.println("DELETION CANCELLED.");
                 }
             } else {
-                stockView.printStockNotFound(inputID);
+                System.out.println(String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, inputID));
             }
 
             System.out.print("\nDO YOU WANT TO DELETE ANOTHER PRODUCT? (Y FOR YES, ANY KEY TO EXIT): ");
@@ -178,6 +199,133 @@ public class StockController {
                 continueDelete = false;
             }
         } while (continueDelete);
+
+        ConsoleUtil.systemPause();
+        ConsoleUtil.clearScreen();
+    }
+
+    /**
+     * Allows editing of stock details (Name, Quantity, Price).
+     */
+    public void edit() {
+        ConsoleUtil.clearScreen();
+        ConsoleUtil.logo();
+        System.out.println("[ EDIT PRODUCT ]");
+        System.out.println("-------------------------------------------------------");
+
+        // Show list so staff can see IDs
+        stockView.displayAvailableStock(stockService.getAllStock());
+
+        System.out.print("ENTER PRODUCT ID TO EDIT [OR '0' TO EXIT]: ");
+        int inputID = ValidationUtil.intValidation(0, 0);
+        if (inputID <= 0) {
+            ConsoleUtil.clearScreen();
+            return;
+        }
+
+        Stock target = stockService.getStockByID(inputID);
+        if (target == null) {
+            System.out.println(String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, inputID));
+            ConsoleUtil.systemPause();
+            return;
+        }
+
+        boolean done = false;
+        while (!done) {
+            System.out.println("-------------------------------------------------------");
+            System.out.println("CURRENT PRODUCT DETAILS:");
+            stockView.displayStockDetails(target);
+            System.out.println("-------------------------------------------------------");
+            System.out.println("WHAT DO YOU WANT TO EDIT?");
+            System.out.println("1. PRODUCT NAME");
+            System.out.println("2. QUANTITY");
+            System.out.println("3. PRICE");
+            System.out.println("0. BACK");
+            System.out.print("YOUR CHOICE: ");
+
+            int opt = ValidationUtil.intValidation(0, 3);
+            if (opt == -9999) {
+                ConsoleUtil.systemPause();
+                continue;
+            }
+
+            switch (opt) {
+                case 1 -> {
+                    String newName;
+                    do {
+                        System.out.print("ENTER NEW PRODUCT NAME: ");
+                        newName = ValidationUtil.scanner.nextLine();
+                        if (newName.trim().isEmpty()) {
+                            System.out.println(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
+                            continue;
+                        }
+                        if (!stockService.isStockNameUniqueForUpdate(newName, target.getStockID())) {
+                            System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
+                        } else {
+                            target.setStockName(newName);
+                            break;
+                        }
+                    } while (true);
+                }
+                case 2 -> {
+                    int newQty;
+                    do {
+                        System.out.print(String.format("ENTER NEW QUANTITY (%d-%d): ",
+                                StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY));
+                        newQty = ValidationUtil.intValidation(StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY);
+                        if (newQty == -9999) {
+                            System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY);
+                            continue;
+                        }
+                        target.setQty(newQty);
+                        break;
+                    } while (true);
+                }
+                case 3 -> {
+                    double newPrice;
+                    do {
+                        System.out.print(String.format("ENTER NEW PRICE (>= RM %.2f): RM ", StockConfig.MIN_PRICE));
+                        newPrice = ValidationUtil.doubleValidation();
+                        if (newPrice == -9999) continue;
+                        if (newPrice >= StockConfig.MIN_PRICE) {
+                            target.setPrice(newPrice);
+                            break;
+                        } else {
+                            System.out.println(StockConfig.ErrorMessage.INVALID_PRICE);
+                        }
+                    } while (true);
+                }
+                case 0 -> done = true;
+                default -> System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
+            }
+
+            if (!done) {
+                // Persist changes
+                boolean updated = stockService.updateStock(
+                        target.getStockID(),
+                        target.getStockName(),
+                        target.getQty(),
+                        target.getPrice()
+                );
+                if (updated) {
+                    System.out.println(StockConfig.SuccessfulMessage.PRODUCT_UPDATED);
+                    // Reload fresh data to confirm persisted values
+                    Stock refreshed = stockService.getStockByID(target.getStockID());
+                    if (refreshed != null) {
+                        stockView.displayStockDetails(refreshed);
+                        target = refreshed; // keep local reference in sync
+                    }
+                } else {
+                    System.out.println("<<< UPDATE FAILED. CHECK NAME DUPLICATES. >>>");
+                }
+
+                System.out.print("EDIT MORE FIELDS FOR THIS PRODUCT? (Y = YES, N = NO): ");
+                char more = ValidationUtil.charValidation();
+                if (more == 'N') {
+                    done = true;
+                }
+            }
+        }
 
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
