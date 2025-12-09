@@ -12,11 +12,9 @@ import assignment.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * Unit tests for PaymentController.
@@ -130,41 +128,41 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Should initialize PaymentController with all services")
     void testPaymentControllerInitialization() {
-        assertNotNull(paymentController);
+        Assertions.assertNotNull(paymentController);
     }
 
     @Test
     @DisplayName("Should calculate payment summary correctly")
     void testCalculatePaymentSummary() {
         PaymentResult result = paymentService.calculatePaymentSummary(0.10);
-        assertNotNull(result);
-        assertEquals(200.0, result.getSubtotal(), 0.01); // 2*50 + 1*100
-        assertEquals(20.0, result.getDiscount(), 0.01); // 10% of 200
-        assertEquals(10.8, result.getTax(), 0.01); // 6% of 180
-        assertEquals(190.8, result.getTotal(), 0.01); // 180 + 10.8
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(200.0, result.getSubtotal(), 0.01); // 2*50 + 1*100
+        Assertions.assertEquals(20.0, result.getDiscount(), 0.01); // 10% of 200
+        Assertions.assertEquals(10.8, result.getTax(), 0.01); // 6% of 180
+        Assertions.assertEquals(190.8, result.getTotal(), 0.01); // 180 + 10.8
     }
 
     @Test
     @DisplayName("Should calculate payment summary with no discount")
     void testCalculatePaymentSummary_NoDiscount() {
         PaymentResult result = paymentService.calculatePaymentSummary(0.0);
-        assertNotNull(result);
-        assertEquals(200.0, result.getSubtotal(), 0.01);
-        assertEquals(0.0, result.getDiscount(), 0.01);
-        assertEquals(12.0, result.getTax(), 0.01); // 6% of 200
-        assertEquals(212.0, result.getTotal(), 0.01);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(200.0, result.getSubtotal(), 0.01);
+        Assertions.assertEquals(0.0, result.getDiscount(), 0.01);
+        Assertions.assertEquals(12.0, result.getTax(), 0.01); // 6% of 200
+        Assertions.assertEquals(212.0, result.getTotal(), 0.01);
     }
 
     @Test
     @DisplayName("Should create transaction correctly")
     void testCreateTransaction() {
         Transaction transaction = paymentService.createTransaction(0.10);
-        assertNotNull(transaction);
-        assertEquals(200.0, transaction.getSubtotal(), 0.01);
-        assertEquals(20.0, transaction.getDiscount(), 0.01);
-        assertEquals(10.8, transaction.getTax(), 0.01);
-        assertEquals(190.8, transaction.getTotal(), 0.01);
-        assertEquals(2, transaction.getItems().size());
+        Assertions.assertNotNull(transaction);
+        Assertions.assertEquals(200.0, transaction.getSubtotal(), 0.01);
+        Assertions.assertEquals(20.0, transaction.getDiscount(), 0.01);
+        Assertions.assertEquals(10.8, transaction.getTax(), 0.01);
+        Assertions.assertEquals(190.8, transaction.getTotal(), 0.01);
+        Assertions.assertEquals(2, transaction.getItems().size());
     }
 
     @Test
@@ -174,33 +172,33 @@ class PaymentControllerTest {
         transactionService.saveTransaction(transaction);
 
         List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(1, transactions.size());
-        assertEquals(190.8, transactions.get(0).getTotal(), 0.01);
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(190.8, transactions.get(0).getTotal(), 0.01);
     }
 
     @Test
     @DisplayName("Should clear cart after payment")
     void testClearCart() {
-        assertFalse(salesService.getCartItems().isEmpty());
+        Assertions.assertFalse(salesService.getCartItems().isEmpty());
         paymentService.clearCart();
-        assertTrue(salesService.getCartItems().isEmpty());
+        Assertions.assertTrue(salesService.getCartItems().isEmpty());
     }
 
     @Test
     @DisplayName("Should get discount rate from member service")
     void testGetDiscountRate() {
         MemberService.DiscountResult result = memberService.getDiscountRate("M-1");
-        assertNotNull(result);
-        assertEquals(0.10, result.getDiscountRate(), 0.01);
-        assertFalse(result.hasError());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(0.10, result.getDiscountRate(), 0.01);
+        Assertions.assertFalse(result.hasError());
     }
 
     @Test
     @DisplayName("Should return zero discount for no member")
     void testGetDiscountRate_NoMember() {
         MemberService.DiscountResult result = memberService.getDiscountRate("0");
-        assertNotNull(result);
-        assertEquals(0.0, result.getDiscountRate(), 0.01);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(0.0, result.getDiscountRate(), 0.01);
     }
 
     @Test
@@ -208,8 +206,8 @@ class PaymentControllerTest {
     void testPaymentFlow_WithMemberDiscount() {
         // Calculate payment with member discount
         PaymentResult summary = paymentService.calculatePaymentSummary(0.10);
-        assertNotNull(summary);
-        assertEquals(20.0, summary.getDiscount(), 0.01);
+        Assertions.assertNotNull(summary);
+        Assertions.assertEquals(20.0, summary.getDiscount(), 0.01);
 
         // Create and save transaction
         Transaction transaction = paymentService.createTransaction(0.10);
@@ -217,7 +215,7 @@ class PaymentControllerTest {
 
         // Verify transaction saved
         List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(1, transactions.size());
+        Assertions.assertEquals(1, transactions.size());
     }
 
     @Test
@@ -225,8 +223,8 @@ class PaymentControllerTest {
     void testPaymentFlow_NoMemberDiscount() {
         // Calculate payment without discount
         PaymentResult summary = paymentService.calculatePaymentSummary(0.0);
-        assertNotNull(summary);
-        assertEquals(0.0, summary.getDiscount(), 0.01);
+        Assertions.assertNotNull(summary);
+        Assertions.assertEquals(0.0, summary.getDiscount(), 0.01);
 
         // Create and save transaction
         Transaction transaction = paymentService.createTransaction(0.0);
@@ -234,8 +232,8 @@ class PaymentControllerTest {
 
         // Verify transaction saved
         List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(1, transactions.size());
-        assertEquals(212.0, transactions.get(0).getTotal(), 0.01);
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(212.0, transactions.get(0).getTotal(), 0.01);
     }
 
     @Test
@@ -248,6 +246,6 @@ class PaymentControllerTest {
         transactionService.saveTransaction(transaction2);
 
         List<Transaction> transactions = transactionService.getAllTransactions();
-        assertEquals(2, transactions.size());
+        Assertions.assertEquals(2, transactions.size());
     }
 }

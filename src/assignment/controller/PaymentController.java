@@ -14,8 +14,6 @@ import assignment.util.ValidationUtil;
 import assignment.view.SalesView;
 import java.util.List;
 
-import static assignment.util.SalesUtil.INVALID_INPUT;
-
 
 /**
  * Controller for payment processing and transaction management operations.
@@ -210,7 +208,7 @@ public class PaymentController {
             salesView.printTransactionSelectionPrompt(transactions.size());
             int transactionNo = ValidationUtil.intValidation(0, transactions.size());
 
-            if (transactionNo == INVALID_INPUT) {
+            if (transactionNo == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
                 continue;
             }
