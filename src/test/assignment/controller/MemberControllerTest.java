@@ -124,7 +124,7 @@ class MemberControllerTest {
     @Test
     @DisplayName("Should not add member with duplicate IC")
     void testAddMemberDuplicateIc() {
-        // Use existing IC from Alice ("121212121234")
+        // Use existing IC from Alice 121212121234
         Membership duplicateMember = new NormalMember("Duplicate", "121212121234", 107, "0112223333", MemberConfig.MEMBER_TYPE_NORMAL);
         boolean result = memberService.addMember(duplicateMember);
         
@@ -175,24 +175,24 @@ class MemberControllerTest {
     @DisplayName("Should check if IC exists")
     void testCheckIcExists() {
         assertTrue(memberService.icExists("121212121234")); // Updated IC
-        assertFalse(memberService.icExists("000000-00-0000"));
+        assertFalse(memberService.icExists("000000000000"));
     }
 
     @Test
     @DisplayName("Should be able to edit member details (mock via service)")
     void testEditMember() {
-        // Logic test: Retrieve, modify, save
+        // Retrieve, modify, save
         Membership member = memberService.findMemberById(101); // Updated ID
         assertNotNull(member);
         
         member.setName("Alice Updated");
-        member.setMemberHp("0999999999");
+        member.setMemberHp("0111111111");
         
         List<Membership> allMembers = memberService.getAllMembers();
         memberService.saveMemberInfo(allMembers);
         
         Membership updatedMember = memberService.findMemberById(101);
         assertEquals("Alice Updated", updatedMember.getName());
-        assertEquals("0999999999", updatedMember.getMemberHp());
+        assertEquals("0111111111", updatedMember.getMemberHp());
     }
 }
