@@ -25,13 +25,24 @@ public class MemberRepository {
 
     private static final Logger LOGGER = Logger.getLogger(MemberRepository.class.getName());
 
+    private final String memberFilePath;
+
+    public MemberRepository() {
+        this.memberFilePath = MemberConfig.MEMBER_FILE_PATH;
+    }
+
+    // For testing purpose
+    public MemberRepository(String memberFilePath) {
+        this.memberFilePath = memberFilePath;
+    }
+
     /**
      * Checks if the file exists.
      * Creates a new file if it does not exist.
      */
     private void ensureFileExists() {
         ensureDirectoriesExist();
-        File file = new File(MemberConfig.MEMBER_FILE_PATH);
+        File file = new File(memberFilePath);
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -60,7 +71,7 @@ public class MemberRepository {
         ensureFileExists();
         List<Membership> members = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(MemberConfig.MEMBER_FILE_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(memberFilePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
@@ -98,7 +109,7 @@ public class MemberRepository {
     public void appendMember(Membership member) {
         ensureFileExists();
 
-        try (FileWriter writer = new FileWriter(MemberConfig.MEMBER_FILE_PATH, true)) {
+        try (FileWriter writer = new FileWriter(memberFilePath, true)) {
             writer.write(member.getName() + "\t");
             writer.write(member.getIc() + "\t");
             writer.write(member.getMemberHp() + "\t");
@@ -119,7 +130,7 @@ public class MemberRepository {
     public void saveAllMembers(List<Membership> members) {
         ensureFileExists();
 
-        try (FileWriter fw = new FileWriter(MemberConfig.MEMBER_FILE_PATH, false)) { // overwrite file
+        try (FileWriter fw = new FileWriter(memberFilePath, false)) { // overwrite file
             for (Membership member : members) {
                 String line =
                         member.getName() + "\t" +
@@ -143,7 +154,7 @@ public class MemberRepository {
      */
     public boolean deleteById(int memberIdToDelete) {
         ensureFileExists();
-        File inputFile = new File(MemberConfig.MEMBER_FILE_PATH);
+        File inputFile = new File(memberFilePath);
         File tempFile = new File(MemberConfig.TEMP_DELETE_FILE_PATH);
 
         boolean found = false;
@@ -187,7 +198,7 @@ public class MemberRepository {
     public boolean existsByIc(String targetIC) {
         ensureFileExists();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(MemberConfig.MEMBER_FILE_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(memberFilePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
