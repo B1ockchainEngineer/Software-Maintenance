@@ -2,12 +2,13 @@ package test.assignment.controller;
 
 import assignment.controller.PaymentController;
 import assignment.model.GoldMember;
+import assignment.model.Order;
 import assignment.model.PaymentResult;
 import assignment.model.Stock;
 import assignment.model.Transaction;
 import assignment.service.MemberService;
 import assignment.service.PaymentService;
-import assignment.service.SalesService;
+import assignment.service.OrderService;
 import assignment.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,22 +28,22 @@ class PaymentControllerTest {
     private PaymentService paymentService;
     private TransactionService transactionService;
     private MemberService memberService;
-    private SalesService salesService;
+    private OrderService orderService;
     private PaymentController paymentController;
 
     @BeforeEach
     void setUp() {
-        // Create mock SalesService first (so PaymentService can reference it)
-        salesService = new SalesService(null, null) {
-            private final List<Stock> cart = new ArrayList<>();
+        // Create mock OrderService first (so PaymentService can reference it)
+        orderService = new OrderService(null, null) {
+            private final List<Order> cart = new ArrayList<>();
 
             {
-                cart.add(new Stock(1, 1001, "Product A", 2, 50.0));
-                cart.add(new Stock(2, 1002, "Product B", 1, 100.0));
+                cart.add(new Order(1, 1001, "Product A", 2, 50.0));
+                cart.add(new Order(2, 1002, "Product B", 1, 100.0));
             }
 
             @Override
-            public List<Stock> getCartItems() {
+            public List<Order> getCartItems() {
                 return cart;
             }
         };
@@ -88,8 +89,8 @@ class PaymentControllerTest {
             @Override
             public void clearCart() {
                 cart.clear();
-                // Also clear the SalesService cart to match real behavior
-                salesService.getCartItems().clear();
+                // Also clear the OrderService cart to match real behavior
+                orderService.getCartItems().clear();
             }
         };
 
@@ -122,7 +123,7 @@ class PaymentControllerTest {
         };
 
         paymentController = new PaymentController(paymentService, transactionService, 
-                                                  memberService, salesService);
+                                                  memberService, orderService);
     }
 
     @Test
@@ -179,9 +180,9 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Should clear cart after payment")
     void testClearCart() {
-        Assertions.assertFalse(salesService.getCartItems().isEmpty());
+        Assertions.assertFalse(orderService.getCartItems().isEmpty());
         paymentService.clearCart();
-        Assertions.assertTrue(salesService.getCartItems().isEmpty());
+        Assertions.assertTrue(orderService.getCartItems().isEmpty());
     }
 
     @Test

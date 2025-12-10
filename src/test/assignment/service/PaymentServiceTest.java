@@ -1,5 +1,6 @@
 package test.assignment.service;
 
+import assignment.model.Order;
 import assignment.model.PaymentResult;
 import assignment.model.Stock;
 import assignment.model.Transaction;
@@ -35,10 +36,10 @@ class PaymentServiceTest {
     void setUp() {
         // Setup mock StockRepository
         stockRepo = new StockRepository() {
-            private final List<Stock> cart = new ArrayList<>();
+            private final List<Order> cart = new ArrayList<>();
 
             @Override
-            public List<Stock> getCart() {
+            public List<Order> getCart() {
                 return cart;
             }
 
@@ -81,7 +82,7 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should calculate subtotal for single item")
     void testCalculateSubtotal_SingleItem() {
-        Stock item = new Stock(1, 1001, "Product A", 2, 50.0);
+        Order item = new Order(1, 1001, "Product A", 2, 50.0);
         stockRepo.getCart().add(item);
 
         double subtotal = paymentService.calculateSubtotal();
@@ -91,9 +92,9 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should calculate subtotal for multiple items")
     void testCalculateSubtotal_MultipleItems() {
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0));  // 100.0
-        stockRepo.getCart().add(new Stock(2, 1002, "Product B", 1, 100.0)); // 100.0
-        stockRepo.getCart().add(new Stock(3, 1003, "Product C", 3, 25.0));  // 75.0
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0));  // 100.0
+        stockRepo.getCart().add(new Order(2, 1002, "Product B", 1, 100.0)); // 100.0
+        stockRepo.getCart().add(new Order(3, 1003, "Product C", 3, 25.0));  // 75.0
 
         double subtotal = paymentService.calculateSubtotal();
         assertEquals(275.0, subtotal, 0.01); // 100 + 100 + 75
@@ -161,8 +162,8 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should calculate payment summary correctly")
     void testCalculatePaymentSummary() {
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0)); // 100.0
-        stockRepo.getCart().add(new Stock(2, 1002, "Product B", 1, 100.0)); // 100.0
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0)); // 100.0
+        stockRepo.getCart().add(new Order(2, 1002, "Product B", 1, 100.0)); // 100.0
         // Subtotal: 200.0
         // Discount (10%): 20.0
         // Amount after discount: 180.0
@@ -188,7 +189,7 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should calculate payment summary with no discount")
     void testCalculatePaymentSummary_NoDiscount() {
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0)); // 100.0
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0)); // 100.0
         // Subtotal: 100.0
         // Discount: 0.0
         // Tax (6%): 6.0
@@ -206,8 +207,8 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should create transaction correctly")
     void testCreateTransaction() {
-        Stock item1 = new Stock(1, 1001, "Product A", 2, 50.0);
-        Stock item2 = new Stock(2, 1002, "Product B", 1, 100.0);
+        Order item1 = new Order(1, 1001, "Product A", 2, 50.0);
+        Order item2 = new Order(2, 1002, "Product B", 1, 100.0);
         stockRepo.getCart().add(item1);
         stockRepo.getCart().add(item2);
         // Subtotal: 200.0
@@ -235,7 +236,7 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should clear cart and orders")
     void testClearCart() {
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0));
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0));
         assertFalse(stockRepo.getCart().isEmpty());
 
         paymentService.clearCart();
@@ -246,9 +247,9 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should handle complex payment calculation with multiple items and discount")
     void testComplexPaymentCalculation() {
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 5, 20.0));  // 100.0
-        stockRepo.getCart().add(new Stock(2, 1002, "Product B", 3, 30.0));  // 90.0
-        stockRepo.getCart().add(new Stock(3, 1003, "Product C", 2, 15.0)); // 30.0
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 5, 20.0));  // 100.0
+        stockRepo.getCart().add(new Order(2, 1002, "Product B", 3, 30.0));  // 90.0
+        stockRepo.getCart().add(new Order(3, 1003, "Product C", 2, 15.0)); // 30.0
         // Subtotal: 220.0
         // Discount (15% premium): 33.0
         // Amount after discount: 187.0
@@ -264,14 +265,13 @@ class PaymentServiceTest {
         assertEquals(198.22, result.getTotal(), 0.01);
     }
 
-    // ================== INTEGRATED PAYMENT AND TRANSACTION TESTS ==================
 
     @Test
     @DisplayName("Should create and save transaction in complete payment flow")
     void testCompletePaymentFlow() {
         // Add items to cart
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0));
-        stockRepo.getCart().add(new Stock(2, 1002, "Product B", 1, 100.0));
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0));
+        stockRepo.getCart().add(new Order(2, 1002, "Product B", 1, 100.0));
 
         // Calculate payment summary
         PaymentResult summary = paymentService.calculatePaymentSummary(0.10);
@@ -299,13 +299,13 @@ class PaymentServiceTest {
     @DisplayName("Should handle multiple payment transactions")
     void testMultiplePaymentTransactions() {
         // First transaction
-        stockRepo.getCart().add(new Stock(1, 1001, "Product A", 2, 50.0));
+        stockRepo.getCart().add(new Order(1, 1001, "Product A", 2, 50.0));
         Transaction transaction1 = paymentService.createTransaction(0.10);
         transactionService.saveTransaction(transaction1);
         paymentService.clearCart();
 
         // Second transaction
-        stockRepo.getCart().add(new Stock(1, 1002, "Product B", 1, 100.0));
+        stockRepo.getCart().add(new Order(1, 1002, "Product B", 1, 100.0));
         Transaction transaction2 = paymentService.createTransaction(0.0);
         transactionService.saveTransaction(transaction2);
         paymentService.clearCart();

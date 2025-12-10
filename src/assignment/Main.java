@@ -1,9 +1,10 @@
 package assignment;
 
 import assignment.view.MainView;
-import assignment.view.SalesView;
+import assignment.view.OrderView;
 import assignment.controller.OrderController;
 import assignment.controller.PaymentController;
+import assignment.controller.TransactionController;
 import assignment.controller.StockController;
 import assignment.controller.MemberController;
 import assignment.controller.StaffController;
@@ -33,13 +34,14 @@ public class Main {
     private final StockController stockController;
     private final OrderController orderController;
     private final PaymentController paymentController;
+    private final TransactionController transactionController;
     private final MemberController memberController;
     private final StaffController staffController;
     private final LoginController loginController;
     private final SignupController signupController;
 
     private final MainView mainView;
-    private final SalesView salesView;
+    private final OrderView orderView;
 
     // Current logged-in staff
     private Staff currentStaff;
@@ -53,7 +55,7 @@ public class Main {
     // Initialise repository, services and controllers and wire them to this Main
     public Main() {
         this.mainView = new MainView();
-        this.salesView = new SalesView();
+        this.orderView = new OrderView();
 
         // Stock-related setup
         StockRepository stockRepo = new StockRepository();
@@ -62,7 +64,7 @@ public class Main {
 
         // Sales-related setup
         OrderRepository orderRepo = new OrderRepository();
-        SalesService salesService = new SalesService(stockRepo, orderRepo);
+        OrderService orderService = new OrderService(stockRepo, orderRepo);
         TransactionRepository transactionRepo = new TransactionRepository();
         TransactionService transactionService = new TransactionService(transactionRepo);
         PaymentService paymentService = new PaymentService(stockRepo, orderRepo);
@@ -80,8 +82,9 @@ public class Main {
         this.memberController = new MemberController(memberService);
         
         // Initialize controllers
-        this.orderController = new OrderController(salesService);
-        this.paymentController = new PaymentController(paymentService, transactionService, memberService, salesService);
+        this.orderController = new OrderController(orderService);
+        this.paymentController = new PaymentController(paymentService, transactionService, memberService, orderService);
+        this.transactionController = new TransactionController(transactionService);
     }
 
     public void entry() {
@@ -228,7 +231,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            salesView.printSalesMenu();
+            mainView.printSalesMenu();
             mainView.printSelectionPrompt();
 
             int salesOpt = ValidationUtil.intValidation(0, 2);
@@ -251,7 +254,7 @@ public class Main {
                     runOrder();
                 }
                 case TRANSACTION_REPORT -> {
-                    paymentController.viewTransactionReport();
+                    transactionController.viewTransactionReport();
                 }
                 case BACK_TO_MAIN -> {
                     mainView.printBackToMainMessage();
@@ -267,7 +270,7 @@ public class Main {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            salesView.printOrderMenu();
+            orderView.printOrderMenu();
             mainView.printSelectionPrompt();
 
             int orderOpt = ValidationUtil.intValidation(0, 5);

@@ -2,9 +2,11 @@ package assignment.view;
 
 import assignment.enums.LogMenu;
 import assignment.enums.MainMenu;
+import assignment.enums.SalesMenu;
 import assignment.enums.StockMenu;
 import assignment.model.Staff;
 import assignment.util.config.AppConfig;
+import assignment.util.config.SalesConfig;
 
 /**
  * View class for Main application entry and global menus.
@@ -42,6 +44,15 @@ public class MainView {
         System.out.println("[ FOOD AND BEVERAGE MANAGEMENT SYSTEM ]");
         System.out.println(AppConfig.SEPARATOR_LINE);
         for (StockMenu menu : StockMenu.values()) {
+            System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
+        }
+        System.out.println(AppConfig.SEPARATOR_LINE);
+    }
+
+    public void printSalesMenu() {
+        System.out.println(SalesConfig.TITLE_SALES_MENU);
+        System.out.println(AppConfig.SEPARATOR_LINE);
+        for (SalesMenu menu : SalesMenu.values()) {
             System.out.printf("%d. %s\n", menu.getOption(), menu.getDescription());
         }
         System.out.println(AppConfig.SEPARATOR_LINE);

@@ -2,7 +2,6 @@ package assignment.model;
 
 /**
  * Model class representing the result of a payment calculation.
- * Contains all payment details (subtotal, discount, tax, total).
  */
 public class PaymentResult {
     private final double subtotal;

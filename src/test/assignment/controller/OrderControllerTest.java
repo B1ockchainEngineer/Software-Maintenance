@@ -1,9 +1,9 @@
 package test.assignment.controller;
 
+import assignment.model.Order;
 import assignment.model.Stock;
-import assignment.service.SalesService;
+import assignment.service.OrderService;
 import assignment.controller.OrderController;
-import assignment.view.SalesView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -21,16 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("OrderController Tests")
 class OrderControllerTest {
 
-    private SalesService salesService;
-    private SalesView salesView;
+    private OrderService orderService;
     private OrderController orderController;
 
     @BeforeEach
     void setUp() {
-        // Create a simple mock SalesService
-        salesService = new SalesService(null, null) {
+        // Create a simple mock OrderService
+        orderService = new OrderService(null, null) {
             private final List<Stock> stocklist = new ArrayList<>();
-            private final List<Stock> cart = new ArrayList<>();
+            private final List<Order> cart = new ArrayList<>();
 
             {
                 // Initialize test stock
@@ -44,7 +43,7 @@ class OrderControllerTest {
             }
 
             @Override
-            public List<Stock> getCartItems() {
+            public List<Order> getCartItems() {
                 return cart;
             }
 
@@ -57,9 +56,9 @@ class OrderControllerTest {
             }
 
             @Override
-            public Stock findCartItemByOrderNo(int orderNo) {
+            public Order findCartItemByOrderNo(int orderNo) {
                 return cart.stream()
-                    .filter(s -> s.getOrderNo() == orderNo)
+                    .filter(o -> o.getOrderNo() == orderNo)
                     .findFirst()
                     .orElse(null);
             }
@@ -71,14 +70,14 @@ class OrderControllerTest {
                     return false;
                 }
                 stock.setQty(stock.getQty() - quantity);
-                Stock cartItem = new Stock(cart.size() + 1, itemID, stock.getStockName(), quantity, stock.getPrice());
+                Order cartItem = new Order(cart.size() + 1, itemID, stock.getStockName(), quantity, stock.getPrice());
                 cart.add(cartItem);
                 return true;
             }
 
             @Override
             public boolean removeOrder(int orderNo) {
-                Stock toRemove = findCartItemByOrderNo(orderNo);
+                Order toRemove = findCartItemByOrderNo(orderNo);
                 if (toRemove != null) {
                     cart.remove(toRemove);
                     // Reassign order numbers
@@ -88,7 +87,7 @@ class OrderControllerTest {
                     // Refund stock
                     Stock stock = findStockItem(toRemove.getStockID());
                     if (stock != null) {
-                        stock.setQty(stock.getQty() + toRemove.getQty());
+                        stock.setQty(stock.getQty() + toRemove.getQuantity());
                     }
                     return true;
                 }
@@ -97,19 +96,19 @@ class OrderControllerTest {
 
             @Override
             public boolean editOrderQuantity(int orderNo, int quantityChange, int type) {
-                Stock cartItem = findCartItemByOrderNo(orderNo);
+                Order cartItem = findCartItemByOrderNo(orderNo);
                 if (cartItem == null) return false;
 
                 Stock stockItem = findStockItem(cartItem.getStockID());
                 if (stockItem == null) return false;
 
                 if (type == 1) { // Reduce
-                    if (quantityChange > cartItem.getQty()) return false;
-                    cartItem.setQty(cartItem.getQty() - quantityChange);
+                    if (quantityChange > cartItem.getQuantity()) return false;
+                    cartItem.setQuantity(cartItem.getQuantity() - quantityChange);
                     stockItem.setQty(stockItem.getQty() + quantityChange);
                 } else if (type == 2) { // Add
                     if (quantityChange > stockItem.getQty()) return false;
-                    cartItem.setQty(cartItem.getQty() + quantityChange);
+                    cartItem.setQuantity(cartItem.getQuantity() + quantityChange);
                     stockItem.setQty(stockItem.getQty() - quantityChange);
                 } else {
                     return false;
@@ -118,21 +117,20 @@ class OrderControllerTest {
             }
         };
 
-        salesView = new SalesView();
-        orderController = new OrderController(salesService);
+        orderController = new OrderController(orderService);
     }
 
     @Test
-    @DisplayName("Should initialize OrderController with SalesService")
+    @DisplayName("Should initialize OrderController with OrderService")
     void testOrderControllerInitialization() {
         assertNotNull(orderController);
     }
 
     @Test
-    @DisplayName("Should have access to sales service")
-    void testHasSalesService() {
+    @DisplayName("Should have access to order service")
+    void testHasOrderService() {
         // Test that controller can access service methods
-        List<Stock> availableStock = salesService.getAvailableStock();
+        List<Stock> availableStock = orderService.getAvailableStock();
         assertNotNull(availableStock);
         assertFalse(availableStock.isEmpty());
     }
@@ -140,7 +138,7 @@ class OrderControllerTest {
     @Test
     @DisplayName("Should be able to get cart items through service")
     void testGetCartItems() {
-        List<Stock> cartItems = salesService.getCartItems();
+        List<Order> cartItems = orderService.getCartItems();
         assertNotNull(cartItems);
         assertTrue(cartItems.isEmpty());
     }
@@ -148,7 +146,7 @@ class OrderControllerTest {
     @Test
     @DisplayName("Should be able to find stock items through service")
     void testFindStockItem() {
-        Stock found = salesService.findStockItem(1001);
+        Stock found = orderService.findStockItem(1001);
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
     }
@@ -156,16 +154,16 @@ class OrderControllerTest {
     @Test
     @DisplayName("Should be able to add items to cart through service")
     void testAddToCart() {
-        boolean result = salesService.addToCart(1001, 2);
+        boolean result = orderService.addToCart(1001, 2);
         assertTrue(result);
-        assertEquals(1, salesService.getCartItems().size());
+        assertEquals(1, orderService.getCartItems().size());
     }
 
     @Test
     @DisplayName("Should be able to find cart items by order number")
     void testFindCartItemByOrderNo() {
-        salesService.addToCart(1001, 2);
-        Stock found = salesService.findCartItemByOrderNo(1);
+        orderService.addToCart(1001, 2);
+        Order found = orderService.findCartItemByOrderNo(1);
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
     }
@@ -173,42 +171,42 @@ class OrderControllerTest {
     @Test
     @DisplayName("Should be able to remove orders through service")
     void testRemoveOrder() {
-        salesService.addToCart(1001, 2);
-        assertEquals(1, salesService.getCartItems().size());
+        orderService.addToCart(1001, 2);
+        assertEquals(1, orderService.getCartItems().size());
 
-        boolean result = salesService.removeOrder(1);
+        boolean result = orderService.removeOrder(1);
         assertTrue(result);
-        assertTrue(salesService.getCartItems().isEmpty());
+        assertTrue(orderService.getCartItems().isEmpty());
     }
 
     @Test
     @DisplayName("Should be able to edit order quantity through service")
     void testEditOrderQuantity() {
-        salesService.addToCart(1001, 2);
-        Stock cartItem = salesService.findCartItemByOrderNo(1);
-        assertEquals(2, cartItem.getQty());
+        orderService.addToCart(1001, 2);
+        Order cartItem = orderService.findCartItemByOrderNo(1);
+        assertEquals(2, cartItem.getQuantity());
 
-        boolean result = salesService.editOrderQuantity(1, 1, 2); // Add 1
+        boolean result = orderService.editOrderQuantity(1, 1, 2); // Add 1
         assertTrue(result);
-        cartItem = salesService.findCartItemByOrderNo(1);
-        assertEquals(3, cartItem.getQty());
+        cartItem = orderService.findCartItemByOrderNo(1);
+        assertEquals(3, cartItem.getQuantity());
     }
 
     @Test
     @DisplayName("Should handle multiple cart operations")
     void testMultipleCartOperations() {
         // Add multiple items
-        salesService.addToCart(1001, 2);
-        salesService.addToCart(1002, 1);
-        assertEquals(2, salesService.getCartItems().size());
+        orderService.addToCart(1001, 2);
+        orderService.addToCart(1002, 1);
+        assertEquals(2, orderService.getCartItems().size());
 
         // Edit first order
-        salesService.editOrderQuantity(1, 1, 2); // Add 1 to first order
-        Stock item1 = salesService.findCartItemByOrderNo(1);
-        assertEquals(3, item1.getQty());
+        orderService.editOrderQuantity(1, 1, 2); // Add 1 to first order
+        Order item1 = orderService.findCartItemByOrderNo(1);
+        assertEquals(3, item1.getQuantity());
 
         // Remove second order
-        salesService.removeOrder(2);
-        assertEquals(1, salesService.getCartItems().size());
+        orderService.removeOrder(2);
+        assertEquals(1, orderService.getCartItems().size());
     }
 }

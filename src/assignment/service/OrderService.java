@@ -1,5 +1,6 @@
 package assignment.service;
 
+import assignment.model.Order;
 import assignment.model.Stock;
 import assignment.repo.OrderRepository;
 import assignment.repo.StockRepository;
@@ -7,11 +8,11 @@ import java.util.List;
 
 import assignment.util.SalesUtil;
 
-public class SalesService {
+public class OrderService {
     private final StockRepository stockRepo;
     private final OrderRepository orderRepo;
 
-    public SalesService(StockRepository stockRepo, OrderRepository orderRepo) {
+    public OrderService(StockRepository stockRepo, OrderRepository orderRepo) {
         this.stockRepo = stockRepo;
         this.orderRepo = orderRepo;
         // Ensure stock is loaded into memory when service is initialized
@@ -28,11 +29,6 @@ public class SalesService {
      * Restores the cart from saved orders in the file.
      * This ensures orders persist across application restarts.
      * Order numbers are assigned based on position in file (1, 2, 3, ...).
-     * 
-     * Note: Stock quantities are NOT adjusted here because:
-     * - When orders are added, stock is deducted and saved to stock.txt immediately
-     * - stock.txt already contains the correct (deducted) quantities
-     * - We just need to restore orders to the cart, stock is already correct
      */
     private void restoreCartFromOrders() {
         // Only restore if orderRepo is not null
@@ -40,7 +36,7 @@ public class SalesService {
             return;
         }
         // loadAllOrders() already assigns orderNo based on position (1, 2, 3, ...)
-        List<Stock> savedOrders = orderRepo.loadAllOrders();
+        List<Order> savedOrders = orderRepo.loadAllOrders();
         
         if (savedOrders.isEmpty()) {
             return; // No orders to restore
@@ -48,7 +44,7 @@ public class SalesService {
 
         // Restore each order to the cart
         // Stock quantities are already correct in stock.txt (deducted when orders were placed)
-        for (Stock order : savedOrders) {
+        for (Order order : savedOrders) {
             // Find the corresponding stock item to verify it exists
             Stock stockItem = findStockItem(order.getStockID());
             
@@ -66,7 +62,7 @@ public class SalesService {
         return stockRepo.getStocklist();
     }
 
-    public List<Stock> getCartItems() {
+    public List<Order> getCartItems() {
         return stockRepo.getCart();
     }
 
@@ -79,9 +75,9 @@ public class SalesService {
         return null;
     }
 
-    public Stock findCartItemByOrderNo(int orderNo) {
+    public Order findCartItemByOrderNo(int orderNo) {
         // We iterate through the list as order numbers may not be sequential due to removals
-        for (Stock item : stockRepo.getCart()) {
+        for (Order item : stockRepo.getCart()) {
             if (item.getOrderNo() == orderNo) {
                 return item;
             }
@@ -111,7 +107,7 @@ public class SalesService {
         int nextOrderNo = stockRepo.getCart().size() + 1;
         
         // 3. Add item to cart
-        Stock cartItem = new Stock(
+        Order cartItem = new Order(
                 nextOrderNo,
                 foundStock.getStockID(),
                 foundStock.getStockName(),
@@ -136,7 +132,7 @@ public class SalesService {
      * @return true if successful, false otherwise.
      */
     public boolean removeOrder(int orderNoRemove) {
-        List<Stock> cart = stockRepo.getCart();
+        List<Order> cart = stockRepo.getCart();
         int indexToRemove = -1;
 
         // Find the order by orderNo (which represents position)
@@ -148,7 +144,7 @@ public class SalesService {
         }
 
         if (indexToRemove != -1) {
-            Stock removedItem = cart.remove(indexToRemove);
+            Order removedItem = cart.remove(indexToRemove);
 
             // Delete order from file (by position)
             orderRepo.deleteOrder(orderNoRemove);
@@ -161,7 +157,7 @@ public class SalesService {
             // Refund the stock quantity (Business Rule)
             Stock stockItem = findStockItem(removedItem.getStockID());
             if (stockItem != null) {
-                stockItem.setQty(stockItem.getQty() + removedItem.getQty());
+                stockItem.setQty(stockItem.getQty() + removedItem.getQuantity());
             }
 
             // Persist the refund change
@@ -184,13 +180,13 @@ public class SalesService {
      * @return true if successful, false otherwise.
      */
     public boolean editOrderQuantity(int orderNo, int quantityChange, int type) {
-        Stock cartItem = findCartItemByOrderNo(orderNo);
+        Order cartItem = findCartItemByOrderNo(orderNo);
         if (cartItem == null) return false;
 
         Stock stockItem = findStockItem(cartItem.getStockID());
         if (stockItem == null) return false;
 
-        int currentCartQty = cartItem.getQty();
+        int currentCartQty = cartItem.getQuantity();
         int availableStock = stockItem.getQty();
 
         if (quantityChange <= 0) return false;
@@ -198,13 +194,13 @@ public class SalesService {
         if (type == SalesUtil.REDUCE_QUANTITY) { // Reduce Quantity
             if (quantityChange > currentCartQty) return false; // Cannot reduce more than what's ordered
 
-            cartItem.setQty(currentCartQty - quantityChange);
+            cartItem.setQuantity(currentCartQty - quantityChange);
             stockItem.setQty(availableStock + quantityChange); // Refund stock
 
         } else if (type == SalesUtil.ADD_QUANTITY) { // Add Quantity
             if (quantityChange > availableStock) return false; // Insufficient stock
 
-            cartItem.setQty(currentCartQty + quantityChange);
+            cartItem.setQuantity(currentCartQty + quantityChange);
             stockItem.setQty(availableStock - quantityChange); // Deduct stock
 
         } else {

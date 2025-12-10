@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * Service layer for transaction management.
- * Handles business logic for transaction operations (retrieval, reporting).
- * Separates business logic from data access layer.
  */
 public class TransactionService {
     private final TransactionRepository transactionRepo;

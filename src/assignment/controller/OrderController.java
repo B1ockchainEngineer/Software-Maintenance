@@ -1,12 +1,13 @@
 package assignment.controller;
 
+import assignment.model.Order;
 import assignment.model.Stock;
-import assignment.service.SalesService;
+import assignment.service.OrderService;
 import assignment.util.ConsoleUtil;
 import assignment.util.SalesUtil;
 import assignment.util.config.SalesConfig;
 import assignment.util.ValidationUtil;
-import assignment.view.SalesView;
+import assignment.view.OrderView;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,12 +18,16 @@ import java.util.List;
  * Handles adding, searching, removing, and editing orders in the cart.
  */
 public class OrderController {
-    private final SalesService salesService;
-    private final SalesView salesView;
+    private final OrderService orderService;
+    private final OrderView orderView;
 
-    public OrderController(SalesService salesService) {
-        this.salesService = salesService;
-        this.salesView = new SalesView();
+    /**
+     * Constructs an OrderController with the specified OrderService.
+     * @param orderService The order service to use for order operations
+     */
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+        this.orderView = new OrderView();
     }
 
     /**
@@ -34,6 +39,13 @@ public class OrderController {
         final boolean shouldExit;
         final boolean shouldReenter;
 
+        /**
+         * Constructs a ProductIdResult with the specified values.
+         * @param itemID The product ID entered by user
+         * @param foundStock The stock item found, or null if not found
+         * @param shouldExit Whether the user wants to exit
+         * @param shouldReenter Whether the user should reenter the product ID
+         */
         ProductIdResult(int itemID, Stock foundStock, boolean shouldExit, boolean shouldReenter) {
             this.itemID = itemID;
             this.foundStock = foundStock;
@@ -44,14 +56,14 @@ public class OrderController {
 
     /**
      * Gets product ID input from user.
-     * @return ProductIdResult containing itemID, foundStock, and flags for exit/reenter
+     * @return ProductIdResult containing itemID, foundStock for exit/reenter
      */
     private ProductIdResult getProductIdInput() {
         int itemID;
         Stock foundStock = null;
 
         do {
-            salesView.printProductIdPrompt();
+            orderView.printProductIdPrompt();
             itemID = ValidationUtil.intValidation(0, 0);
 
             if (itemID == 0) {
@@ -62,13 +74,13 @@ public class OrderController {
                 return new ProductIdResult(SalesUtil.INVALID_INPUT, null, false, true);
             }
 
-            foundStock = salesService.findStockItem(itemID);
+            foundStock = orderService.findStockItem(itemID);
 
             if (foundStock == null || foundStock.getQty() == 0) {
-                salesView.printInvalidItemIdMessage();
+                orderView.printInvalidItemIdMessage();
                 itemID = SalesUtil.INVALID_INPUT;
             } else {
-                salesView.printProductDetails(foundStock);
+                orderView.printProductDetails(foundStock);
                 break;
             }
         } while (true);
@@ -87,7 +99,7 @@ public class OrderController {
         int maxQty = foundStock.getQty();
 
         do {
-            salesView.printQuantityPrompt();
+            orderView.printQuantityPrompt();
             quantity = ValidationUtil.intValidation(0, 10000);
 
             if (quantity == SalesUtil.INVALID_INPUT) continue;
@@ -96,14 +108,14 @@ public class OrderController {
             }
 
             if (quantity <= 0 || quantity > maxQty) {
-                salesView.printInvalidQuantityMessage(maxQty);
+                orderView.printInvalidQuantityMessage(maxQty);
             } else {
                 // Add to Cart (Business Logic Handled by Service)
-                boolean success = salesService.addToCart(itemID, quantity);
+                boolean success = orderService.addToCart(itemID, quantity);
                 if (success) {
-                    salesView.printCartSummary(foundStock, quantity);
+                    orderView.printCartSummary(foundStock, quantity);
                 } else {
-                    salesView.printAddOrderFailure();
+                    orderView.printAddOrderFailure();
                 }
                 break; // Exit quantity input loop
             }
@@ -119,11 +131,11 @@ public class OrderController {
      * @return true if orders exist and were displayed, false if cart is empty
      */
     private boolean listAllOrders(String emptyMessage, boolean showHeader) {
-        List<Stock> cartItems = salesService.getCartItems();
+        List<Order> cartItems = orderService.getCartItems();
         
         if (cartItems.isEmpty()) {
             String message = (emptyMessage != null) ? emptyMessage : SalesConfig.MSG_NO_ORDERS_IN_CART;
-            salesView.printEmptyCartMessage(message);
+            orderView.printEmptyCartMessage(message);
             ConsoleUtil.systemPause();
             ConsoleUtil.clearScreen();
             return false;
@@ -131,31 +143,30 @@ public class OrderController {
 
         // Display all orders with their numbers
         if (showHeader) {
-            salesView.printAllOrdersHeader();
+            orderView.printAllOrdersHeader();
         }
-        salesView.displayCartItems(cartItems);
+        orderView.displayCartItems(cartItems);
         if (showHeader) {
-            salesView.printEmptyLine();
+            orderView.printEmptyLine();
         }
         return true;
     }
 
     /**
-     * Lists all orders from the cart with default settings.
-     * @return true if orders exist and were displayed, false if cart is empty
+     * Adds a new order to the cart.
+     * Displays available items, prompts for product ID and quantity,
+     * and allows multiple orders to be added in sequence.
+     * User can exit by entering 0 for product ID or confirm finished ordering.
+     * @throws IOException if an I/O error occurs
      */
-    private boolean listAllOrders() {
-        return listAllOrders(null, true);
-    }
-
     public void addOrder() throws IOException {
         char nextOrder = 'N';
 
         do {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
-            salesView.printOrderingSystemTitle();
-            salesView.displayAvailableItems(salesService.getAvailableStock());
+            orderView.printOrderingSystemTitle();
+            orderView.displayAvailableItems(orderService.getAvailableStock());
 
             // Get Product ID
             ProductIdResult productResult = getProductIdInput();
@@ -180,18 +191,23 @@ public class OrderController {
             // Ask for next order
             nextOrder = ValidationUtil.confirmValidation(SalesConfig.PROMPT_FINISHED_ORDERING);
 
-        } while (Character.toUpperCase(nextOrder) != 'Y');
+        } while (nextOrder != 'Y');
 
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Searches for an order by order number and displays its details.
+     * Prompts user for order number and shows order information if found,
+     * or displays a not found message if the order doesn't exist.
+     */
     public void searchOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printSearchOrderMenu();
+        orderView.printSearchOrderMenu();
 
-        salesView.printOrderNoSearchPrompt();
+        orderView.printOrderNoSearchPrompt();
         int orderNoSearch = ValidationUtil.intValidation(1, 10000);
 
         if (orderNoSearch == SalesUtil.INVALID_INPUT) {
@@ -200,29 +216,35 @@ public class OrderController {
             return;
         }
 
-        Stock item = salesService.findCartItemByOrderNo(orderNoSearch);
+        Order item = orderService.findCartItemByOrderNo(orderNoSearch);
 
         if (item != null) {
-            salesView.displayOrderDetail(item);
+            orderView.displayOrderDetail(item);
         } else {
-            salesView.printOrderNotFound();
+            orderView.printOrderNotFound();
         }
 
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
     }
 
+    /**
+     * Removes an order from the cart.
+     * Displays all orders, prompts for order number to remove,
+     * asks for confirmation, and removes the order if confirmed.
+     * Stock quantity is automatically refunded when order is removed.
+     */
     public void removeOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printRemoveOrderMenu();
+        orderView.printRemoveOrderMenu();
 
         // Display all orders from the cart
-        if (!listAllOrders()) {
+        if (!listAllOrders(null, true)) {
             return; // Cart is empty, exit early
         }
 
-        salesView.printOrderNoRemovePrompt();
+        orderView.printOrderNoRemovePrompt();
         int orderNoRemove = ValidationUtil.intValidation(1, 10000);
 
         if (orderNoRemove == SalesUtil.INVALID_INPUT) {
@@ -231,23 +253,23 @@ public class OrderController {
             return;
         }
 
-        Stock cartItem = salesService.findCartItemByOrderNo(orderNoRemove);
+        Order cartItem = orderService.findCartItemByOrderNo(orderNoRemove);
 
         if (cartItem == null) {
-            salesView.printOrderNotFound();
+            orderView.printOrderNotFound();
         } else {
-            salesView.printRemoveConfirmation(cartItem);
+            orderView.printRemoveConfirmation(cartItem);
 
             char confirm = ValidationUtil.confirmValidation(SalesConfig.PROMPT_DELETE_ORDER_CONFIRM);
 
             if (confirm == 'Y') {
-                if (salesService.removeOrder(orderNoRemove)) {
-                    salesView.printRemoveSuccess();
+                if (orderService.removeOrder(orderNoRemove)) {
+                    orderView.printRemoveSuccess();
                 } else {
-                    salesView.printRemoveFailure();
+                    orderView.printRemoveFailure();
                 }
             } else {
-                salesView.printRemoveCancelled();
+                orderView.printRemoveCancelled();
             }
         }
 
@@ -259,11 +281,17 @@ public class OrderController {
      * Result class for order validation.
      */
     private static class OrderValidationResult {
-        final Stock cartItem;
+        final Order cartItem;
         final Stock stockItem;
         final boolean isValid;
 
-        OrderValidationResult(Stock cartItem, Stock stockItem, boolean isValid) {
+        /**
+         * Constructs an OrderValidationResult with the specified values.
+         * @param cartItem The cart item found, or null if not found
+         * @param stockItem The stock item found, or null if not found
+         * @param isValid Whether the order validation was successful
+         */
+        OrderValidationResult(Order cartItem, Stock stockItem, boolean isValid) {
             this.cartItem = cartItem;
             this.stockItem = stockItem;
             this.isValid = isValid;
@@ -280,15 +308,15 @@ public class OrderController {
             return new OrderValidationResult(null, null, false);
         }
 
-        Stock cartItem = salesService.findCartItemByOrderNo(orderNoEdit);
+        Order cartItem = orderService.findCartItemByOrderNo(orderNoEdit);
         if (cartItem == null) {
-            salesView.printNoOrderFoundMessage();
+            orderView.printNoOrderFoundMessage();
             return new OrderValidationResult(null, null, false);
         }
 
-        Stock stockItem = salesService.findStockItem(cartItem.getStockID());
+        Stock stockItem = orderService.findStockItem(cartItem.getStockID());
         if (stockItem == null) {
-            salesView.printStockNotFoundMessage();
+            orderView.printStockNotFoundMessage();
             return new OrderValidationResult(null, null, false);
         }
 
@@ -300,19 +328,19 @@ public class OrderController {
      * @param orderNoEdit The order number to delete
      * @param cartItem The cart item to delete
      */
-    private void handleFullQuantityDeletion(int orderNoEdit, Stock cartItem) {
-        salesView.printFullQuantityDeleteWarning();
-        salesView.printRemoveConfirmation(cartItem);
+    private void handleFullQuantityDeletion(int orderNoEdit, Order cartItem) {
+        orderView.printFullQuantityDeleteWarning();
+        orderView.printRemoveConfirmation(cartItem);
         char confirm = ValidationUtil.confirmValidation(SalesConfig.PROMPT_DELETE_ORDER_CONFIRM);
         
         if (confirm == 'Y') {
-            if (salesService.removeOrder(orderNoEdit)) {
-                salesView.printRemoveSuccess();
+            if (orderService.removeOrder(orderNoEdit)) {
+                orderView.printRemoveSuccess();
             } else {
-                salesView.printRemoveFailure();
+                orderView.printRemoveFailure();
             }
         } else {
-            salesView.printRemoveCancelled();
+            orderView.printRemoveCancelled();
         }
     }
 
@@ -323,44 +351,55 @@ public class OrderController {
      * @param stockItem The stock item
      * @param choice The edit choice (1 = reduce, 2 = add)
      */
-    private void processQuantityChange(int orderNoEdit, Stock cartItem, Stock stockItem, int choice) {
-        int maxChange = (choice == SalesUtil.REDUCE_QUANTITY) ? cartItem.getQty() : stockItem.getQty();
-        salesView.printQuantityChangePrompt(choice == SalesUtil.REDUCE_QUANTITY, maxChange);
+    private void processQuantityChange(int orderNoEdit, Order cartItem, Stock stockItem, int choice) {
+        int maxChange = (choice == SalesUtil.REDUCE_QUANTITY) ? cartItem.getQuantity() : stockItem.getQty();
+        orderView.printQuantityChangePrompt(choice == SalesUtil.REDUCE_QUANTITY, maxChange);
         int quantityChange = ValidationUtil.intValidation(1, maxChange);
 
         if (quantityChange == SalesUtil.INVALID_INPUT) {
-            salesView.printInvalidQuantityInputMessage();
+            orderView.printInvalidQuantityInputMessage();
             return;
         }
 
         // Check if reducing full quantity (same as deleting)
-        if (choice == SalesUtil.REDUCE_QUANTITY && quantityChange == cartItem.getQty()) {
+        if (choice == SalesUtil.REDUCE_QUANTITY && quantityChange == cartItem.getQuantity()) {
             handleFullQuantityDeletion(orderNoEdit, cartItem);
         } else {
             // Normal edit operation
-            boolean success = salesService.editOrderQuantity(orderNoEdit, quantityChange, choice);
+            boolean success = orderService.editOrderQuantity(orderNoEdit, quantityChange, choice);
             if (success) {
                 String action = (choice == SalesUtil.REDUCE_QUANTITY ? "REDUCED" : "ADDED");
-                int newQty = salesService.findCartItemByOrderNo(orderNoEdit).getQty();
-                salesView.printEditSuccess(action, newQty);
+                Order updatedOrder = orderService.findCartItemByOrderNo(orderNoEdit);
+                if (updatedOrder != null) {
+                    int newQty = updatedOrder.getQuantity();
+                    orderView.printEditSuccess(action, newQty);
+                } else {
+                    orderView.printEditFailure();
+                }
             } else {
-                salesView.printEditFailure();
+                orderView.printEditFailure();
             }
         }
     }
 
+    /**
+     * Edits the quantity of an existing order in the cart.
+     * Displays all orders, prompts for order number, validates the order,
+     * and allows user to either reduce or add quantity.
+     * If reducing full quantity, treats it as order deletion.
+     */
     public void editOrder() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        salesView.printEditOrderMenu();
+        orderView.printEditOrderMenu();
 
-        if (!listAllOrders()) {
+        if (!listAllOrders(null, true)) {
             return;
         }
 
-        salesView.printOrderNoEditPrompt();
+        orderView.printOrderNoEditPrompt();
         int orderNoEdit = ValidationUtil.intValidation(1, 10000);
-        salesView.printSeparatorLine();
+        orderView.printSeparatorLine();
 
         // Validate order
         OrderValidationResult validation = validateOrderForEdit(orderNoEdit);
@@ -371,17 +410,17 @@ public class OrderController {
         }
 
         // Display edit order details and submenu
-        salesView.printEditOrderDetails(validation.cartItem, validation.stockItem);
-        salesView.printEditOrderSubMenu();
+        orderView.printEditOrderDetails(validation.cartItem, validation.stockItem);
+        orderView.printEditOrderSubMenu();
 
         // Get edit choice
-        salesView.printEditChoicePrompt();
+        orderView.printEditChoicePrompt();
         int choice = ValidationUtil.intValidation(0, 2);
 
         if (choice == 0) {
-            salesView.printEditCancelledMessage();
+            orderView.printEditCancelledMessage();
         } else if (choice == SalesUtil.INVALID_INPUT) {
-            salesView.printInvalidChoiceMessage();
+            orderView.printInvalidChoiceMessage();
         } else {
             processQuantityChange(orderNoEdit, validation.cartItem, validation.stockItem, choice);
         }

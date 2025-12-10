@@ -1,6 +1,6 @@
 package assignment.repo;
 
-import assignment.model.Stock;
+import assignment.model.Order;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,15 +27,15 @@ public class OrderRepository {
     /**
      * Appends an order to the file.
      * Order number is determined by line position (not stored in file).
-     * @param order The order (Stock item) to save
+     * @param order The order to save
      */
-    public void appendOrder(Stock order) {
+    public void appendOrder(Order order) {
         ensureFileExists();
         try (FileWriter writer = new FileWriter(ORDER_FILE_PATH, true)) {
             writer.write(ORDER_MARKER + "\t");
             writer.write(order.getStockID() + "\t");
             writer.write(order.getStockName() + "\t");
-            writer.write(order.getQty() + "\t");
+            writer.write(order.getQuantity() + "\t");
             writer.write(order.getPrice() + "\t");
             writer.write("\n");
         } catch (IOException e) {
@@ -48,14 +48,14 @@ public class OrderRepository {
      * Order numbers are determined by line position (not stored in file).
      * @param orders List of orders to save
      */
-    public void appendOrders(List<Stock> orders) {
+    public void appendOrders(List<Order> orders) {
         ensureFileExists();
         try (FileWriter writer = new FileWriter(ORDER_FILE_PATH, true)) {
-            for (Stock order : orders) {
+            for (Order order : orders) {
                 writer.write(ORDER_MARKER + "\t");
                 writer.write(order.getStockID() + "\t");
                 writer.write(order.getStockName() + "\t");
-                writer.write(order.getQty() + "\t");
+                writer.write(order.getQuantity() + "\t");
                 writer.write(order.getPrice() + "\t");
                 writer.write("\n");
             }
@@ -69,9 +69,9 @@ public class OrderRepository {
      * Order numbers are assigned based on line position (1, 2, 3, ...).
      * @return List of all orders with orderNo assigned by position
      */
-    public List<Stock> loadAllOrders() {
+    public List<Order> loadAllOrders() {
         ensureFileExists();
-        List<Stock> orders = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(ORDER_FILE_PATH))) {
             String line;
@@ -84,31 +84,31 @@ public class OrderRepository {
 
                 String[] parts = line.split("\t");
                 
-                // New format: ORDER \t stockID \t stockName \t qty \t price (5 parts)
+                // New format: ORDER \t stockID \t stockName \t quantity \t price (5 parts)
                 // Old format (backward compatibility): ORDER \t orderNo \t stockID \t stockName \t qty \t price (6 parts)
                 if (parts.length >= 5 && parts[0].equals(ORDER_MARKER)) {
                     try {
                         int stockID;
                         String stockName;
-                        int qty;
+                        int quantity;
                         double price;
                         
                         if (parts.length >= 6) {
                             // Old format with orderNo - ignore stored orderNo, use position instead
                             stockID = Integer.parseInt(parts[2]);
                             stockName = parts[3];
-                            qty = Integer.parseInt(parts[4]);
+                            quantity = Integer.parseInt(parts[4]);
                             price = Double.parseDouble(parts[5]);
                         } else {
                             // New format without orderNo
                             stockID = Integer.parseInt(parts[1]);
                             stockName = parts[2];
-                            qty = Integer.parseInt(parts[3]);
+                            quantity = Integer.parseInt(parts[3]);
                             price = Double.parseDouble(parts[4]);
                         }
                         
                         // Assign orderNo based on position in file
-                        orders.add(new Stock(orderNo, stockID, stockName, qty, price));
+                        orders.add(new Order(orderNo, stockID, stockName, quantity, price));
                         orderNo++;
                     } catch (NumberFormatException e) {
                         LOGGER.log(Level.WARNING, "Error parsing order line: " + line, e);
@@ -128,7 +128,7 @@ public class OrderRepository {
      * @param order The updated order (orderNo represents position: 1, 2, 3, ...)
      * @return true if order was found and updated, false otherwise
      */
-    public boolean updateOrder(Stock order) {
+    public boolean updateOrder(Order order) {
         ensureFileExists();
         File inputFile = new File(ORDER_FILE_PATH);
         File tempFile = new File(DATA_DIR + "temp/orderUpdateTemp.txt");
@@ -160,7 +160,7 @@ public class OrderRepository {
                         writer.write(ORDER_MARKER + "\t");
                         writer.write(order.getStockID() + "\t");
                         writer.write(order.getStockName() + "\t");
-                        writer.write(order.getQty() + "\t");
+                        writer.write(order.getQuantity() + "\t");
                         writer.write(order.getPrice() + "\t");
                         writer.write("\n");
                         orderFound = true;
@@ -274,7 +274,7 @@ public class OrderRepository {
      * @return The number of orders, or 0 if no orders exist
      */
     public int getOrderCount() {
-        List<Stock> orders = loadAllOrders();
+        List<Order> orders = loadAllOrders();
         return orders.size();
     }
 

@@ -1,5 +1,6 @@
 package assignment.service;
 
+import assignment.model.Order;
 import assignment.model.PaymentResult;
 import assignment.model.Stock;
 import assignment.model.Transaction;
@@ -10,8 +11,6 @@ import java.util.List;
 
 /**
  * Service layer for payment processing.
- * Handles business logic for payment calculations (subtotal, discount, tax).
- * Does NOT handle transaction persistence - that's handled by TransactionService.
  */
 public class PaymentService {
     private final StockRepository stockRepo;
@@ -27,7 +26,7 @@ public class PaymentService {
      */
     public double calculateSubtotal() {
         double subtotal = 0.0;
-        for (Stock item : stockRepo.getCart()) {
+        for (Order item : stockRepo.getCart()) {
             subtotal += item.calculateTotalCost();
         }
         return subtotal;
@@ -79,7 +78,7 @@ public class PaymentService {
      * @return PaymentCalculation containing all calculated values, or null if cart is empty
      */
     private PaymentCalculation calculatePayment(double discountRate) {
-        List<Stock> cart = stockRepo.getCart();
+        List<Order> cart = stockRepo.getCart();
         
         if (cart.isEmpty()) {
             return null; // No items to calculate
@@ -128,7 +127,7 @@ public class PaymentService {
      * @return Transaction object with calculated payment details, or null if cart is empty
      */
     public Transaction createTransaction(double discountRate) {
-        List<Stock> cart = stockRepo.getCart();
+        List<Order> cart = stockRepo.getCart();
         
         if (cart.isEmpty()) {
             return null; // No items to process
@@ -140,7 +139,14 @@ public class PaymentService {
             return null; // No items to process
         }
 
-        return new Transaction(calc.subtotal, calc.discount, calc.tax, calc.total, cart);
+        // Convert Order list to Stock list for Transaction (Transaction uses Stock for items)
+        List<Stock> transactionItems = new java.util.ArrayList<>();
+        for (Order order : cart) {
+            transactionItems.add(new Stock(order.getStockID(), order.getStockName(), 
+                    order.getQuantity(), order.getPrice()));
+        }
+
+        return new Transaction(calc.subtotal, calc.discount, calc.tax, calc.total, transactionItems);
     }
 }
 

@@ -5,7 +5,6 @@ import java.util.List;
 
 /**
  * Model class representing a transaction with its items.
- * This is a data structure that holds transaction information.
  */
 public class Transaction {
     private final double subtotal;

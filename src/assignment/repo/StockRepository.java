@@ -1,5 +1,6 @@
 package assignment.repo;
 
+import assignment.model.Order;
 import assignment.model.Stock;
 import java.io.*;
 import java.util.ArrayList;
@@ -15,14 +16,14 @@ public class StockRepository {
     private static final String STOCK_FILE_PATH = DATA_DIR + "stock.txt";
     // In-memory data structures for fast lookups (Sales logic needs this)
     private static List<Stock> stocklist = new ArrayList<>();
-    private static List<Stock> cart = new ArrayList<>();
+    private static List<Order> cart = new ArrayList<>();
     private static boolean stockLoaded = false; // Flag to prevent repeated loading
 
     public List<Stock> getStocklist() {
         return stocklist;
     }
 
-    public List<Stock> getCart() {
+    public List<Order> getCart() {
         return cart;
     }
 
