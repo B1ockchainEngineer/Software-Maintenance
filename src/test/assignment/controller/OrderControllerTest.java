@@ -1,4 +1,4 @@
-package test.assignment.controller;
+package assignment.controller;
 
 import assignment.model.Order;
 import assignment.model.Stock;

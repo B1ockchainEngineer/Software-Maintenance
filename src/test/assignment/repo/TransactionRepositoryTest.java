@@ -1,4 +1,4 @@
-package test.assignment.repo;
+package assignment.repo;
 
 import assignment.model.Stock;
 import assignment.model.Transaction;

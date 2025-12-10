@@ -1,4 +1,4 @@
-package test.assignment.controller;
+package assignment.controller;
 
 import assignment.controller.MemberController;
 import assignment.model.Membership;
