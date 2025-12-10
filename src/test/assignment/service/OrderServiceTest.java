@@ -1,4 +1,4 @@
-package test.assignment.service;
+package assignment.service;
 
 import assignment.model.Order;
 import assignment.model.Stock;
