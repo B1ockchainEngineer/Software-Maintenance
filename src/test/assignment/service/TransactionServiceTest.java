@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("TransactionService Tests")
 class TransactionServiceTest {
+    private static final Logger LOGGER = Logger.getLogger(TransactionServiceTest.class.getName());
 
     private TransactionRepository transactionRepo;
     private TransactionService transactionService;
@@ -53,6 +55,7 @@ class TransactionServiceTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         assertNotNull(transactions);
         assertTrue(transactions.isEmpty());
+        LOGGER.info("✓ SUCCESS: TransactionService - Returned empty list when no transactions exist");
     }
 
     @Test
@@ -71,6 +74,7 @@ class TransactionServiceTest {
 
         List<Transaction> transactions = transactionService.getAllTransactions();
         assertEquals(2, transactions.size());
+        LOGGER.info("✓ SUCCESS: TransactionService - Retrieved all saved transactions (2 transactions found)");
     }
 
     @Test
@@ -92,6 +96,7 @@ class TransactionServiceTest {
         assertEquals(10.8, saved.getTax(), 0.01);
         assertEquals(190.8, saved.getTotal(), 0.01);
         assertEquals(2, saved.getItems().size());
+        LOGGER.info("✓ SUCCESS: TransactionService - Saved transaction correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80, Items: 2)");
     }
 
     @Test
@@ -109,6 +114,7 @@ class TransactionServiceTest {
 
         List<Transaction> transactions = transactionService.getAllTransactions();
         assertEquals(2, transactions.size());
+        LOGGER.info("✓ SUCCESS: TransactionService - Saved multiple transactions (2 transactions saved)");
     }
 
     @Test
@@ -130,6 +136,7 @@ class TransactionServiceTest {
         assertEquals(2, savedItems.size());
         assertEquals(1001, savedItems.get(0).getStockID());
         assertEquals(1002, savedItems.get(1).getStockID());
+        LOGGER.info("✓ SUCCESS: TransactionService - Preserved transaction items when saving (Items: Product 1001, Product 1002)");
     }
 
     @Test
@@ -144,6 +151,7 @@ class TransactionServiceTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Transaction saved = transactions.get(0);
         assertEquals(0.0, saved.getDiscount(), 0.01);
+        LOGGER.info("✓ SUCCESS: TransactionService - Handled transaction with no discount (Discount: RM0.00)");
     }
 
     @Test
@@ -156,6 +164,7 @@ class TransactionServiceTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         assertEquals(1, transactions.size());
         assertTrue(transactions.get(0).getItems().isEmpty());
+        LOGGER.info("✓ SUCCESS: TransactionService - Handled transaction with empty items list");
     }
 }
 

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
 
 /**
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
  */
 @DisplayName("PaymentController Tests")
 class PaymentControllerTest {
+    private static final Logger LOGGER = Logger.getLogger(PaymentControllerTest.class.getName());
 
     private PaymentService paymentService;
     private TransactionService transactionService;
@@ -130,6 +132,7 @@ class PaymentControllerTest {
     @DisplayName("Should initialize PaymentController with all services")
     void testPaymentControllerInitialization() {
         Assertions.assertNotNull(paymentController);
+        LOGGER.info("✓ SUCCESS: PaymentController - Initialized with all services (PaymentService, TransactionService, MemberService, OrderService)");
     }
 
     @Test
@@ -141,6 +144,7 @@ class PaymentControllerTest {
         Assertions.assertEquals(20.0, result.getDiscount(), 0.01); // 10% of 200
         Assertions.assertEquals(10.8, result.getTax(), 0.01); // 6% of 180
         Assertions.assertEquals(190.8, result.getTotal(), 0.01); // 180 + 10.8
+        LOGGER.info("✓ SUCCESS: PaymentController - Calculated payment summary correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80)");
     }
 
     @Test
@@ -152,6 +156,7 @@ class PaymentControllerTest {
         Assertions.assertEquals(0.0, result.getDiscount(), 0.01);
         Assertions.assertEquals(12.0, result.getTax(), 0.01); // 6% of 200
         Assertions.assertEquals(212.0, result.getTotal(), 0.01);
+        LOGGER.info("✓ SUCCESS: PaymentController - Calculated payment summary with no discount (Subtotal: RM200.00, Tax: RM12.00, Total: RM212.00)");
     }
 
     @Test
@@ -164,6 +169,7 @@ class PaymentControllerTest {
         Assertions.assertEquals(10.8, transaction.getTax(), 0.01);
         Assertions.assertEquals(190.8, transaction.getTotal(), 0.01);
         Assertions.assertEquals(2, transaction.getItems().size());
+        LOGGER.info("✓ SUCCESS: PaymentController - Created transaction correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80, Items: 2)");
     }
 
     @Test
@@ -175,6 +181,7 @@ class PaymentControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Assertions.assertEquals(1, transactions.size());
         Assertions.assertEquals(190.8, transactions.get(0).getTotal(), 0.01);
+        LOGGER.info("✓ SUCCESS: PaymentController - Saved transaction through service (Transaction saved with Total: RM190.80)");
     }
 
     @Test
@@ -183,6 +190,7 @@ class PaymentControllerTest {
         Assertions.assertFalse(orderService.getCartItems().isEmpty());
         paymentService.clearCart();
         Assertions.assertTrue(orderService.getCartItems().isEmpty());
+        LOGGER.info("✓ SUCCESS: PaymentController - Cleared cart after payment");
     }
 
     @Test
@@ -192,6 +200,7 @@ class PaymentControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(0.10, result.getDiscountRate(), 0.01);
         Assertions.assertFalse(result.hasError());
+        LOGGER.info("✓ SUCCESS: PaymentController - Got discount rate from member service (Discount Rate: 10%)");
     }
 
     @Test
@@ -200,6 +209,7 @@ class PaymentControllerTest {
         MemberService.DiscountResult result = memberService.getDiscountRate("0");
         Assertions.assertNotNull(result);
         Assertions.assertEquals(0.0, result.getDiscountRate(), 0.01);
+        LOGGER.info("✓ SUCCESS: PaymentController - Returned zero discount for no member");
     }
 
     @Test
@@ -217,6 +227,7 @@ class PaymentControllerTest {
         // Verify transaction saved
         List<Transaction> transactions = transactionService.getAllTransactions();
         Assertions.assertEquals(1, transactions.size());
+        LOGGER.info("✓ SUCCESS: PaymentController - Handled payment flow with member discount (Discount: RM20.00, Transaction saved)");
     }
 
     @Test
@@ -235,6 +246,7 @@ class PaymentControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Assertions.assertEquals(1, transactions.size());
         Assertions.assertEquals(212.0, transactions.get(0).getTotal(), 0.01);
+        LOGGER.info("✓ SUCCESS: PaymentController - Handled payment flow without member discount (Discount: RM0.00, Transaction saved with Total: RM212.00)");
     }
 
     @Test
@@ -248,5 +260,6 @@ class PaymentControllerTest {
 
         List<Transaction> transactions = transactionService.getAllTransactions();
         Assertions.assertEquals(2, transactions.size());
+        LOGGER.info("✓ SUCCESS: PaymentController - Retrieved all transactions (2 transactions found)");
     }
 }

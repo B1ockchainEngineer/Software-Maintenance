@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("OrderService Tests")
 class OrderServiceTest {
+    private static final Logger LOGGER = Logger.getLogger(OrderServiceTest.class.getName());
 
     private StockRepository stockRepo;
     private OrderRepository orderRepo;
@@ -102,6 +104,7 @@ class OrderServiceTest {
         List<Stock> availableStock = orderService.getAvailableStock();
         assertNotNull(availableStock);
         assertEquals(3, availableStock.size());
+        LOGGER.info("✓ SUCCESS: OrderService - Retrieved available stock items (3 items found)");
     }
 
     @Test
@@ -110,6 +113,7 @@ class OrderServiceTest {
         List<Order> cartItems = orderService.getCartItems();
         assertNotNull(cartItems);
         assertTrue(cartItems.isEmpty());
+        LOGGER.info("✓ SUCCESS: OrderService - Cart is initially empty as expected");
     }
 
     @Test
@@ -119,6 +123,7 @@ class OrderServiceTest {
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
         assertEquals("PRODUCT A", found.getStockName()); // getStockName() returns uppercase
+        LOGGER.info("✓ SUCCESS: OrderService - Found stock item by ID (1001: PRODUCT A)");
     }
 
     @Test
@@ -126,6 +131,7 @@ class OrderServiceTest {
     void testFindStockItem_NotFound() {
         Stock found = orderService.findStockItem(9999);
         assertNull(found);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly returns null for non-existent stock item (ID: 9999)");
     }
 
     @Test
@@ -143,6 +149,7 @@ class OrderServiceTest {
         // Verify stock was deducted
         Stock stockItem = orderService.findStockItem(1001);
         assertEquals(7, stockItem.getQty()); // 10 - 3 = 7
+        LOGGER.info("✓ SUCCESS: OrderService - Successfully added item to cart (Product 1001, Qty: 3, Stock deducted: 10→7)");
     }
 
     @Test
@@ -151,6 +158,7 @@ class OrderServiceTest {
         boolean result = orderService.addToCart(1001, 15); // More than available (10)
         assertFalse(result);
         assertTrue(orderService.getCartItems().isEmpty());
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected adding item with insufficient stock (Requested: 15, Available: 10)");
     }
 
     @Test
@@ -158,6 +166,7 @@ class OrderServiceTest {
     void testAddToCart_InvalidQuantity() {
         assertFalse(orderService.addToCart(1001, 0));
         assertFalse(orderService.addToCart(1001, -1));
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected invalid quantities (0 and -1)");
     }
 
     @Test
@@ -165,6 +174,7 @@ class OrderServiceTest {
     void testAddToCart_ItemNotFound() {
         boolean result = orderService.addToCart(9999, 1);
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected adding non-existent item (ID: 9999)");
     }
 
     @Test
@@ -172,6 +182,7 @@ class OrderServiceTest {
     void testAddToCart_OutOfStock() {
         boolean result = orderService.addToCart(1003, 1); // Product C has 0 quantity
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected adding out-of-stock item (Product 1003, Qty: 0)");
     }
 
     @Test
@@ -184,6 +195,7 @@ class OrderServiceTest {
         assertEquals(2, cart.size());
         assertEquals(1, cart.get(0).getOrderNo());
         assertEquals(2, cart.get(1).getOrderNo());
+        LOGGER.info("✓ SUCCESS: OrderService - Sequential order numbers assigned correctly (Order #1, #2)");
     }
 
     @Test
@@ -207,6 +219,7 @@ class OrderServiceTest {
         // Verify stock was refunded
         Stock stockItem = orderService.findStockItem(1001);
         assertEquals(10, stockItem.getQty()); // Refunded back to 10
+        LOGGER.info("✓ SUCCESS: OrderService - Successfully removed order from cart (Order #1 removed, stock refunded: 7→10)");
     }
 
     @Test
@@ -215,6 +228,7 @@ class OrderServiceTest {
         orderService.addToCart(1001, 2);
         boolean result = orderService.removeOrder(999);
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected removing non-existent order (Order #999)");
     }
 
     @Test
@@ -231,6 +245,7 @@ class OrderServiceTest {
         assertEquals(2, cart.size());
         assertEquals(1, cart.get(0).getOrderNo());
         assertEquals(2, cart.get(1).getOrderNo());
+        LOGGER.info("✓ SUCCESS: OrderService - Order numbers reassigned after removal (Order #2 removed, remaining: #1, #2)");
     }
 
     @Test
@@ -243,6 +258,7 @@ class OrderServiceTest {
         assertNotNull(found);
         assertEquals(1002, found.getStockID());
         assertEquals(2, found.getOrderNo());
+        LOGGER.info("✓ SUCCESS: OrderService - Found cart item by order number (Order #2: Product 1002)");
     }
 
     @Test
@@ -251,6 +267,7 @@ class OrderServiceTest {
         orderService.addToCart(1001, 2);
         Order found = orderService.findCartItemByOrderNo(999);
         assertNull(found);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly returns null for non-existent order number (#999)");
     }
 
     @Test
@@ -269,6 +286,7 @@ class OrderServiceTest {
         // Verify stock was refunded
         Stock stockAfter = orderService.findStockItem(1001);
         assertEquals(stockQtyBefore + 2, stockAfter.getQty());
+        LOGGER.info("✓ SUCCESS: OrderService - Successfully reduced order quantity (Order #1: 5→3, Stock refunded: +2)");
     }
 
     @Test
@@ -287,6 +305,7 @@ class OrderServiceTest {
         // Verify stock was deducted
         Stock stockAfter = orderService.findStockItem(1001);
         assertEquals(stockQtyBefore - 2, stockAfter.getQty());
+        LOGGER.info("✓ SUCCESS: OrderService - Successfully added order quantity (Order #1: 3→5, Stock deducted: -2)");
     }
 
     @Test
@@ -295,6 +314,7 @@ class OrderServiceTest {
         orderService.addToCart(1001, 3);
         boolean result = orderService.editOrderQuantity(1, 5, 1); // Try to reduce 5 from 3
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected reducing more than ordered (Order Qty: 3, Attempted: -5)");
     }
 
     @Test
@@ -304,6 +324,7 @@ class OrderServiceTest {
         // Stock now has 7 left (10 - 3 = 7)
         boolean result = orderService.editOrderQuantity(1, 10, 2); // Try to add 10 when only 7 available
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected adding more than available stock (Available: 7, Attempted: +10)");
     }
 
     @Test
@@ -312,6 +333,7 @@ class OrderServiceTest {
         orderService.addToCart(1001, 3);
         assertFalse(orderService.editOrderQuantity(1, 0, 1));
         assertFalse(orderService.editOrderQuantity(1, -1, 1));
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected invalid quantity changes (0 and -1)");
     }
 
     @Test
@@ -320,6 +342,7 @@ class OrderServiceTest {
         orderService.addToCart(1001, 3);
         boolean result = orderService.editOrderQuantity(999, 1, 1);
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected editing non-existent order (Order #999)");
     }
 
     @Test
@@ -328,5 +351,6 @@ class OrderServiceTest {
         orderService.addToCart(1001, 3);
         boolean result = orderService.editOrderQuantity(1, 1, 99); // Invalid type
         assertFalse(result);
+        LOGGER.info("✓ SUCCESS: OrderService - Correctly rejected invalid edit type (Type: 99, Valid: 1 or 2)");
     }
 }

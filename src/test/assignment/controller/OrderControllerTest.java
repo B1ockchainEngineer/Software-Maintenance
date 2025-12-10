@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("OrderController Tests")
 class OrderControllerTest {
+    private static final Logger LOGGER = Logger.getLogger(OrderControllerTest.class.getName());
 
     private OrderService orderService;
     private OrderController orderController;
@@ -124,6 +126,7 @@ class OrderControllerTest {
     @DisplayName("Should initialize OrderController with OrderService")
     void testOrderControllerInitialization() {
         assertNotNull(orderController);
+        LOGGER.info("✓ SUCCESS: OrderController - Initialized with OrderService");
     }
 
     @Test
@@ -133,6 +136,7 @@ class OrderControllerTest {
         List<Stock> availableStock = orderService.getAvailableStock();
         assertNotNull(availableStock);
         assertFalse(availableStock.isEmpty());
+        LOGGER.info("✓ SUCCESS: OrderController - Has access to order service (Available stock retrieved)");
     }
 
     @Test
@@ -141,6 +145,7 @@ class OrderControllerTest {
         List<Order> cartItems = orderService.getCartItems();
         assertNotNull(cartItems);
         assertTrue(cartItems.isEmpty());
+        LOGGER.info("✓ SUCCESS: OrderController - Got cart items through service (Cart is empty)");
     }
 
     @Test
@@ -149,6 +154,7 @@ class OrderControllerTest {
         Stock found = orderService.findStockItem(1001);
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
+        LOGGER.info("✓ SUCCESS: OrderController - Found stock items through service (Product 1001 found)");
     }
 
     @Test
@@ -157,6 +163,7 @@ class OrderControllerTest {
         boolean result = orderService.addToCart(1001, 2);
         assertTrue(result);
         assertEquals(1, orderService.getCartItems().size());
+        LOGGER.info("✓ SUCCESS: OrderController - Added items to cart through service (Product 1001, Qty: 2)");
     }
 
     @Test
@@ -166,6 +173,7 @@ class OrderControllerTest {
         Order found = orderService.findCartItemByOrderNo(1);
         assertNotNull(found);
         assertEquals(1001, found.getStockID());
+        LOGGER.info("✓ SUCCESS: OrderController - Found cart items by order number (Order #1: Product 1001)");
     }
 
     @Test
@@ -177,6 +185,7 @@ class OrderControllerTest {
         boolean result = orderService.removeOrder(1);
         assertTrue(result);
         assertTrue(orderService.getCartItems().isEmpty());
+        LOGGER.info("✓ SUCCESS: OrderController - Removed orders through service (Order #1 removed, cart is empty)");
     }
 
     @Test
@@ -190,6 +199,7 @@ class OrderControllerTest {
         assertTrue(result);
         cartItem = orderService.findCartItemByOrderNo(1);
         assertEquals(3, cartItem.getQuantity());
+        LOGGER.info("✓ SUCCESS: OrderController - Edited order quantity through service (Order #1: Qty 2→3)");
     }
 
     @Test
@@ -208,5 +218,6 @@ class OrderControllerTest {
         // Remove second order
         orderService.removeOrder(2);
         assertEquals(1, orderService.getCartItems().size());
+        LOGGER.info("✓ SUCCESS: OrderController - Handled multiple cart operations (Added 2 items, edited order #1, removed order #2)");
     }
 }

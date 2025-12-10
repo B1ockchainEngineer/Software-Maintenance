@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("TransactionController Tests")
 class TransactionControllerTest {
+    private static final Logger LOGGER = Logger.getLogger(TransactionControllerTest.class.getName());
 
     private TransactionService transactionService;
     private TransactionController transactionController;
@@ -54,6 +56,7 @@ class TransactionControllerTest {
     @DisplayName("Should initialize TransactionController with TransactionService")
     void testTransactionControllerInitialization() {
         assertNotNull(transactionController);
+        LOGGER.info("✓ SUCCESS: TransactionController - Initialized with TransactionService");
     }
 
     @Test
@@ -62,6 +65,7 @@ class TransactionControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         assertNotNull(transactions);
         assertEquals(2, transactions.size());
+        LOGGER.info("✓ SUCCESS: TransactionController - Has access to transaction service (2 transactions available)");
     }
 
     @Test
@@ -71,6 +75,7 @@ class TransactionControllerTest {
         assertNotNull(transactions);
         assertFalse(transactions.isEmpty());
         assertEquals(2, transactions.size());
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved all transactions (2 transactions found)");
     }
 
     @Test
@@ -87,6 +92,7 @@ class TransactionControllerTest {
         
         List<Transaction> transactions = emptyService.getAllTransactions();
         assertTrue(transactions.isEmpty());
+        LOGGER.info("✓ SUCCESS: TransactionController - Handled empty transaction list");
     }
 
     @Test
@@ -95,6 +101,7 @@ class TransactionControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Transaction firstTransaction = transactions.get(0);
         assertEquals(200.0, firstTransaction.getSubtotal(), 0.01);
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved transaction with correct subtotal (RM200.00)");
     }
 
     @Test
@@ -103,6 +110,7 @@ class TransactionControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Transaction firstTransaction = transactions.get(0);
         assertEquals(20.0, firstTransaction.getDiscount(), 0.01);
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved transaction with correct discount (RM20.00)");
     }
 
     @Test
@@ -111,6 +119,7 @@ class TransactionControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Transaction firstTransaction = transactions.get(0);
         assertEquals(10.8, firstTransaction.getTax(), 0.01);
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved transaction with correct tax (RM10.80)");
     }
 
     @Test
@@ -119,6 +128,7 @@ class TransactionControllerTest {
         List<Transaction> transactions = transactionService.getAllTransactions();
         Transaction firstTransaction = transactions.get(0);
         assertEquals(190.8, firstTransaction.getTotal(), 0.01);
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved transaction with correct total (RM190.80)");
     }
 
     @Test
@@ -132,6 +142,7 @@ class TransactionControllerTest {
         assertEquals(2, items.size());
         assertEquals(1001, items.get(0).getStockID());
         assertEquals(1002, items.get(1).getStockID());
+        LOGGER.info("✓ SUCCESS: TransactionController - Retrieved transaction items (Items: Product 1001, Product 1002)");
     }
 }
 
