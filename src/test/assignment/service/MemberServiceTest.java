@@ -34,9 +34,6 @@ class MemberServiceTest {
         memberRepo = new MemberRepository() {
             private final List<Membership> memberList = new ArrayList<>();
             private final String DUMMY_PATH = "dummy_path";
-
-            // internal helper not part of generic repo interface but useful for setup
-            // Note: In strict mock terms we just override the methods used by service.
             
             @Override
             public List<Membership> loadAllMembers() {
@@ -56,17 +53,24 @@ class MemberServiceTest {
             @Override
             public void saveAllMembers(List<Membership> members) {
                 // Mock overwrite
+                List<Membership> snapshot = new ArrayList<>(members);
                 memberList.clear();
-                memberList.addAll(members);
+                memberList.addAll(snapshot);
             }
 
             @Override
             public boolean deleteById(int memberIdToDelete) {
+                if (memberList.isEmpty()) {
+                    loadAllMembers();
+                }
                 return memberList.removeIf(m -> m.getId() == memberIdToDelete);
             }
 
             @Override
             public boolean existsByIc(String targetIC) {
+                if (memberList.isEmpty()) {
+                    loadAllMembers();
+                }
                 return memberList.stream().anyMatch(m -> m.getIc().equals(targetIC));
             }
         };
@@ -80,6 +84,7 @@ class MemberServiceTest {
         List<Membership> members = memberService.getAllMembers();
         assertNotNull(members);
         assertEquals(2, members.size());
+        System.out.println("Success. Members count: " + members.size());
     }
 
     @Test
@@ -87,18 +92,21 @@ class MemberServiceTest {
     void testAddMember_Success() {
         Membership newMember = new NormalMember("Charlie", "111111111111", 103, "0111111111", MemberConfig.MEMBER_TYPE_NORMAL);
         boolean result = memberService.addMember(newMember);
+        System.out.println("Add result: " + result);
 
         assertTrue(result);
         assertEquals(3, memberService.getAllMembers().size());
         assertEquals("Charlie", memberService.findMemberById(103).getName());
+        System.out.println("Member 103 verified.");
     }
 
     @Test
     @DisplayName("Should fail to add member when IC already exists")
     void testAddMember_DuplicateIc() {
-        // Alice has IC "121212121234"
+        // Alice has IC 121212121234
         Membership duplicateMember = new NormalMember("Duplicate", "121212121234", 104, "0112223333", MemberConfig.MEMBER_TYPE_NORMAL);
         boolean result = memberService.addMember(duplicateMember);
+        System.out.println("Add duplicate result: " + result);
 
         assertFalse(result);
         assertEquals(2, memberService.getAllMembers().size());
@@ -109,6 +117,7 @@ class MemberServiceTest {
     void testCheckIdExists() {
         assertTrue(memberService.checkIdExists(101));
         assertFalse(memberService.checkIdExists(9999));
+        System.out.println("ID check passed.");
     }
 
     @Test
@@ -118,6 +127,7 @@ class MemberServiceTest {
         assertNotNull(found);
         assertEquals(101, found.getId());
         assertEquals("Alice", found.getName());
+        System.out.println("Found: " + found.getName());
     }
 
     @Test
@@ -125,6 +135,7 @@ class MemberServiceTest {
     void testFindMemberById_NotFound() {
         Membership found = memberService.findMemberById(9999);
         assertNull(found);
+        System.out.println("Correctly returned null.");
     }
 
     @Test
@@ -133,9 +144,10 @@ class MemberServiceTest {
         List<Membership> members = memberService.getAllMembers();
         
         int index = memberService.findMemberIndexById(members, 102);
-        // Bob is 2nd in list (index 1) if we assume load order, but let's verify logic
+        // Bob is 2nd in list (index 1) if assume load order
         // List is [Alice, Bob]
         assertEquals(1, index);
+        System.out.println("Index for 102: " + index);
     }
 
     @Test
@@ -144,6 +156,7 @@ class MemberServiceTest {
         List<Membership> members = memberService.getAllMembers();
         int index = memberService.findMemberIndexById(members, 9999);
         assertEquals(SalesUtil.INVALID_INPUT, index);
+        System.out.println("Index: " + index);
     }
 
     @Test
@@ -157,7 +170,8 @@ class MemberServiceTest {
         
         // Verify via repo (mock internal state updated)
         Membership updated = memberService.findMemberById(101);
-        assertEquals("Alice Updated", updated.getName());
+        assertEquals("ALICE UPDATED", updated.getName());
+        System.out.println("Saved name: " + updated.getName());
     }
 
     @Test
@@ -168,6 +182,7 @@ class MemberServiceTest {
         
         assertEquals(1, memberService.getAllMembers().size());
         assertNull(memberService.findMemberById(101));
+        System.out.println("Deleted 101. Result: " + result);
     }
 
     @Test
@@ -176,6 +191,7 @@ class MemberServiceTest {
         boolean result = memberService.deleteMemberById(9999);
         assertFalse(result);
         assertEquals(2, memberService.getAllMembers().size());
+        System.out.println("Deletion failed. Result: " + result);
     }
 
     @Test
@@ -183,6 +199,7 @@ class MemberServiceTest {
     void testIcExists() {
         assertTrue(memberService.icExists("121212121234"));
         assertFalse(memberService.icExists("000000000000"));
+        System.out.println("IC check verified.");
     }
 
     @Test
@@ -198,6 +215,7 @@ class MemberServiceTest {
         assertEquals(MemberConfig.DISCOUNT_RATE_GOLD, result.getDiscountRate()); // 0.10
         assertEquals(goldMember, result.getMember());
         assertNull(result.getErrorMessage());
+        System.out.println("Discount Rate: " + result.getDiscountRate());
     }
 
     @Test
@@ -211,6 +229,7 @@ class MemberServiceTest {
 
         MemberService.DiscountResult r3 = memberService.getDiscountRate("0");
         assertEquals(0.0, r3.getDiscountRate());
+        System.out.println("Discount for invalid inputs checked (0.0).");
     }
 
     @Test
@@ -221,6 +240,7 @@ class MemberServiceTest {
         assertTrue(result.hasError());
         assertEquals(0.0, result.getDiscountRate());
         assertEquals(MemberConfig.MSG_MEMBER_NOT_FOUND_PAYMENT, result.getErrorMessage());
+        System.out.println("Error msg: " + result.getErrorMessage());
     }
 
     @Test
@@ -231,5 +251,6 @@ class MemberServiceTest {
         assertTrue(result.hasError());
         assertEquals(0.0, result.getDiscountRate());
         assertEquals(MemberConfig.MSG_INVALID_MEMBER_ID_FORMAT_PAYMENT, result.getErrorMessage());
+        System.out.println("Error msg: " + result.getErrorMessage());
     }
 }

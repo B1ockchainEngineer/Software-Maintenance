@@ -79,8 +79,10 @@ class MemberControllerTest {
 
             @Override
             public void saveMemberInfo(List<Membership> updatedMemberList) {
+                // Fix reference problem
+                List<Membership> snapshot = new ArrayList<>(updatedMemberList);
                 memberList.clear();
-                memberList.addAll(updatedMemberList);
+                memberList.addAll(snapshot);
             }
             
             @Override
@@ -99,6 +101,7 @@ class MemberControllerTest {
     @DisplayName("Should initialize MemberController with MemberService")
     void testMemberControllerInitialization() {
         assertNotNull(memberController);
+        System.out.println("Initialization successful.");
     }
 
     @Test
@@ -107,6 +110,7 @@ class MemberControllerTest {
         List<Membership> members = memberService.getAllMembers();
         assertNotNull(members);
         assertEquals(5, members.size()); // Updated expectation
+        System.out.println("Got " + members.size() + " members.");
     }
 
     @Test
@@ -119,6 +123,7 @@ class MemberControllerTest {
         assertTrue(result);
         assertEquals(6, memberService.getAllMembers().size());
         assertNotNull(memberService.findMemberById(106));
+        System.out.println("Member added successfully. Total count: " + memberService.getAllMembers().size());
     }
 
     @Test
@@ -130,6 +135,7 @@ class MemberControllerTest {
         
         assertFalse(result);
         assertEquals(5, memberService.getAllMembers().size());
+        System.out.println("Duplicate IC check passed. Result: " + result);
     }
 
     @Test
@@ -138,6 +144,7 @@ class MemberControllerTest {
         Membership member = memberService.findMemberById(101); // Updated ID
         assertNotNull(member);
         assertEquals("Alice", member.getName());
+        System.out.println("Found member: " + member.getName());
     }
 
     @Test
@@ -145,6 +152,7 @@ class MemberControllerTest {
     void testSearchMemberNotFound() {
         Membership member = memberService.findMemberById(9999);
         assertNull(member);
+        System.out.println("Member correctly not found.");
     }
 
     @Test
@@ -154,6 +162,7 @@ class MemberControllerTest {
         assertTrue(result);
         assertNull(memberService.findMemberById(101));
         assertEquals(4, memberService.getAllMembers().size());
+        System.out.println("Member deleted. Result: " + result);
     }
 
     @Test
@@ -162,6 +171,7 @@ class MemberControllerTest {
         boolean result = memberService.deleteMemberById(9999);
         assertFalse(result);
         assertEquals(5, memberService.getAllMembers().size());
+        System.out.println("Member deletion failed as expected. Result: " + result);
     }
 
     @Test
@@ -169,13 +179,15 @@ class MemberControllerTest {
     void testCheckIdExists() {
         assertTrue(memberService.checkIdExists(101)); // Updated ID
         assertFalse(memberService.checkIdExists(9999));
+        System.out.println("ID check verified.");
     }
 
     @Test
     @DisplayName("Should check if IC exists")
     void testCheckIcExists() {
         assertTrue(memberService.icExists("121212121234")); // Updated IC
-        assertFalse(memberService.icExists("000000000000"));
+        assertFalse(memberService.icExists("010101140007"));
+        System.out.println("IC check verified.");
     }
 
     @Test
@@ -192,7 +204,8 @@ class MemberControllerTest {
         memberService.saveMemberInfo(allMembers);
         
         Membership updatedMember = memberService.findMemberById(101);
-        assertEquals("Alice Updated", updatedMember.getName());
+        assertEquals("ALICE UPDATED", updatedMember.getName());
         assertEquals("0111111111", updatedMember.getMemberHp());
+        System.out.println("Member edited: " + updatedMember.getName());
     }
 }

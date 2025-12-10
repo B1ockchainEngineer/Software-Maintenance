@@ -29,7 +29,7 @@ class MemberRepositoryTest {
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
         // Create a temporary file for each test
-        // This ensures we do not overwrite the actual members.txt file
+        // This ensures no overwritten on the actual members.txt file
         tempFile = tempDir.resolve("test_members.txt").toFile();
         memberRepository = new MemberRepository(tempFile.getAbsolutePath());
     }
@@ -54,6 +54,7 @@ class MemberRepositoryTest {
         assertEquals("Alice", members.get(0).getName());
         assertEquals("121212121234", members.get(0).getIc());
         assertEquals(101, members.get(0).getId());
+        System.out.println("Appended member verified.");
     }
 
     @Test
@@ -79,6 +80,7 @@ class MemberRepositoryTest {
         assertEquals("May", members.get(2).getName());
         assertEquals(103, members.get(2).getId());
         assertEquals(MemberConfig.MEMBER_TYPE_GOLD, members.get(2).getMemberType());
+        System.out.println("Loaded " + members.size() + " members successfully.");
     }
 
     @Test
@@ -105,6 +107,7 @@ class MemberRepositoryTest {
         assertEquals(2, finalLoaded.size());
         assertEquals("Bob Updated", finalLoaded.get(0).getName());
         assertEquals("Charlie", finalLoaded.get(1).getName());
+        System.out.println("Overwritten with " + finalLoaded.size() + " members.");
     }
 
     @Test
@@ -123,6 +126,7 @@ class MemberRepositoryTest {
         assertEquals(1, members.size());
         assertEquals("Bob", members.get(0).getName());
         assertEquals(102, members.get(0).getId());
+        System.out.println("Deleted 101. Remaining: " + members.size());
     }
 
     @Test
@@ -134,6 +138,7 @@ class MemberRepositoryTest {
         
         assertFalse(result);
         assertEquals(1, memberRepository.loadAllMembers().size());
+        System.out.println("Result: " + result);
     }
 
     @Test
@@ -143,6 +148,7 @@ class MemberRepositoryTest {
 
         assertTrue(memberRepository.existsByIc("121212121234"));
         assertFalse(memberRepository.existsByIc("000000000000"));
+        System.out.println("IC checks verified.");
     }
 
     @Test
@@ -151,5 +157,6 @@ class MemberRepositoryTest {
         List<Membership> members = memberRepository.loadAllMembers();
         assertNotNull(members);
         assertTrue(members.isEmpty());
+        System.out.println("Empty check pass.");
     }
 }
