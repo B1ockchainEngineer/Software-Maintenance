@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("MemberRepository Tests")
 class MemberRepositoryTest {
 
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MemberRepositoryTest.class.getName());
     private MemberRepository memberRepository;
     private File tempFile;
 
@@ -54,7 +55,7 @@ class MemberRepositoryTest {
         assertEquals("Alice", members.get(0).getName());
         assertEquals("121212121234", members.get(0).getIc());
         assertEquals(101, members.get(0).getId());
-        System.out.println("Appended member verified.");
+        LOGGER.info("Appended member verified.");
     }
 
     @Test
@@ -80,7 +81,7 @@ class MemberRepositoryTest {
         assertEquals("May", members.get(2).getName());
         assertEquals(103, members.get(2).getId());
         assertEquals(MemberConfig.MEMBER_TYPE_GOLD, members.get(2).getMemberType());
-        System.out.println("Loaded " + members.size() + " members successfully.");
+        LOGGER.info("Loaded " + members.size() + " members successfully.");
     }
 
     @Test
@@ -107,7 +108,7 @@ class MemberRepositoryTest {
         assertEquals(2, finalLoaded.size());
         assertEquals("Bob Updated", finalLoaded.get(0).getName());
         assertEquals("Charlie", finalLoaded.get(1).getName());
-        System.out.println("Overwritten with " + finalLoaded.size() + " members.");
+        LOGGER.info("Overwritten with " + finalLoaded.size() + " members.");
     }
 
     @Test
@@ -126,7 +127,7 @@ class MemberRepositoryTest {
         assertEquals(1, members.size());
         assertEquals("Bob", members.get(0).getName());
         assertEquals(102, members.get(0).getId());
-        System.out.println("Deleted 101. Remaining: " + members.size());
+        LOGGER.info("Deleted 101. Remaining: " + members.size());
     }
 
     @Test
@@ -138,7 +139,7 @@ class MemberRepositoryTest {
         
         assertFalse(result);
         assertEquals(1, memberRepository.loadAllMembers().size());
-        System.out.println("Result: " + result);
+        LOGGER.info("Result: " + result);
     }
 
     @Test
@@ -148,7 +149,7 @@ class MemberRepositoryTest {
 
         assertTrue(memberRepository.existsByIc("121212121234"));
         assertFalse(memberRepository.existsByIc("000000000000"));
-        System.out.println("IC checks verified.");
+        LOGGER.info("IC checks verified.");
     }
 
     @Test
@@ -157,6 +158,6 @@ class MemberRepositoryTest {
         List<Membership> members = memberRepository.loadAllMembers();
         assertNotNull(members);
         assertTrue(members.isEmpty());
-        System.out.println("Empty check pass.");
+        LOGGER.info("Empty check pass.");
     }
 }

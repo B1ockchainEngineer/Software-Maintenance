@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("MemberController Tests")
 class MemberControllerTest {
 
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MemberControllerTest.class.getName());
     private MemberService memberService;
     private MemberController memberController;
 
@@ -101,7 +102,7 @@ class MemberControllerTest {
     @DisplayName("Should initialize MemberController with MemberService")
     void testMemberControllerInitialization() {
         assertNotNull(memberController);
-        System.out.println("Initialization successful.");
+        LOGGER.info("Initialization successful.");
     }
 
     @Test
@@ -110,7 +111,7 @@ class MemberControllerTest {
         List<Membership> members = memberService.getAllMembers();
         assertNotNull(members);
         assertEquals(5, members.size()); // Updated expectation
-        System.out.println("Got " + members.size() + " members.");
+        LOGGER.info("Got " + members.size() + " members.");
     }
 
     @Test
@@ -123,7 +124,7 @@ class MemberControllerTest {
         assertTrue(result);
         assertEquals(6, memberService.getAllMembers().size());
         assertNotNull(memberService.findMemberById(106));
-        System.out.println("Member added successfully. Total count: " + memberService.getAllMembers().size());
+        LOGGER.info("Member added successfully. Total count: " + memberService.getAllMembers().size());
     }
 
     @Test
@@ -135,7 +136,7 @@ class MemberControllerTest {
         
         assertFalse(result);
         assertEquals(5, memberService.getAllMembers().size());
-        System.out.println("Duplicate IC check passed. Result: " + result);
+        LOGGER.info("Duplicate IC check passed. Result: " + result);
     }
 
     @Test
@@ -144,7 +145,7 @@ class MemberControllerTest {
         Membership member = memberService.findMemberById(101); // Updated ID
         assertNotNull(member);
         assertEquals("Alice", member.getName());
-        System.out.println("Found member: " + member.getName());
+        LOGGER.info("Found member: " + member.getName());
     }
 
     @Test
@@ -152,7 +153,7 @@ class MemberControllerTest {
     void testSearchMemberNotFound() {
         Membership member = memberService.findMemberById(9999);
         assertNull(member);
-        System.out.println("Member correctly not found.");
+        LOGGER.info("Member correctly not found.");
     }
 
     @Test
@@ -162,7 +163,7 @@ class MemberControllerTest {
         assertTrue(result);
         assertNull(memberService.findMemberById(101));
         assertEquals(4, memberService.getAllMembers().size());
-        System.out.println("Member deleted. Result: " + result);
+        LOGGER.info("Member deleted. Result: " + result);
     }
 
     @Test
@@ -171,7 +172,7 @@ class MemberControllerTest {
         boolean result = memberService.deleteMemberById(9999);
         assertFalse(result);
         assertEquals(5, memberService.getAllMembers().size());
-        System.out.println("Member deletion failed as expected. Result: " + result);
+        LOGGER.info("Member deletion failed as expected. Result: " + result);
     }
 
     @Test
@@ -179,7 +180,7 @@ class MemberControllerTest {
     void testCheckIdExists() {
         assertTrue(memberService.checkIdExists(101)); // Updated ID
         assertFalse(memberService.checkIdExists(9999));
-        System.out.println("ID check verified.");
+        LOGGER.info("ID check verified.");
     }
 
     @Test
@@ -187,7 +188,7 @@ class MemberControllerTest {
     void testCheckIcExists() {
         assertTrue(memberService.icExists("121212121234")); // Updated IC
         assertFalse(memberService.icExists("010101140007"));
-        System.out.println("IC check verified.");
+        LOGGER.info("IC check verified.");
     }
 
     @Test
@@ -206,6 +207,6 @@ class MemberControllerTest {
         Membership updatedMember = memberService.findMemberById(101);
         assertEquals("ALICE UPDATED", updatedMember.getName());
         assertEquals("0111111111", updatedMember.getMemberHp());
-        System.out.println("Member edited: " + updatedMember.getName());
+        LOGGER.info("Member edited: " + updatedMember.getName());
     }
 }
