@@ -477,14 +477,17 @@ public class MemberController {
                         case NORMAL_MEMBER -> {
                             NormalMember normalMember = new NormalMember();
                             normalMember.setMemberType(MemberConfig.MEMBER_TYPE_NORMAL);
+                            memberFound.setMemberType(normalMember.getMemberType());
                         }
                         case GOLD_MEMBER   -> {
                             GoldMember goldMember = new GoldMember();
                             goldMember.setMemberType(MemberConfig.MEMBER_TYPE_GOLD);
+                            memberFound.setMemberType(goldMember.getMemberType());
                         }
                         case PREMIUM_MEMBER -> {
                             PremiumMember premiumMember = new PremiumMember();
                             premiumMember.setMemberType(MemberConfig.MEMBER_TYPE_PREMIUM);
+                            memberFound.setMemberType(premiumMember.getMemberType());
                         }
                     }
                 }
