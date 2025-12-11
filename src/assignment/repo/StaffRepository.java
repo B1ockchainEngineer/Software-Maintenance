@@ -1,6 +1,7 @@
 package assignment.repo;
 
 import assignment.model.Staff;
+import assignment.util.PasswordHashUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -82,15 +83,22 @@ public class StaffRepository {
 
     /**
      * Appends a new staff record to the file.
+     * Automatically hashes the password before storing.
      */
     public void appendStaff(Staff staff) {
         ensureFileExists();
 
         try (FileWriter writer = new FileWriter(STAFF_FILE_PATH, true)) {
+            // Hash password if it's not already hashed
+            String passwordToStore = staff.getStfPassword();
+            if (!PasswordHashUtil.isHashed(passwordToStore)) {
+                passwordToStore = PasswordHashUtil.hashPassword(passwordToStore);
+            }
+
             writer.write(staff.getId() + "\t");
             writer.write(staff.getIc() + "\t");
             writer.write(staff.getName() + "\t");
-            writer.write(staff.getStfPassword() + "\t");
+            writer.write(passwordToStore + "\t");
             writer.write(staff.getStfAge() + "\t");
             writer.write(staff.getStfSalary() + "\t");
             writer.write("\n");
@@ -199,6 +207,7 @@ public class StaffRepository {
 
     /**
      * Updates a staff record. Returns true if updated successfully.
+     * Automatically hashes the password if it's not already hashed.
      */
     public boolean updateStaff(Staff updatedStaff) {
         ensureFileExists();
@@ -206,6 +215,12 @@ public class StaffRepository {
         File tempFile = new File(TEMP_DIR + "updateStaffTemp.txt");
 
         boolean found = false;
+
+        // Hash password if it's not already hashed
+        String passwordToStore = updatedStaff.getStfPassword();
+        if (!PasswordHashUtil.isHashed(passwordToStore)) {
+            passwordToStore = PasswordHashUtil.hashPassword(passwordToStore);
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
@@ -217,11 +232,11 @@ public class StaffRepository {
                     try {
                         int id = Integer.parseInt(staffDetails[0]);
                         if (id == updatedStaff.getId()) {
-                            // Write updated staff record
+                            // Write updated staff record with hashed password
                             writer.write(updatedStaff.getId() + "\t");
                             writer.write(updatedStaff.getIc() + "\t");
                             writer.write(updatedStaff.getName() + "\t");
-                            writer.write(updatedStaff.getStfPassword() + "\t");
+                            writer.write(passwordToStore + "\t");
                             writer.write(updatedStaff.getStfAge() + "\t");
                             writer.write(updatedStaff.getStfSalary() + "\t");
                             writer.write("\n");
@@ -296,6 +311,7 @@ public class StaffRepository {
 
     /**
      * Finds a staff by IC and password (for login).
+     * Verifies password using hash comparison (supports both hashed and legacy plain text).
      */
     public Staff findByCredentials(String stfIc, String stfPassword) {
         ensureFileExists();
@@ -306,16 +322,23 @@ public class StaffRepository {
                 String[] stfDtls = stfLine.split("\t");
                 if (stfDtls.length >= 4) {
                     String staffIC = stfDtls[1];
-                    String staffPassword = stfDtls[3];
+                    String storedPassword = stfDtls[3];
 
-                    if (stfIc.equals(staffIC) && stfPassword.equals(staffPassword)) {
-                        int id = Integer.parseInt(stfDtls[0]);
-                        String name = stfDtls[2];
-                        int age = Integer.parseInt(stfDtls[4]);
-                        double salary = Double.parseDouble(stfDtls[5]);
-                        Staff staff = new Staff(name, staffIC, age, salary, staffPassword);
-                        staff.setId(id);
-                        return staff;
+                    // Check IC first
+                    if (stfIc.equals(staffIC)) {
+                        // Verify password (supports both hashed and legacy plain text)
+                        boolean passwordMatches = PasswordHashUtil.verifyPassword(stfPassword, storedPassword);
+
+                        if (passwordMatches) {
+                            int id = Integer.parseInt(stfDtls[0]);
+                            String name = stfDtls[2];
+                            int age = Integer.parseInt(stfDtls[4]);
+                            double salary = Double.parseDouble(stfDtls[5]);
+                            // Store the original stored password (hash) in the Staff object
+                            Staff staff = new Staff(name, staffIC, age, salary, storedPassword);
+                            staff.setId(id);
+                            return staff;
+                        }
                     }
                 }
             }

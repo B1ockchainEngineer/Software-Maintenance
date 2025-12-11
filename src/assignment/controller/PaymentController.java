@@ -13,12 +13,14 @@ import assignment.util.config.SalesConfig;
 import assignment.util.ValidationUtil;
 import assignment.view.PaymentView;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
  * Controller for payment processing operations.
  */
 public class PaymentController {
+    private static final Logger LOGGER = Logger.getLogger(PaymentController.class.getName());
     private final PaymentService paymentService;
     private final TransactionService transactionService;
     private final MemberService memberService;
@@ -61,6 +63,7 @@ public class PaymentController {
 
         // Display error message if any
         if (discountResult.hasError()) {
+            LOGGER.warning("Member discount error: " + discountResult.getErrorMessage() + " (member input: " + memberInput + ")");
             paymentView.printMemberErrorMessage(discountResult.getErrorMessage());
         } else if (discountResult.getMember() != null) {
             // Display member info if found
@@ -81,6 +84,7 @@ public class PaymentController {
         PaymentResult summary = paymentService.calculatePaymentSummary(discountRate);
         
         if (summary == null) {
+            LOGGER.severe("Payment failure: payment summary is null (discount rate: " + discountRate + ")");
             paymentView.printPaymentFailure();
             return false;
         }
@@ -108,6 +112,7 @@ public class PaymentController {
             paymentView.printPaymentSuccess();
             return true;
         } else {
+            LOGGER.severe("Payment failure: transaction is null after creation");
             paymentView.printPaymentFailure();
             return false;
         }

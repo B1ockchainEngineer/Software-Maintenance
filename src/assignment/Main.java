@@ -171,7 +171,7 @@ public class Main {
                     }
                 }
                 case STAFF_MANAGEMENT -> {
-                    staffController.manageStaff();
+                    staffController.manageStaff(currentStaff);
                 }
                 case STOCK_MANAGEMENT -> {
                     runStock(); // Calls StockController methods

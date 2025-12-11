@@ -5,9 +5,12 @@ import assignment.model.Staff;
 import assignment.service.StaffService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
+import assignment.util.PasswordUtil;
+import assignment.util.config.StaffConfig;
 import assignment.view.StaffView;
 
 import assignment.util.SalesUtil;
+import assignment.util.config.AppConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +29,12 @@ public class StaffController {
         this.staffView = new StaffView();
     }
 
-    public void manageStaff() {
+    public void manageStaff(Staff currentStaff) {
         while (true) {
             ConsoleUtil.clearScreen();
             ConsoleUtil.logo();
             staffView.printStaffMenu(staffService.getAllStaff().size());
-            System.out.print("ENTER YOUR SELECTION: ");
+            System.out.print(StaffConfig.PROMPT_ENTER_SELECTION);
 
             int staffOpt = ValidationUtil.intValidation(0, 5);
 
@@ -42,32 +45,32 @@ public class StaffController {
 
             StaffMenu selection = StaffMenu.getByOption(staffOpt);
             if (selection == null) {
-                System.out.println("<<<INVALID OPTION!>>>");
+                System.out.println(StaffConfig.ErrorMessage.INVALID_OPTION);
                 ConsoleUtil.systemPause();
                 continue;
             }
 
             switch (selection) {
-                case ADD_STAFF -> {
+                case ADD_STAFF:
                     addStaff();
-                }
-                case UPDATE_STAFF -> {
+                    break;
+                case UPDATE_STAFF:
                     updateStaff();
-                }
-                case DELETE_STAFF -> {
-                    deleteStaff();
-                }
-                case SEARCH_STAFF -> {
+                    break;
+                case DELETE_STAFF:
+                    deleteStaff(currentStaff);
+                    break;
+                case SEARCH_STAFF:
                     searchStaff();
-                }
-                case VIEW_STAFF_LIST -> {
+                    break;
+                case VIEW_STAFF_LIST:
                     viewStaffList();
-                }
-                case BACK_TO_MAIN -> {
-                    System.out.println("\nRETURNING TO MAIN MENU...");
+                    break;
+                case BACK_TO_MAIN:
+                    System.out.println();
+                    System.out.println(StaffConfig.MSG_RETURNING_TO_MAIN);
                     ConsoleUtil.systemPause();
                     return;
-                }
             }
         }
     }
@@ -102,11 +105,13 @@ public class StaffController {
 
         // Show summary before adding
         staffView.printNewStaffSummary(newStaff);
-        System.out.print("CONFIRM ADD STAFF? (Y/N): ");
+        System.out.print(StaffConfig.PROMPT_CONFIRM_ADD_STAFF);
         String confirm = ValidationUtil.scanner.nextLine().trim();
 
         if (!confirm.equalsIgnoreCase("Y")) {
-            System.out.println("\n<<<STAFF ADDITION CANCELLED!>>>\n");
+            System.out.println();
+            System.out.println(StaffConfig.ErrorMessage.STAFF_ADDITION_CANCELLED);
+            System.out.println();
             return;
         }
 
@@ -118,9 +123,9 @@ public class StaffController {
             ConsoleUtil.systemPause();
         } else {
             System.out.println();
-            System.out.println("<<<FAILED TO ADD STAFF!>>>");
-            System.out.println("Reason: IC already exists in the system.");
-            System.out.println("Please use a different IC number.");
+            System.out.println(StaffConfig.ErrorMessage.FAILED_TO_ADD_STAFF);
+            System.out.println(StaffConfig.ErrorMessage.REASON_IC_EXISTS);
+            System.out.println(StaffConfig.ErrorMessage.USE_DIFFERENT_IC);
             System.out.println();
             ConsoleUtil.systemPause();
         }
@@ -132,57 +137,132 @@ public class StaffController {
     private void updateStaff() {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
-        staffView.printUpdateStaffMenu();
-        System.out.print("ENTER YOUR CHOICE (OR 'E' TO CANCEL): ");
+        
+        String choice;
+        while (true) {
+            staffView.printUpdateStaffMenu();
+            System.out.print("ENTER YOUR CHOICE (OR 'E' TO CANCEL): ");
 
-        String choice = ValidationUtil.scanner.nextLine().trim();
+            choice = ValidationUtil.scanner.nextLine().trim();
 
-        if (choice.equalsIgnoreCase("E")) {
-            return;
+            if (choice.equalsIgnoreCase("E")) {
+                return;
+            }
+
+            if (!choice.equals("1") && !choice.equals("2")) {
+                System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
+                System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                String retry = ValidationUtil.scanner.nextLine().trim();
+                if (retry.equalsIgnoreCase("E")) {
+                    return;
+                }
+                ConsoleUtil.clearScreen();
+                ConsoleUtil.logo();
+                continue; // Try again
+            }
+            break; // Valid choice, exit loop
         }
 
         Staff staffToUpdate = null;
 
         if (choice.equals("1")) {
-            System.out.print("ENTER STAFF ID TO UPDATE (OR '0' TO CANCEL): S-");
-            int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
+            while (true) {
+                System.out.print("ENTER STAFF NAME TO UPDATE (OR 'E' TO CANCEL): ");
+                String name = ValidationUtil.scanner.nextLine().trim();
 
-            if (staffId == SalesUtil.INVALID_INPUT || staffId == 0) {
-                return;
+                if (name.equalsIgnoreCase("E")) {
+                    return;
+                }
+
+                if (name.trim().isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.NAME_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    continue; // Ask again
+                }
+
+                List<Staff> results = staffService.findByName(name);
+                if (results.isEmpty()) {
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the name");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the name");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    continue; // Ask again
+                } else if (results.size() == 1) {
+                    staffToUpdate = results.get(0);
+                    break; // Exit loop, staff found
+                } else {
+                    // Multiple staff found with same name
+                    System.out.println();
+                    System.out.println("Multiple staff found with name containing \"" + name + "\":");
+                    System.out.println(AppConfig.SEPARATOR_LINE);
+                    int index = 1;
+                    for (Staff s : results) {
+                        System.out.println("[" + index + "]");
+                        System.out.println(s.toString());
+                        if (index < results.size()) {
+                            System.out.println(AppConfig.SEPARATOR_LINE);
+                        }
+                        index++;
+                    }
+                    System.out.println();
+                    System.out.print("ENTER THE NUMBER OF THE STAFF TO UPDATE (OR '0' TO CANCEL): ");
+                    int selection = ValidationUtil.intValidation(0, results.size());
+                    if (selection == SalesUtil.INVALID_INPUT || selection == 0 || selection < 1 || selection > results.size()) {
+                        return;
+                    }
+                    staffToUpdate = results.get(selection - 1);
+                    break; // Exit loop, staff selected
+                }
             }
-
-            staffToUpdate = staffService.findById(staffId);
 
         } else if (choice.equals("2")) {
-            System.out.print("ENTER STAFF IC TO UPDATE (OR 'E' TO CANCEL): ");
-            String ic = ValidationUtil.scanner.nextLine().trim();
+            while (true) {
+                System.out.print("ENTER STAFF IC TO UPDATE (OR 'E' TO CANCEL): ");
+                String ic = ValidationUtil.scanner.nextLine().trim();
 
-            if (ic.equalsIgnoreCase("E")) {
-                return;
+                if (ic.equalsIgnoreCase("E")) {
+                    return;
+                }
+
+                if (ic.trim().isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    continue; // Ask again
+                }
+
+                if (!ic.matches("\\d{12}")) {
+                    System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
+                    continue; // Ask again
+                }
+
+                staffToUpdate = staffService.findByIc(ic);
+                if (staffToUpdate == null) {
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the IC");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the IC");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    continue; // Ask again
+                }
+                break; // Exit loop, staff found
             }
-
-            if (!ic.matches("\\d{12}")) {
-                System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
-                return;
-            }
-
-            staffToUpdate = staffService.findByIc(ic);
-
-        } else {
-            System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
-            return;
-        }
-
-        if (staffToUpdate == null) {
-            System.out.println();
-            System.out.println("<<<STAFF NOT FOUND!>>>");
-            System.out.println();
-            System.out.println("TIP: You can:");
-            System.out.println("  - View the staff list to verify the ID/IC");
-            System.out.println("  - Use the search function to find the staff");
-            System.out.println("  - Check for typos in the ID/IC");
-            System.out.println();
-            return;
         }
 
         // Display current information
@@ -233,7 +313,7 @@ public class StaffController {
         if (!newPassword.isEmpty()) {
             if (newPassword.matches("^[a-zA-Z0-9]{8,16}$")) {
                 System.out.print("CONFIRM PASSWORD: ");
-                String confirmPassword = ValidationUtil.scanner.nextLine();
+                String confirmPassword = PasswordUtil.readPassword("");
                 if (newPassword.equals(confirmPassword)) {
                     staffToUpdate.setStfPassword(newPassword);
                     System.out.println("  -> Password updated successfully!");
@@ -259,17 +339,19 @@ public class StaffController {
         if (!ageInput.isEmpty()) {
             try {
                 int newAge = Integer.parseInt(ageInput);
-                if (newAge >= 18 && newAge <= 54) {
+                if (newAge < 0) {
+                    System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE + " Keeping current value.");
+                } else if (newAge >= 18 && newAge <= 54) {
                     staffToUpdate.setStfAge(newAge);
-                    System.out.println("  -> Age updated successfully!");
+                    System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_UPDATED);
                 } else {
-                    System.out.println("  -> Invalid age! Age must be between 18-54. Keeping current value.");
+                    System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_INVALID);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("  -> Invalid input! Please enter a number. Keeping current value.");
+                System.out.println("  -> " + StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value.");
             }
         } else {
-            System.out.println("  -> Keeping current age.");
+            System.out.println("  -> " + StaffConfig.ErrorMessage.KEEPING_CURRENT_AGE);
         }
         System.out.println();
 
@@ -283,28 +365,30 @@ public class StaffController {
         if (!salaryInput.isEmpty()) {
             try {
                 double newSalary = Double.parseDouble(salaryInput);
-                if (newSalary > 0) {
+                if (newSalary < 0) {
+                    System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE + " Keeping current value.");
+                } else if (newSalary > 0) {
                     if (newSalary > 1000000) {
-                        System.out.print("  -> Warning: Salary seems unusually high. Continue? (Y/N): ");
+                        System.out.print("  -> " + StaffConfig.WARNING_SALARY_HIGH);
                         String confirm = ValidationUtil.scanner.nextLine().trim();
                         if (!confirm.equalsIgnoreCase("Y")) {
-                            System.out.println("  -> Keeping current salary.");
+                            System.out.println("  -> " + StaffConfig.ErrorMessage.KEEPING_CURRENT_SALARY);
                         } else {
                             staffToUpdate.setStfSalary(newSalary);
-                            System.out.println("  -> Salary updated successfully!");
+                            System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_UPDATED);
                         }
                     } else {
                         staffToUpdate.setStfSalary(newSalary);
-                        System.out.println("  -> Salary updated successfully!");
+                        System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_UPDATED);
                     }
                 } else {
-                    System.out.println("  -> Invalid salary! Salary must be greater than 0. Keeping current value.");
+                    System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_INVALID);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("  -> Invalid input! Please enter a valid number. Keeping current value.");
+                System.out.println("  -> " + StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value.");
             }
         } else {
-            System.out.println("  -> Keeping current salary.");
+            System.out.println("  -> " + StaffConfig.ErrorMessage.KEEPING_CURRENT_SALARY);
         }
         System.out.println();
 
@@ -347,9 +431,10 @@ public class StaffController {
 
     /**
      * Handles deleting a staff member.
-     * Allows deletion by ID or IC with confirmation.
+     * Allows deletion by Name or IC with confirmation.
+     * Prevents staff from deleting themselves.
      */
-    private void deleteStaff() {
+    private void deleteStaff(Staff currentStaff) {
         ConsoleUtil.clearScreen();
         ConsoleUtil.logo();
 
@@ -368,66 +453,154 @@ public class StaffController {
             return;
         }
 
-        staffView.printDeleteStaffMenu(staffList);
-        System.out.print("ENTER YOUR CHOICE (OR 'E' TO CANCEL): ");
+        String choice;
+        while (true) {
+            staffView.printDeleteStaffMenu(staffList);
+            System.out.print("ENTER YOUR CHOICE (OR 'E' TO CANCEL): ");
 
-        String choice = ValidationUtil.scanner.nextLine().trim();
+            choice = ValidationUtil.scanner.nextLine().trim();
 
-        if (choice.equalsIgnoreCase("E")) {
-            return;
+            if (choice.equalsIgnoreCase("E")) {
+                return;
+            }
+
+            if (!choice.equals("1") && !choice.equals("2")) {
+                System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
+                System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                String retry = ValidationUtil.scanner.nextLine().trim();
+                if (retry.equalsIgnoreCase("E")) {
+                    return;
+                }
+                ConsoleUtil.clearScreen();
+                ConsoleUtil.logo();
+                continue; // Try again
+            }
+            break; // Valid choice, exit loop
         }
 
         Staff staffToDelete = null;
         String identifier = "";
 
         if (choice.equals("1")) {
-            // Delete by ID
-            System.out.print("ENTER STAFF ID TO DELETE (OR '0' TO CANCEL): S-");
-            int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
+            // Delete by Name
+            while (true) {
+                System.out.print("ENTER STAFF NAME TO DELETE (OR 'E' TO CANCEL): ");
+                String name = ValidationUtil.scanner.nextLine().trim();
 
-            if (staffId == SalesUtil.INVALID_INPUT) {
-                System.out.println("\n<<<INVALID INPUT!>>>\n");
-                return;
+                if (name.equalsIgnoreCase("E")) {
+                    return;
+                }
+
+                if (name.trim().isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.NAME_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    continue; // Ask again
+                }
+
+                List<Staff> results = staffService.findByName(name);
+                if (results.isEmpty()) {
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the name");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the name");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    continue; // Ask again
+                } else if (results.size() == 1) {
+                    staffToDelete = results.get(0);
+                    identifier = "NAME '" + name + "'";
+                    break; // Exit loop, staff found
+                } else {
+                    // Multiple staff found with same name
+                    System.out.println();
+                    System.out.println("Multiple staff found with name containing \"" + name + "\":");
+                    System.out.println(AppConfig.SEPARATOR_LINE);
+                    int index = 1;
+                    for (Staff s : results) {
+                        System.out.println("[" + index + "]");
+                        System.out.println(s.toString());
+                        if (index < results.size()) {
+                            System.out.println(AppConfig.SEPARATOR_LINE);
+                        }
+                        index++;
+                    }
+                    System.out.println();
+                    System.out.print("ENTER THE NUMBER OF THE STAFF TO DELETE (OR '0' TO CANCEL): ");
+                    int selection = ValidationUtil.intValidation(0, results.size());
+                    if (selection == SalesUtil.INVALID_INPUT || selection == 0 || selection < 1 || selection > results.size()) {
+                        return;
+                    }
+                    staffToDelete = results.get(selection - 1);
+                    identifier = "NAME '" + name + "'";
+                    break; // Exit loop, staff selected
+                }
             }
-
-            if (staffId == 0) {
-                return;
-            }
-
-            staffToDelete = staffService.findById(staffId);
-            identifier = "ID S-" + staffId;
 
         } else if (choice.equals("2")) {
             // Delete by IC
-            System.out.print("ENTER STAFF IC TO DELETE (OR 'E' TO CANCEL): ");
-            String icToDelete = ValidationUtil.scanner.nextLine().trim();
+            while (true) {
+                System.out.print("ENTER STAFF IC TO DELETE (OR 'E' TO CANCEL): ");
+                String icToDelete = ValidationUtil.scanner.nextLine().trim();
 
-            if (icToDelete.equalsIgnoreCase("E")) {
-                return;
+                if (icToDelete.equalsIgnoreCase("E")) {
+                    return;
+                }
+
+                if (icToDelete.trim().isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    continue; // Ask again
+                }
+
+                if (!icToDelete.matches("\\d{12}")) {
+                    System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
+                    continue; // Ask again
+                }
+
+                staffToDelete = staffService.findByIc(icToDelete);
+                if (staffToDelete == null) {
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the IC");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the IC");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    continue; // Ask again
+                }
+                identifier = "IC " + icToDelete;
+                break; // Exit loop, staff found
             }
-
-            if (!icToDelete.matches("\\d{12}")) {
-                System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
-                return;
-            }
-
-            staffToDelete = staffService.findByIc(icToDelete);
-            identifier = "IC " + icToDelete;
-
-        } else {
-            System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
-            return;
         }
 
-        if (staffToDelete == null) {
+        // Check if staff is trying to delete themselves
+        if (currentStaff != null && staffToDelete.getIc().equals(currentStaff.getIc())) {
             System.out.println();
-            System.out.println("<<<STAFF WITH " + identifier + " NOT FOUND!>>>");
+            System.out.println(StaffConfig.ErrorMessage.CANNOT_DELETE_YOURSELF);
             System.out.println();
-            System.out.println("TIP: You can:");
-            System.out.println("  - View the staff list to verify the ID/IC");
-            System.out.println("  - Use the search function to find the staff");
-            System.out.println("  - Check for typos in the ID/IC");
+            System.out.println(StaffConfig.ErrorMessage.CANNOT_DELETE_YOURSELF_REASON);
+            System.out.println(StaffConfig.ErrorMessage.CANNOT_DELETE_YOURSELF_TIP);
             System.out.println();
+            System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+            String retry = ValidationUtil.scanner.nextLine().trim();
+            if (retry.equalsIgnoreCase("E")) {
+                return;
+            }
+            // Retry by restarting the delete process
+            deleteStaff(currentStaff);
             return;
         }
 
@@ -443,16 +616,18 @@ public class StaffController {
             System.out.println("<<<DELETION CANCELLED!>>>");
             System.out.println("Staff record is safe.");
             System.out.println();
+            System.out.print("PRESS 'E' TO EXIT OR ENTER TO CONTINUE: ");
+            String retry = ValidationUtil.scanner.nextLine().trim();
+            if (retry.equalsIgnoreCase("E")) {
+                return;
+            }
+            // Continue by restarting the delete process
+            deleteStaff(currentStaff);
             return;
         }
 
         // Perform deletion
-        boolean deleted = false;
-        if (identifier.startsWith("ID")) {
-            deleted = staffService.deleteById(staffToDelete.getId());
-        } else {
-            deleted = staffService.deleteByIc(staffToDelete.getIc());
-        }
+        boolean deleted = staffService.deleteByIc(staffToDelete.getIc());
 
         if (deleted) {
             System.out.println();
@@ -494,76 +669,197 @@ public class StaffController {
 
         if (choice.equals("1")) {
             // Search by ID
-            System.out.print("ENTER STAFF ID TO SEARCH (OR '0' TO CANCEL): S-");
-            int staffId = ValidationUtil.intValidation(0, Integer.MAX_VALUE);
+            while (true) {
+                System.out.print("ENTER STAFF ID TO SEARCH (OR '0' TO CANCEL): S-");
+                String idInput = ValidationUtil.scanner.nextLine().trim();
 
-            if (staffId == SalesUtil.INVALID_INPUT) {
-                System.out.println("\n<<<INVALID INPUT!>>>\n");
-                return;
-            }
+                if (idInput.equalsIgnoreCase("E") || idInput.equals("0")) {
+                    return;
+                }
 
-            if (staffId == 0) {
-                return;
-            }
+                if (idInput.isEmpty()) {
+                    System.out.println("\n<<<ID CANNOT BE EMPTY!>>>\n");
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("1. Staff ID");
+                    continue;
+                }
 
-            Staff staff = staffService.findById(staffId);
-            if (staff != null) {
-                results.add(staff);
+                try {
+                    int staffId = Integer.parseInt(idInput);
+                    Staff staff = staffService.findById(staffId);
+                    if (staff != null) {
+                        results.add(staff);
+                        searchType = "ID S-" + staffId;
+                        break;
+                    } else {
+                        System.out.println();
+                        System.out.println("<<<STAFF NOT FOUND!>>>");
+                        System.out.println();
+                        System.out.println("TIP: You can:");
+                        System.out.println("  - View the staff list to verify the ID");
+                        System.out.println("  - Use the search function to find the staff");
+                        System.out.println("  - Check for typos in the ID");
+                        System.out.println();
+                        System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                        String retry = ValidationUtil.scanner.nextLine().trim();
+                        if (retry.equalsIgnoreCase("E")) {
+                            return;
+                        }
+                        ConsoleUtil.clearScreen();
+                        ConsoleUtil.logo();
+                        staffView.printSearchStaffMenu(staffService.getAllStaff());
+                        System.out.println("1. Staff ID");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("\n<<<INVALID INPUT! Please enter a valid number!>>>\n");
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("1. Staff ID");
+                    continue;
+                }
             }
-            searchType = "ID S-" + staffId;
 
         } else if (choice.equals("2")) {
-            // Search by IC with retry mechanism
-            String ic = "";
-            boolean validIc = false;
-
-            while (!validIc) {
+            // Search by IC
+            while (true) {
                 System.out.print("ENTER STAFF IC TO SEARCH (OR 'E' TO CANCEL): ");
-                ic = ValidationUtil.scanner.nextLine().trim();
+                String ic = ValidationUtil.scanner.nextLine().trim();
 
                 if (ic.equalsIgnoreCase("E")) {
                     return;
                 }
 
+                if (ic.isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("2. Staff IC");
+                    continue;
+                }
+
                 if (!ic.matches("\\d{12}")) {
                     System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
-                    System.out.print("DO YOU WANT TO SEARCH AGAIN? (Y/N): ");
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                     String retry = ValidationUtil.scanner.nextLine().trim();
-
-                    if (!retry.equalsIgnoreCase("Y")) {
-                        return; // Return to menu if user doesn't want to retry
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
                     }
-                    System.out.println(); // Add spacing before retry
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("2. Staff IC");
+                    continue;
+                }
+
+                Staff staff = staffService.findByIc(ic);
+                if (staff != null) {
+                    results.add(staff);
+                    searchType = "IC " + ic;
+                    break;
                 } else {
-                    validIc = true;
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the IC");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the IC");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("2. Staff IC");
+                    continue;
                 }
             }
 
-            Staff staff = staffService.findByIc(ic);
-            if (staff != null) {
-                results.add(staff);
-            }
-            searchType = "IC " + ic;
-
         } else if (choice.equals("3")) {
             // Search by Name
-            System.out.print("ENTER STAFF NAME TO SEARCH (OR 'E' TO CANCEL): ");
-            String name = ValidationUtil.scanner.nextLine().trim();
+            while (true) {
+                System.out.print("ENTER STAFF NAME TO SEARCH (OR 'E' TO CANCEL): ");
+                String name = ValidationUtil.scanner.nextLine().trim();
 
-            if (name.equalsIgnoreCase("E")) {
-                return;
+                if (name.equalsIgnoreCase("E")) {
+                    return;
+                }
+
+                if (name.isEmpty()) {
+                    System.out.println(StaffConfig.ErrorMessage.NAME_CANNOT_BE_EMPTY);
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("3. Staff Name");
+                    continue;
+                }
+
+                results = staffService.findByName(name);
+                if (!results.isEmpty()) {
+                    searchType = "NAME '" + name + "'";
+                    break;
+                } else {
+                    System.out.println();
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
+                    System.out.println();
+                    System.out.println("TIP: You can:");
+                    System.out.println("  - View the staff list to verify the name");
+                    System.out.println("  - Use the search function to find the staff");
+                    System.out.println("  - Check for typos in the name");
+                    System.out.println("  - Try a partial name match");
+                    System.out.println();
+                    System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+                    String retry = ValidationUtil.scanner.nextLine().trim();
+                    if (retry.equalsIgnoreCase("E")) {
+                        return;
+                    }
+                    ConsoleUtil.clearScreen();
+                    ConsoleUtil.logo();
+                    staffView.printSearchStaffMenu(staffService.getAllStaff());
+                    System.out.println("3. Staff Name");
+                    continue;
+                }
             }
-
-            if (name.isEmpty()) {
-                System.out.println("\n<<<NAME CANNOT BE EMPTY!>>>\n");
-                return;
-            }
-
-            results = staffService.findByName(name);
-            searchType = "NAME '" + name + "'";
 
         } else {
             System.out.println("\n<<<INVALID CHOICE! Please enter 1, 2, or 3!>>>\n");
+            System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
+            String retry = ValidationUtil.scanner.nextLine().trim();
+            if (retry.equalsIgnoreCase("E")) {
+                return;
+            }
+            // Retry by restarting the search process
+            searchStaff();
             return;
         }
 
@@ -677,7 +973,7 @@ public class StaffController {
     private String collectPassword() {
         while (true) {
             System.out.print("ENTER PASSWORD (8-16 alphanumeric characters, e.g., Staff123): ");
-            String password = ValidationUtil.scanner.nextLine();
+            String password = PasswordUtil.readPassword("");
 
             if (password.equalsIgnoreCase("E")) {
                 System.out.println("  -> Operation cancelled.");
@@ -721,7 +1017,7 @@ public class StaffController {
             }
 
             System.out.print("CONFIRM PASSWORD: ");
-            String confirmPassword = ValidationUtil.scanner.nextLine();
+            String confirmPassword = PasswordUtil.readPassword("");
 
             if (!password.equals(confirmPassword)) {
                 System.out.println("  -> ERROR: Passwords do not match! Please try again.");
@@ -756,21 +1052,26 @@ public class StaffController {
 
             try {
                 int age = Integer.parseInt(input);
+                if (age < 0) {
+                    System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE);
+                    System.out.println();
+                    continue;
+                }
                 if (age < 18) {
-                    System.out.println("  -> ERROR: Age too young! Minimum age is 18 years.");
+                    System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_TOO_YOUNG);
                     System.out.println();
                     continue;
                 }
                 if (age > 54) {
-                    System.out.println("  -> ERROR: Age too old! Maximum age is 54 years.");
+                    System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_TOO_OLD);
                     System.out.println();
                     continue;
                 }
-                System.out.println("  -> Age validated successfully!");
+                System.out.println("  -> " + StaffConfig.SuccessfulMessage.AGE_VALIDATED);
                 System.out.println();
                 return age;
             } catch (NumberFormatException e) {
-                System.out.println("  -> ERROR: Invalid input! Please enter a valid number (e.g., 25).");
+                System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }
         }
@@ -797,14 +1098,19 @@ public class StaffController {
 
             try {
                 double salary = Double.parseDouble(input);
+                if (salary < 0) {
+                    System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE);
+                    System.out.println();
+                    continue;
+                }
                 if (salary <= 0) {
-                    System.out.println("  -> ERROR: Salary must be greater than 0!");
+                    System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.SALARY_MUST_BE_POSITIVE);
                     System.out.println("     Please enter a positive amount (e.g., 2500.00)");
                     System.out.println();
                     continue;
                 }
                 if (salary > 1000000) {
-                    System.out.print("  -> WARNING: Salary seems unusually high (>RM 1,000,000). Are you sure? (Y/N): ");
+                    System.out.print("  -> " + StaffConfig.ErrorMessage.SALARY_UNUSUALLY_HIGH);
                     String confirm = ValidationUtil.scanner.nextLine().trim();
                     if (!confirm.equalsIgnoreCase("Y")) {
                         System.out.println("  -> Please re-enter the salary.");
@@ -812,11 +1118,11 @@ public class StaffController {
                         continue;
                     }
                 }
-                System.out.println("  -> Salary validated successfully!");
+                System.out.println("  -> " + StaffConfig.SuccessfulMessage.SALARY_VALIDATED);
                 System.out.println();
                 return salary;
             } catch (NumberFormatException e) {
-                System.out.println("  -> ERROR: Invalid input! Please enter a valid number (e.g., 2500.00).");
+                System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }
         }

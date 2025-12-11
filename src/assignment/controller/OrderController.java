@@ -10,6 +10,7 @@ import assignment.util.ValidationUtil;
 import assignment.view.OrderView;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 
@@ -18,6 +19,7 @@ import java.util.List;
  * Handles adding, searching, removing, and editing orders in the cart.
  */
 public class OrderController {
+    private static final Logger LOGGER = Logger.getLogger(OrderController.class.getName());
     private final OrderService orderService;
     private final OrderView orderView;
 
@@ -77,6 +79,11 @@ public class OrderController {
             foundStock = orderService.findStockItem(itemID);
 
             if (foundStock == null || foundStock.getQty() == 0) {
+                if (foundStock == null) {
+                    LOGGER.warning("Invalid item ID: " + itemID + " (stock not found)");
+                } else {
+                    LOGGER.warning("Invalid item ID: " + itemID + " (stock quantity is 0)");
+                }
                 orderView.printInvalidItemIdMessage();
                 itemID = SalesUtil.INVALID_INPUT;
             } else {
@@ -108,6 +115,7 @@ public class OrderController {
             }
 
             if (quantity <= 0 || quantity > maxQty) {
+                LOGGER.warning("Invalid quantity: " + quantity + " (max available: " + maxQty + ", item ID: " + itemID + ")");
                 orderView.printInvalidQuantityMessage(maxQty);
             } else {
                 // Add to Cart (Business Logic Handled by Service)
@@ -115,6 +123,7 @@ public class OrderController {
                 if (success) {
                     orderView.printCartSummary(foundStock, quantity);
                 } else {
+                    LOGGER.warning("Failed to add order to cart: item ID " + itemID + ", quantity " + quantity);
                     orderView.printAddOrderFailure();
                 }
                 break; // Exit quantity input loop
@@ -221,6 +230,7 @@ public class OrderController {
         if (item != null) {
             orderView.displayOrderDetail(item);
         } else {
+            LOGGER.warning("Order not found: order number " + orderNoSearch);
             orderView.printOrderNotFound();
         }
 
@@ -256,6 +266,7 @@ public class OrderController {
         Order cartItem = orderService.findCartItemByOrderNo(orderNoRemove);
 
         if (cartItem == null) {
+            LOGGER.warning("Order not found for removal: order number " + orderNoRemove);
             orderView.printOrderNotFound();
         } else {
             orderView.printRemoveConfirmation(cartItem);
@@ -266,6 +277,7 @@ public class OrderController {
                 if (orderService.removeOrder(orderNoRemove)) {
                     orderView.printRemoveSuccess();
                 } else {
+                    LOGGER.warning("Failed to remove order: order number " + orderNoRemove);
                     orderView.printRemoveFailure();
                 }
             } else {
@@ -310,12 +322,14 @@ public class OrderController {
 
         Order cartItem = orderService.findCartItemByOrderNo(orderNoEdit);
         if (cartItem == null) {
+            LOGGER.warning("Order not found for editing: order number " + orderNoEdit);
             orderView.printNoOrderFoundMessage();
             return new OrderValidationResult(null, null, false);
         }
 
         Stock stockItem = orderService.findStockItem(cartItem.getStockID());
         if (stockItem == null) {
+            LOGGER.warning("Stock not found for order editing: stock ID " + cartItem.getStockID() + " (order number: " + orderNoEdit + ")");
             orderView.printStockNotFoundMessage();
             return new OrderValidationResult(null, null, false);
         }
@@ -337,6 +351,7 @@ public class OrderController {
             if (orderService.removeOrder(orderNoEdit)) {
                 orderView.printRemoveSuccess();
             } else {
+                LOGGER.warning("Failed to remove order during full quantity deletion: order number " + orderNoEdit);
                 orderView.printRemoveFailure();
             }
         } else {
@@ -357,6 +372,7 @@ public class OrderController {
         int quantityChange = ValidationUtil.intValidation(1, maxChange);
 
         if (quantityChange == SalesUtil.INVALID_INPUT) {
+            LOGGER.warning("Invalid quantity input for order edit: order number " + orderNoEdit + ", choice " + choice);
             orderView.printInvalidQuantityInputMessage();
             return;
         }
@@ -374,9 +390,11 @@ public class OrderController {
                     int newQty = updatedOrder.getQuantity();
                     orderView.printEditSuccess(action, newQty);
                 } else {
+                    LOGGER.warning("Failed to edit order: order number " + orderNoEdit + ", quantity change " + quantityChange + ", choice " + choice);
                     orderView.printEditFailure();
                 }
             } else {
+                LOGGER.warning("Failed to edit order: order number " + orderNoEdit + ", quantity change " + quantityChange + ", choice " + choice);
                 orderView.printEditFailure();
             }
         }
@@ -420,6 +438,7 @@ public class OrderController {
         if (choice == 0) {
             orderView.printEditCancelledMessage();
         } else if (choice == SalesUtil.INVALID_INPUT) {
+            LOGGER.warning("Invalid edit choice: " + choice + " (order number: " + orderNoEdit + ")");
             orderView.printInvalidChoiceMessage();
         } else {
             processQuantityChange(orderNoEdit, validation.cartItem, validation.stockItem, choice);

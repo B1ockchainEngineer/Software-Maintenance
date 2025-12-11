@@ -45,14 +45,14 @@ public class StaffService {
         if (existing == null) {
             return false;
         }
-        
+
         // Check if IC is being changed and if new IC already exists
         if (!existing.getIc().equals(updatedStaff.getIc())) {
             if (staffRepo.existsByIc(updatedStaff.getIc())) {
                 return false; // New IC already exists
             }
         }
-        
+
         return staffRepo.updateStaff(updatedStaff);
     }
 

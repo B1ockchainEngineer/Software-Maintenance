@@ -6,12 +6,14 @@ import assignment.model.Stock;
 import assignment.util.config.AppConfig;
 import assignment.util.config.SalesConfig;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * View class for Order management operations.
  * Handles all display outputs for order/cart operations.
  */
 public class OrderView {
+    private static final Logger LOGGER = Logger.getLogger(OrderView.class.getName());
 
     /**
      * Displays the ordering management menu with all available options.
@@ -87,6 +89,7 @@ public class OrderView {
      * Displays failure message when adding an order fails.
      */
     public void printAddOrderFailure() {
+        LOGGER.warning("Failed to add order to cart");
         System.out.println(SalesConfig.MSG_ADD_ORDER_FAILURE);
     }
 
@@ -113,6 +116,7 @@ public class OrderView {
      * Displays message when order is not found.
      */
     public void printOrderNotFound() {
+        LOGGER.warning("Order not found");
         System.out.println(SalesConfig.MSG_ORDER_NOT_FOUND);
     }
 
@@ -145,6 +149,7 @@ public class OrderView {
      * Displays failure message when order removal fails.
      */
     public void printRemoveFailure() {
+        LOGGER.warning("Failed to remove order");
         System.out.println(SalesConfig.MSG_ORDER_REMOVAL_FAILED);
     }
 
@@ -197,6 +202,7 @@ public class OrderView {
      * Displays failure message when order edit fails.
      */
     public void printEditFailure() {
+        LOGGER.warning("Order edit failed: invalid quantity limits");
         System.out.println(SalesConfig.MSG_INVALID_QUANTITY_LIMITS);
     }
 
@@ -218,6 +224,7 @@ public class OrderView {
      * Displays message when no order is found.
      */
     public void printNoOrderFoundMessage() {
+        LOGGER.warning("No order found");
         System.out.println(SalesConfig.MSG_ORDER_NOT_FOUND);
     }
 
@@ -225,6 +232,7 @@ public class OrderView {
      * Displays message when stock is not found.
      */
     public void printStockNotFoundMessage() {
+        LOGGER.warning("Stock not found");
         System.out.println(SalesConfig.MSG_STOCK_NOT_FOUND);
     }
 
@@ -249,6 +257,7 @@ public class OrderView {
      * Displays invalid item ID message.
      */
     public void printInvalidItemIdMessage() {
+        LOGGER.warning("Invalid item ID");
         System.out.println(SalesConfig.MSG_INVALID_ITEM_ID);
     }
 
@@ -263,6 +272,7 @@ public class OrderView {
      * Displays invalid quantity message with range.
      */
     public void printInvalidQuantityMessage(int maxQty) {
+        LOGGER.warning("Invalid quantity: max available quantity is " + maxQty);
         System.out.printf(SalesConfig.MSG_INVALID_QUANTITY_RANGE + "%n", maxQty);
     }
 
@@ -270,6 +280,7 @@ public class OrderView {
      * Displays invalid quantity input message.
      */
     public void printInvalidQuantityInputMessage() {
+        LOGGER.warning("Invalid quantity input");
         System.out.println(SalesConfig.MSG_INVALID_QUANTITY_INPUT);
     }
 
@@ -326,6 +337,7 @@ public class OrderView {
      * Displays invalid choice message.
      */
     public void printInvalidChoiceMessage() {
+        LOGGER.warning("Invalid choice");
         System.out.println(SalesConfig.MSG_INVALID_CHOICE);
     }
 

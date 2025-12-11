@@ -7,8 +7,7 @@ import assignment.util.ValidationUtil;
 import assignment.util.config.StockConfig;
 import assignment.view.StockView;
 
-import assignment.util.SalesUtil;
-import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Controller for stock/inventory management flows.
@@ -16,6 +15,7 @@ import java.util.List;
  */
 public class StockController {
 
+    private static final Logger LOGGER = Logger.getLogger(StockController.class.getName());
     private final StockService stockService;
     private final StockView stockView;
 
@@ -60,11 +60,13 @@ public class StockController {
                 }
 
                 if (inputName.trim().isEmpty()) {
+                    LOGGER.warning("Invalid product name: empty input");
                     System.out.println(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
                     continue;
                 }
 
                 if (!stockService.isStockNameUnique(inputName)) {
+                    LOGGER.warning("Product name already exists: " + inputName);
                     System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
                 } else {
                     newStock.setStockName(inputName);
@@ -81,6 +83,7 @@ public class StockController {
                         StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY));
                 qty = ValidationUtil.intValidation(StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY);
                 if (qty == -9999) {
+                    LOGGER.warning("Invalid quantity input: out of range or invalid format");
                     System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY);
                     continue;
                 }
@@ -98,6 +101,7 @@ public class StockController {
                     newStock.setPrice(price);
                     break;
                 } else {
+                    LOGGER.warning("Invalid price input: " + price + " (minimum: " + StockConfig.MIN_PRICE + ")");
                     System.out.println(StockConfig.ErrorMessage.INVALID_PRICE);
                 }
             } while (true);
@@ -116,6 +120,7 @@ public class StockController {
                             System.out.println(StockConfig.SuccessfulMessage.PRODUCT_ADDED);
                             System.out.println("---------------------------------------------------");
                         } else {
+                            LOGGER.warning("Failed to add stock: name already exists - " + newStock.getStockName());
                             System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
                         }
                         break OUTER;
@@ -124,8 +129,10 @@ public class StockController {
                         System.out.println("\nPRODUCT NOT ADDED. RETURNING TO THE MAIN MENU...");
                         break OUTER;
                     }
-                    default ->
-                            System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
+                    default -> {
+                        LOGGER.warning("Invalid confirmation option: " + confirmation);
+                        System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
+                    }
                 }
             }
 
@@ -169,6 +176,7 @@ public class StockController {
             if (productToDelete != null) {
                 // Safety: block deletion if quantity > 0 to avoid accidental loss of in-use stock
                 if (productToDelete.getQty() > 0) {
+                    LOGGER.warning("Cannot delete product ID " + inputID + ": quantity > 0 (current qty: " + productToDelete.getQty() + ")");
                     System.out.println("<<< CANNOT DELETE: PRODUCT STILL HAS QUANTITY > 0. PLEASE ADJUST STOCK TO 0 BEFORE DELETING. >>>");
                     ConsoleUtil.systemPause();
                     continue;
@@ -182,12 +190,14 @@ public class StockController {
                     if (stockService.deleteStock(inputID)) {
                         System.out.println(String.format(StockConfig.SuccessfulMessage.PRODUCT_DELETED, inputID));
                     } else {
+                        LOGGER.warning("Failed to delete product ID: " + inputID);
                         System.out.println(StockConfig.ErrorMessage.DELETE_FAILED);
                     }
                 } else {
                     System.out.println("DELETION CANCELLED.");
                 }
             } else {
+                LOGGER.warning("Stock not found for deletion: ID " + inputID);
                 System.out.println(String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, inputID));
             }
 
@@ -225,6 +235,7 @@ public class StockController {
 
         Stock target = stockService.getStockByID(inputID);
         if (target == null) {
+            LOGGER.warning("Stock not found for editing: ID " + inputID);
             System.out.println(String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, inputID));
             ConsoleUtil.systemPause();
             return;
@@ -256,10 +267,12 @@ public class StockController {
                         System.out.print("ENTER NEW PRODUCT NAME: ");
                         newName = ValidationUtil.scanner.nextLine();
                         if (newName.trim().isEmpty()) {
+                            LOGGER.warning("Invalid product name during edit: empty input");
                             System.out.println(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
                             continue;
                         }
                         if (!stockService.isStockNameUniqueForUpdate(newName, target.getStockID())) {
+                            LOGGER.warning("Product name already exists during edit: " + newName + " (current ID: " + target.getStockID() + ")");
                             System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
                         } else {
                             target.setStockName(newName);
@@ -274,6 +287,7 @@ public class StockController {
                                 StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY));
                         newQty = ValidationUtil.intValidation(StockConfig.MIN_QUANTITY, StockConfig.MAX_QUANTITY);
                         if (newQty == -9999) {
+                            LOGGER.warning("Invalid quantity input during edit: out of range or invalid format");
                             System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY);
                             continue;
                         }
@@ -291,12 +305,16 @@ public class StockController {
                             target.setPrice(newPrice);
                             break;
                         } else {
+                            LOGGER.warning("Invalid price input during edit: " + newPrice + " (minimum: " + StockConfig.MIN_PRICE + ")");
                             System.out.println(StockConfig.ErrorMessage.INVALID_PRICE);
                         }
                     } while (true);
                 }
                 case 0 -> done = true;
-                default -> System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
+                default -> {
+                    LOGGER.warning("Invalid edit option: " + opt);
+                    System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
+                }
             }
 
             if (!done) {
@@ -316,6 +334,7 @@ public class StockController {
                         target = refreshed; // keep local reference in sync
                     }
                 } else {
+                    LOGGER.warning("Update failed for stock ID " + target.getStockID() + ": check name duplicates");
                     System.out.println("<<< UPDATE FAILED. CHECK NAME DUPLICATES. >>>");
                 }
 

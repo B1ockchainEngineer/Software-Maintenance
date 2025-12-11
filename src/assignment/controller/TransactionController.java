@@ -7,11 +7,13 @@ import assignment.util.SalesUtil;
 import assignment.util.ValidationUtil;
 import assignment.view.TransactionView;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Controller for transaction viewing and management operations.
  */
 public class TransactionController {
+    private static final Logger LOGGER = Logger.getLogger(TransactionController.class.getName());
     private final TransactionService transactionService;
     private final TransactionView transactionView;
 
@@ -39,6 +41,7 @@ public class TransactionController {
             
             ConsoleUtil.systemPause();
         } else {
+            LOGGER.warning("Invalid transaction number: " + transactionNo + " (valid range: 1-" + transactions.size() + ")");
             transactionView.printInvalidTransactionNumber();
             ConsoleUtil.systemPause();
         }
