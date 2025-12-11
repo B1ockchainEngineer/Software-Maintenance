@@ -59,6 +59,10 @@ public class SignupView {
         System.out.print(SignupConfig.PROMPT_ENTER_STAFF_IC);
     }
 
+    public void printIcPrompt() {
+        System.out.print(SignupConfig.PROMPT_ENTER_STAFF_IC);
+    }
+
     public void printIcCollected(String ic) {
         System.out.println(String.format(SignupConfig.MSG_IC_COLLECTED, ic));
         System.out.println();
@@ -81,13 +85,22 @@ public class SignupView {
         System.out.println();
         System.out.println(SignupConfig.MSG_PASSWORD_REQUIREMENTS);
         System.out.println(SignupConfig.MSG_PASSWORD_REQ_1);
-        System.out.println(SignupConfig.MSG_PASSWORD_REQ_2);
-        System.out.println(SignupConfig.MSG_PASSWORD_REQ_3);
+        if (!SignupConfig.MSG_PASSWORD_REQ_2.isEmpty()) {
+            System.out.println(SignupConfig.MSG_PASSWORD_REQ_2);
+        }
+        if (!SignupConfig.MSG_PASSWORD_REQ_3.isEmpty()) {
+            System.out.println(SignupConfig.MSG_PASSWORD_REQ_3);
+        }
         System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.println();
+        System.out.print(SignupConfig.PROMPT_ENTER_PASSWORD);
     }
 
     public void printPasswordStepPrompt() {
+        System.out.print(SignupConfig.PROMPT_ENTER_PASSWORD);
+    }
+
+    public void printPasswordPrompt() {
         System.out.print(SignupConfig.PROMPT_ENTER_PASSWORD);
     }
 
@@ -144,15 +157,28 @@ public class SignupView {
         System.out.println();
     }
 
+    public void printAdditionalInfoStep() {
+        System.out.println(SignupConfig.STEP_ADDITIONAL_INFO);
+        System.out.println(AppConfig.SEPARATOR_LINE);
+    }
+
     public void printAgeStep() {
         System.out.println(SignupConfig.STEP_AGE);
         System.out.println(AppConfig.SEPARATOR_LINE);
         System.out.print(SignupConfig.PROMPT_ENTER_STAFF_AGE);
     }
 
+    public void printAgePrompt() {
+        System.out.print(SignupConfig.PROMPT_ENTER_STAFF_AGE);
+    }
+
     public void printSalaryStep() {
         System.out.println(SignupConfig.STEP_SALARY);
         System.out.println(AppConfig.SEPARATOR_LINE);
+        System.out.print(SignupConfig.PROMPT_ENTER_STAFF_SALARY);
+    }
+
+    public void printSalaryPrompt() {
         System.out.print(SignupConfig.PROMPT_ENTER_STAFF_SALARY);
     }
 

@@ -5,8 +5,6 @@ import assignment.service.StaffService;
 import assignment.util.ConsoleUtil;
 import assignment.util.ValidationUtil;
 import assignment.util.MemberUtil;
-import assignment.util.PasswordStrengthUtil;
-import assignment.util.PasswordStrengthUtil.PasswordStrength;
 import assignment.util.PasswordUtil;
 import assignment.util.config.SignupConfig;
 import assignment.view.SignupView;
@@ -233,7 +231,7 @@ public class SignupController {
     }
 
     /**
-     * Collects and validates password with strength indicator.
+     * Collects and validates password (minimum 8 characters only).
      */
     private String collectPassword() {
         signupView.printPasswordStep();
@@ -255,26 +253,10 @@ public class SignupController {
                 continue; // Ask user to enter again
             }
 
-            // Show password strength immediately (only if password is not empty)
-            signupView.printPasswordStrength(password);
-
-            // Basic validation (still required)
-            if (!password.matches("^[a-zA-Z0-9]{8,16}$")) {
+            // Only check minimum length (8 characters)
+            if (password.length() < 8) {
                 signupView.printInvalidPasswordFormat();
-                signupView.printPasswordFeedback(password);
                 continue;
-            }
-
-            // Warn about weak passwords but allow them
-            PasswordStrength strength = PasswordStrengthUtil.checkPasswordStrength(password);
-            if (strength.getLevel() <= 2) {
-                signupView.printWeakPasswordWarning();
-                String choice = ValidationUtil.scanner.nextLine().trim();
-                if (!choice.equalsIgnoreCase("Y") && !choice.equalsIgnoreCase("YES")) {
-                    System.out.println("Please enter a stronger password.");
-                    System.out.println();
-                    continue;
-                }
             }
 
             signupView.printPasswordConfirmPrompt();
@@ -284,9 +266,6 @@ public class SignupController {
                 signupView.printPasswordMismatch();
                 continue;
             }
-
-            // Show final strength after confirmation
-            signupView.printPasswordConfirmed(password);
 
             return password;
         }

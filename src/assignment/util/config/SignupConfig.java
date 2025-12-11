@@ -39,15 +39,16 @@ public class SignupConfig {
     public static final String STEP_STAFF_IC = "STEP 2/6: STAFF IC";
     public static final String STEP_STAFF_NAME = "STEP 3/6: STAFF NAME";
     public static final String STEP_PASSWORD = "STEP 4/6: PASSWORD";
+    public static final String STEP_ADDITIONAL_INFO = "STEP 5/6: ADDITIONAL INFORMATION";
     public static final String STEP_AGE = "STEP 5/6: STAFF AGE";
     public static final String STEP_SALARY = "STEP 6/6: STAFF SALARY";
     public static final String STEP_SAVING = "STEP 8/8: SAVING REGISTRATION...";
 
     // ================== PASSWORD REQUIREMENTS ==================
     public static final String MSG_PASSWORD_REQUIREMENTS = "PASSWORD REQUIREMENTS:";
-    public static final String MSG_PASSWORD_REQ_1 = "• 8-16 characters";
-    public static final String MSG_PASSWORD_REQ_2 = "• Alphanumeric characters (a-z, A-Z, 0-9)";
-    public static final String MSG_PASSWORD_REQ_3 = "• For stronger passwords, include uppercase, lowercase, numbers, and special characters";
+    public static final String MSG_PASSWORD_REQ_1 = "• Minimum 8 characters";
+    public static final String MSG_PASSWORD_REQ_2 = "";
+    public static final String MSG_PASSWORD_REQ_3 = "";
 
     // ================== COLLECTION CONFIRMATIONS ==================
     public static final String MSG_IC_COLLECTED = "✓ IC collected: %s";
@@ -71,7 +72,7 @@ public class SignupConfig {
         public static final String IC_ALREADY_EXISTS = "<<<IC ALREADY EXISTS! Please use a different IC!>>>";
         public static final String NAME_CANNOT_BE_EMPTY = "<<<NAME CANNOT BE EMPTY!>>>";
         public static final String PASSWORD_CANNOT_BE_EMPTY = "<<<PASSWORD CANNOT BE EMPTY! Please enter a password!>>>";
-        public static final String INVALID_PASSWORD_FORMAT = "<<<INVALID INPUT! Password must be 8-16 alphanumeric characters!>>>";
+        public static final String INVALID_PASSWORD_FORMAT = "<<<INVALID INPUT! Password must be at least 8 characters!>>>";
         public static final String CURRENT_ISSUES = "CURRENT ISSUES:";
         public static final String PASSWORDS_DO_NOT_MATCH = "<<<PASSWORDS DO NOT MATCH! Please try again!>>>";
         public static final String AGE_CANNOT_BE_NEGATIVE = "<<<INVALID INPUT! Age cannot be negative! Please enter a positive number.>>>";
