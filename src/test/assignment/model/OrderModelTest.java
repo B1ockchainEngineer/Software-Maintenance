@@ -1,6 +1,4 @@
-package test.assignment.model;
-
-import assignment.model.Order;
+package assignment.model;
 
 /**
  * Test fixture for creating Order objects in tests.

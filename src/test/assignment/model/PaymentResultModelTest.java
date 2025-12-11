@@ -1,6 +1,4 @@
-package test.assignment.model;
-
-import assignment.model.PaymentResult;
+package assignment.model;
 
 /**
  * Test fixture for creating PaymentResult objects in tests.
