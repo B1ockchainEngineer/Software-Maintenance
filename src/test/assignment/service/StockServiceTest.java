@@ -1,10 +1,14 @@
 package assignment.service;
 
+import assignment.model.Order;
 import assignment.model.Stock;
-import assignment.repo.MockStockRepository;
 import assignment.repo.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -17,7 +21,116 @@ class StockServiceTest {
 
     @BeforeEach
     void setUp() {
-        mockRepository = new MockStockRepository();
+        // Create mock StockRepository with in-memory data
+        mockRepository = new StockRepository() {
+            private final List<Stock> stocks = new ArrayList<>();
+            private final List<Stock> stocklist = new ArrayList<>();
+            private final List<Order> cart = new ArrayList<>();
+
+            @Override
+            public List<Stock> loadAllStock() {
+                stocklist.clear();
+                stocklist.addAll(stocks);
+                return new ArrayList<>(stocks);
+            }
+
+            @Override
+            public void appendStock(Stock stock) {
+                stocks.add(stock);
+                stocklist.add(stock);
+            }
+
+            @Override
+            public void saveAllStock(List<Stock> stockList) {
+                stocks.clear();
+                stocks.addAll(stockList);
+                stocklist.clear();
+                stocklist.addAll(stockList);
+            }
+
+            @Override
+            public boolean deleteById(int stockIdToDelete) {
+                boolean removed = stocks.removeIf(s -> s.getStockID() == stockIdToDelete);
+                if (removed) {
+                    stocklist.removeIf(s -> s.getStockID() == stockIdToDelete);
+                }
+                return removed;
+            }
+
+            @Override
+            public boolean existsByName(String name) {
+                String upperName = name.toUpperCase();
+                for (Stock stock : stocks) {
+                    if (stock.getStockName().equals(upperName)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public int findMaxId() {
+                int maxId = 10000;
+                for (Stock stock : stocks) {
+                    if (stock.getStockID() > maxId) {
+                        maxId = stock.getStockID();
+                    }
+                }
+                return maxId;
+            }
+
+            @Override
+            public List<Stock> getStocklist() {
+                if (stocklist.size() != stocks.size()) {
+                    loadAllStock();
+                }
+                return stocklist;
+            }
+
+            @Override
+            public List<Order> getCart() {
+                return cart;
+            }
+
+            @Override
+            public void clearCart() {
+                cart.clear();
+            }
+
+            @Override
+            public void saveStockToFile() {
+                stocks.clear();
+                stocks.addAll(stocklist);
+            }
+
+            @Override
+            public List<Stock> loadStockFromFile() {
+                return loadAllStock();
+            }
+
+            @Override
+            public int findLastStockID() {
+                return findMaxId();
+            }
+
+            @Override
+            public boolean checkNameExists(String name) {
+                return existsByName(name);
+            }
+
+            @Override
+            public void addStockToFile(Stock newStock) throws java.io.IOException {
+                appendStock(newStock);
+                loadAllStock();
+            }
+
+            @Override
+            public void deleteProductFromFile(int productIDToDelete) {
+                deleteById(productIDToDelete);
+                loadAllStock();
+            }
+        };
+
         stockService = new StockService(mockRepository);
     }
 
