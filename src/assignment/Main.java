@@ -198,7 +198,7 @@ public class Main {
             mainView.printStockMenu();
             mainView.printSelectionPrompt();
 
-            int stockOpt = ValidationUtil.intValidation(0, 3);
+            int stockOpt = ValidationUtil.intValidation(0, 4);
 
             if (stockOpt == SalesUtil.INVALID_INPUT) {
                 ConsoleUtil.systemPause();
@@ -217,6 +217,7 @@ public class Main {
                 case ADD_PRODUCT -> stockController.add();
                 case DELETE_PRODUCT -> stockController.delete();
                 case VIEW_PRODUCT_LIST -> stockController.view();
+                case EDIT_PRODUCT -> stockController.edit();
                 case BACK_TO_MAIN -> {
                     mainView.printBackToMainMessage();
                     ConsoleUtil.systemPause();

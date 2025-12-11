@@ -2,6 +2,7 @@ package assignment.view;
 
 import assignment.model.Stock;
 import assignment.util.config.AppConfig;
+import assignment.util.config.StockConfig;
 import java.util.List;
 
 /**
@@ -11,8 +12,8 @@ import java.util.List;
 public class StockView {
 
     public void displayAvailableStock(List<Stock> stockList) {
-        System.out.println("         [ VIEW ALL PRODUCTS IN STOCK ]");
-        System.out.println(AppConfig.SEPARATOR_LONG);
+        System.out.println(StockConfig.TITLE_VIEW_STOCK);
+        System.out.println("------------------------------------------------------------------");
 
         // Header
         System.out.printf("%-10s      %-25s%-10s  %-10s\n", "PRODUCT ID", "PRODUCT NAME", "QUANTITY", "PRICE");
@@ -31,14 +32,14 @@ public class StockView {
         }
 
         if (!found) {
-            System.out.println("No products found in the inventory file.");
-            System.out.println(AppConfig.SEPARATOR_LONG);
+            System.out.println(StockConfig.ErrorMessage.NO_STOCK_TO_DISPLAY);
+            System.out.println("------------------------------------------------------------------");
         }
     }
 
     public void printAddStockHeader() {
-        System.out.println("[ ADD NEW PRODUCT ]");
-        System.out.println(AppConfig.SEPARATOR_LINE);
+        System.out.println(StockConfig.TITLE_ADD_PRODUCT);
+        System.out.println("-------------------------------------------------------");
     }
 
     public void printProductID(int displayID) {
@@ -50,36 +51,16 @@ public class StockView {
         System.out.println(newStock.toString());
     }
 
-    public void printAddSuccess() {
-        System.out.println("\nNEW PRODUCT ADDED TO THE SYSTEM...");
-        System.out.println(AppConfig.SEPARATOR_LINE);
-    }
-
-    public void printAddFailure() {
-        System.out.println("\nFAILED TO ADD PRODUCT! Check service logs.");
-    }
-
     public void printDeleteStockMenu() {
-        System.out.println("[ DELETE A PRODUCT ]");
-        System.out.println(AppConfig.SEPARATOR_LINE);
+        System.out.println(StockConfig.TITLE_DELETE_PRODUCT);
+        System.out.println("-------------------------------------------------------");
     }
 
     public void displayStockDetails(Stock stock) {
-        System.out.println(AppConfig.SEPARATOR_LINE);
-        System.out.println("PRODUCT INFORMATION TO BE DELETED:");
+        System.out.println("-------------------------------------------------------");
+        System.out.println("PRODUCT INFORMATION:");
         System.out.println(stock.toString());
         System.out.println(AppConfig.SEPARATOR_LINE);
     }
 
-    public void printDeleteSuccess(int inputID) {
-        System.out.println("PRODUCT WITH ID " + inputID + " HAS BEEN DELETED");
-    }
-
-    public void printDeleteFailure() {
-        System.out.println("PRODUCT DELETION FAILED.");
-    }
-
-    public void printStockNotFound(int inputID) {
-        System.out.println("PRODUCT WITH ID " + inputID + " NOT FOUND");
-    }
 }

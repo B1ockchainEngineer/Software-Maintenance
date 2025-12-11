@@ -4,7 +4,8 @@ public enum StockMenu {
     BACK_TO_MAIN(0, "BACK TO MAIN MENU"),
     ADD_PRODUCT(1, "ADD NEW PRODUCT"),
     DELETE_PRODUCT(2, "DELETE PRODUCT"),
-    VIEW_PRODUCT_LIST(3, "VIEW PRODUCT LIST");
+    VIEW_PRODUCT_LIST(3, "VIEW PRODUCT LIST"),
+    EDIT_PRODUCT(4, "EDIT PRODUCT");
 
     private final int option;
     private final String description;
