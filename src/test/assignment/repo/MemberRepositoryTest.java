@@ -2,7 +2,6 @@ package assignment.repo;
 
 import assignment.model.Membership;
 import assignment.model.NormalMember;
-import assignment.repo.MemberRepository;
 import assignment.util.config.MemberConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,5 @@
-package test.assignment.model;
+package assignment.model;
 
-import assignment.model.Transaction;
-import assignment.model.Stock;
 import java.util.ArrayList;
 import java.util.List;
 
