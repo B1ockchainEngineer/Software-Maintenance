@@ -1,6 +1,5 @@
 package assignment.view;
 
-import assignment.enums.QuantityEditMenu;
 import assignment.model.Stock;
 import assignment.util.config.AppConfig;
 import assignment.util.config.StockConfig;
