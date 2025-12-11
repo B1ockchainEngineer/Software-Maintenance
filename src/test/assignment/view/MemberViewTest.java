@@ -114,4 +114,17 @@ class MemberViewTest {
         assertTrue(outputGold.contains("Bob"));
         logger.info("DisplayMembersByType test passed.");
     }
+    @Test
+    @DisplayName("Should print edit menu")
+    void testPrintEditMenu() {
+        memberView.printEditMenu();
+        String output = outContent.toString();
+
+        assertTrue(output.contains("MEMBER NAME"));
+        assertTrue(output.contains("MEMBER HP"));
+        assertTrue(output.contains("MEMBER IC"));
+        assertTrue(output.contains("MEMBER TYPE"));
+        assertTrue(output.contains("BACK TO PREVIOUS MENU"));
+        logger.info("PrintEditMenu test passed.");
+    }
 }
