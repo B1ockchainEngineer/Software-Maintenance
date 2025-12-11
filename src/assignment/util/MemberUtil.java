@@ -17,9 +17,30 @@ public class MemberUtil {
     public static String icValidation() {
         String input = ValidationUtil.scanner.nextLine().trim();
 
+        // Check if empty
+        if (input.isEmpty()) {
+            String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
+            LOGGER.severe(errorMsg);
+            System.out.println(errorMsg);
+            System.out.println();
+            return null;
+        }
+
         // Must be exactly 12 digits
-        if (input.length() != 12 || !input.matches("\\d+")) {
-            LOGGER.severe("<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>\n");
+        if (input.length() != 12) {
+            String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
+            LOGGER.severe(errorMsg);
+            System.out.println(errorMsg);
+            System.out.println();
+            return null;
+        }
+        
+        // Check if all characters are digits (only check this if length is 12)
+        if (!input.matches("\\d{12}")) {
+            String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
+            LOGGER.severe(errorMsg);
+            System.out.println(errorMsg);
+            System.out.println();
             return null;
         }
 
@@ -31,7 +52,10 @@ public class MemberUtil {
 
             // Place of birth: only 01-16 allowed
             if (pb < 1 || pb > 16) {
-                LOGGER.severe("<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>\n");
+                String errorMsg = "<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>";
+                LOGGER.severe(errorMsg);
+                System.out.println(errorMsg);
+                System.out.println();
                 return null;
             }
 
@@ -48,19 +72,26 @@ public class MemberUtil {
                     }
 
                 } catch (DateTimeException ignored) {
-                    // Invalid date in 20xx, so force to 19xx
+                    // Invalid date in 20xx, so try 19xx
                 }
 
-                // Change to 1900 + yy (20th century)
-                LocalDate birthDate19 = LocalDate.of(1900 + yy, mm, dd);
+                // Try 1900 + yy (20th century)
+                // If this doesn't throw an exception, the date is valid and person is definitely >= 12 years old
+                LocalDate.of(1900 + yy, mm, dd);
                 return input;
 
             } catch (DateTimeException e) {
-                LOGGER.severe("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
+                String errorMsg = "<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>";
+                LOGGER.severe(errorMsg);
+                System.out.println(errorMsg);
+                System.out.println();
                 return null;
 
         } catch (Exception e) {
-            LOGGER.severe("<<< INVALID IC FORMAT >>>\n");
+            String errorMsg = "<<< INVALID IC FORMAT >>>";
+            LOGGER.severe(errorMsg);
+            System.out.println(errorMsg);
+            System.out.println();
             return null;
         }
     }
