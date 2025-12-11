@@ -216,5 +216,70 @@ class StockViewTest {
         assertTrue(output.contains("0"));
         assertTrue(output.contains("RM0.00"));
     }
+
+    // ================== printQuantityEditMenu TESTS ==================
+
+    @Test
+    void printQuantityEditMenu_ShouldDisplayMenu() {
+        // When: Printing quantity edit menu
+        stockView.printQuantityEditMenu();
+
+        // Then: Should display menu with options
+        String output = getOutput();
+        assertTrue(output.contains(StockConfig.TITLE_EDIT_QUANTITY));
+        assertTrue(output.contains(StockConfig.MSG_QUANTITY_EDIT_MENU));
+        assertTrue(output.contains(StockConfig.OPTION_ADD_STOCK));
+        assertTrue(output.contains(StockConfig.OPTION_REDUCE_STOCK));
+    }
+
+    // ================== printQuantityToAddPrompt TESTS ==================
+
+    @Test
+    void printQuantityToAddPrompt_ShouldDisplayPrompt() {
+        // When: Printing quantity to add prompt
+        stockView.printQuantityToAddPrompt();
+
+        // Then: Should display prompt
+        String output = getOutput();
+        assertTrue(output.contains(StockConfig.PROMPT_ENTER_QUANTITY_TO_ADD));
+    }
+
+    // ================== printQuantityToReducePrompt TESTS ==================
+
+    @Test
+    void printQuantityToReducePrompt_ShouldDisplayPrompt() {
+        // When: Printing quantity to reduce prompt
+        stockView.printQuantityToReducePrompt();
+
+        // Then: Should display prompt
+        String output = getOutput();
+        assertTrue(output.contains(StockConfig.PROMPT_ENTER_QUANTITY_TO_REDUCE));
+    }
+
+    // ================== printQuantityAddedSuccess TESTS ==================
+
+    @Test
+    void printQuantityAddedSuccess_ShouldDisplaySuccessMessage() {
+        // When: Printing quantity added success
+        stockView.printQuantityAddedSuccess(25);
+
+        // Then: Should display success message and new quantity
+        String output = getOutput();
+        assertTrue(output.contains(StockConfig.SuccessfulMessage.QUANTITY_ADDED_SUCCESS));
+        assertTrue(output.contains("25"));
+    }
+
+    // ================== printQuantityReducedSuccess TESTS ==================
+
+    @Test
+    void printQuantityReducedSuccess_ShouldDisplaySuccessMessage() {
+        // When: Printing quantity reduced success
+        stockView.printQuantityReducedSuccess(15);
+
+        // Then: Should display success message and new quantity
+        String output = getOutput();
+        assertTrue(output.contains(StockConfig.SuccessfulMessage.QUANTITY_REDUCED_SUCCESS));
+        assertTrue(output.contains("15"));
+    }
 }
 

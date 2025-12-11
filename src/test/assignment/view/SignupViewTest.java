@@ -202,9 +202,8 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_PASSWORD));
         assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQUIREMENTS));
-        assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQ_1));
-        assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQ_2));
-        assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQ_3));
+        assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQ_1)); // "• Minimum 8 characters"
+        // Note: MSG_PASSWORD_REQ_2 and MSG_PASSWORD_REQ_3 are now empty, so they won't be displayed
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_PASSWORD));
     }
 
