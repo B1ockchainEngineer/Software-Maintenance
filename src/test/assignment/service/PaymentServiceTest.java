@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("PaymentService Tests")
 class PaymentServiceTest {
-    private static final Logger LOGGER = Logger.getLogger(PaymentServiceTest.class.getName());
+    private final Logger logger = Logger.getLogger(PaymentServiceTest.class.getName());
 
     private StockRepository stockRepo;
     private OrderRepository orderRepo;
@@ -89,7 +89,7 @@ class PaymentServiceTest {
 
         double subtotal = paymentService.calculateSubtotal();
         assertEquals(100.0, subtotal, 0.01); // 2 * 50.0
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated subtotal for single item (2 × RM50.00 = RM100.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated subtotal for single item (2 × RM50.00 = RM100.00)");
     }
 
     @Test
@@ -101,7 +101,7 @@ class PaymentServiceTest {
 
         double subtotal = paymentService.calculateSubtotal();
         assertEquals(275.0, subtotal, 0.01); // 100 + 100 + 75
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated subtotal for multiple items (RM100.00 + RM100.00 + RM75.00 = RM275.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated subtotal for multiple items (RM100.00 + RM100.00 + RM75.00 = RM275.00)");
     }
 
     @Test
@@ -109,7 +109,7 @@ class PaymentServiceTest {
     void testCalculateSubtotal_EmptyCart() {
         double subtotal = paymentService.calculateSubtotal();
         assertEquals(0.0, subtotal, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Returned zero subtotal for empty cart");
+        logger.info("✓ SUCCESS: PaymentService - Returned zero subtotal for empty cart");
     }
 
     @Test
@@ -120,7 +120,7 @@ class PaymentServiceTest {
 
         double discount = paymentService.calculateDiscount(discountRate, subtotal);
         assertEquals(10.0, discount, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated discount correctly (10% of RM100.00 = RM10.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated discount correctly (10% of RM100.00 = RM10.00)");
     }
 
     @Test
@@ -129,7 +129,7 @@ class PaymentServiceTest {
         double subtotal = 100.0;
         double discount = paymentService.calculateDiscount(0.0, subtotal);
         assertEquals(0.0, discount, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated zero discount when rate is zero");
+        logger.info("✓ SUCCESS: PaymentService - Calculated zero discount when rate is zero");
     }
 
     @Test
@@ -140,7 +140,7 @@ class PaymentServiceTest {
 
         double discount = paymentService.calculateDiscount(discountRate, subtotal);
         assertEquals(30.0, discount, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated premium member discount (15% of RM200.00 = RM30.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated premium member discount (15% of RM200.00 = RM30.00)");
     }
 
     @Test
@@ -154,7 +154,7 @@ class PaymentServiceTest {
 
         double tax = paymentService.calculateTax(subtotal, discount);
         assertEquals(5.4, tax, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated tax correctly (6% of RM90.00 after discount = RM5.40)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated tax correctly (6% of RM90.00 after discount = RM5.40)");
     }
 
     @Test
@@ -166,7 +166,7 @@ class PaymentServiceTest {
 
         double tax = paymentService.calculateTax(subtotal, discount);
         assertEquals(6.0, tax, 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated tax with no discount (6% of RM100.00 = RM6.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated tax with no discount (6% of RM100.00 = RM6.00)");
     }
 
     @Test
@@ -187,7 +187,7 @@ class PaymentServiceTest {
         assertEquals(20.0, result.getDiscount(), 0.01);
         assertEquals(10.8, result.getTax(), 0.01);
         assertEquals(190.8, result.getTotal(), 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated payment summary correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated payment summary correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80)");
     }
 
     @Test
@@ -195,7 +195,7 @@ class PaymentServiceTest {
     void testCalculatePaymentSummary_EmptyCart() {
         PaymentResult result = paymentService.calculatePaymentSummary(0.10);
         assertNull(result);
-        LOGGER.info("✓ SUCCESS: PaymentService - Returned null payment summary for empty cart");
+        logger.info("✓ SUCCESS: PaymentService - Returned null payment summary for empty cart");
     }
 
     @Test
@@ -214,7 +214,7 @@ class PaymentServiceTest {
         assertEquals(0.0, result.getDiscount(), 0.01);
         assertEquals(6.0, result.getTax(), 0.01);
         assertEquals(106.0, result.getTotal(), 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Calculated payment summary with no discount (Subtotal: RM100.00, Tax: RM6.00, Total: RM106.00)");
+        logger.info("✓ SUCCESS: PaymentService - Calculated payment summary with no discount (Subtotal: RM100.00, Tax: RM6.00, Total: RM106.00)");
     }
 
     @Test
@@ -237,7 +237,7 @@ class PaymentServiceTest {
         assertEquals(10.8, transaction.getTax(), 0.01);
         assertEquals(190.8, transaction.getTotal(), 0.01);
         assertEquals(2, transaction.getItems().size());
-        LOGGER.info("✓ SUCCESS: PaymentService - Created transaction correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80, Items: 2)");
+        logger.info("✓ SUCCESS: PaymentService - Created transaction correctly (Subtotal: RM200.00, Discount: RM20.00, Tax: RM10.80, Total: RM190.80, Items: 2)");
     }
 
     @Test
@@ -245,7 +245,7 @@ class PaymentServiceTest {
     void testCreateTransaction_EmptyCart() {
         Transaction transaction = paymentService.createTransaction(0.10);
         assertNull(transaction);
-        LOGGER.info("✓ SUCCESS: PaymentService - Returned null transaction for empty cart");
+        logger.info("✓ SUCCESS: PaymentService - Returned null transaction for empty cart");
     }
 
     @Test
@@ -257,7 +257,7 @@ class PaymentServiceTest {
         paymentService.clearCart();
 
         assertTrue(stockRepo.getCart().isEmpty());
-        LOGGER.info("✓ SUCCESS: PaymentService - Cleared cart and orders successfully");
+        logger.info("✓ SUCCESS: PaymentService - Cleared cart and orders successfully");
     }
 
     @Test
@@ -279,7 +279,7 @@ class PaymentServiceTest {
         assertEquals(33.0, result.getDiscount(), 0.01);
         assertEquals(11.22, result.getTax(), 0.01);
         assertEquals(198.22, result.getTotal(), 0.01);
-        LOGGER.info("✓ SUCCESS: PaymentService - Handled complex payment calculation (Subtotal: RM220.00, Discount: RM33.00, Tax: RM11.22, Total: RM198.22)");
+        logger.info("✓ SUCCESS: PaymentService - Handled complex payment calculation (Subtotal: RM220.00, Discount: RM33.00, Tax: RM11.22, Total: RM198.22)");
     }
 
 
@@ -310,7 +310,7 @@ class PaymentServiceTest {
         // Clear cart after payment
         paymentService.clearCart();
         assertTrue(stockRepo.getCart().isEmpty());
-        LOGGER.info("✓ SUCCESS: PaymentService - Completed full payment flow (Summary calculated, transaction created and saved, cart cleared)");
+        logger.info("✓ SUCCESS: PaymentService - Completed full payment flow (Summary calculated, transaction created and saved, cart cleared)");
     }
 
     @Test
@@ -333,7 +333,7 @@ class PaymentServiceTest {
         assertEquals(2, transactions.size());
         assertEquals(95.4, transactions.get(0).getTotal(), 0.01); // With discount
         assertEquals(106.0, transactions.get(1).getTotal(), 0.01); // Without discount
-        LOGGER.info("✓ SUCCESS: PaymentService - Handled multiple payment transactions (Transaction 1: RM95.40 with discount, Transaction 2: RM106.00 without discount)");
+        logger.info("✓ SUCCESS: PaymentService - Handled multiple payment transactions (Transaction 1: RM95.40 with discount, Transaction 2: RM106.00 without discount)");
     }
 }
 

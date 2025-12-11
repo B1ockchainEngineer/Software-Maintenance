@@ -5,12 +5,14 @@ import assignment.model.Stock;
 import assignment.util.config.AppConfig;
 import assignment.util.config.StockConfig;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * View class for Stock management.
  * Handles all print outputs for stock operations.
  */
 public class StockView {
+    private static final Logger LOGGER = Logger.getLogger(StockView.class.getName());
 
     public void displayAvailableStock(List<Stock> stockList) {
         System.out.println(StockConfig.TITLE_VIEW_STOCK);
@@ -33,6 +35,7 @@ public class StockView {
         }
 
         if (!found) {
+            LOGGER.warning(StockConfig.ErrorMessage.NO_STOCK_TO_DISPLAY);
             System.out.println(StockConfig.ErrorMessage.NO_STOCK_TO_DISPLAY);
             System.out.println("------------------------------------------------------------------");
         }
@@ -103,10 +106,12 @@ public class StockView {
     }
 
     public void printInvalidProductName() {
+        LOGGER.warning(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
         System.out.println(StockConfig.ErrorMessage.INVALID_PRODUCT_NAME);
     }
 
     public void printNameAlreadyExists() {
+        LOGGER.warning(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
         System.out.println(StockConfig.ErrorMessage.NAME_ALREADY_EXISTS);
     }
 
@@ -115,6 +120,7 @@ public class StockView {
     }
 
     public void printInvalidQuantity() {
+        LOGGER.warning(StockConfig.ErrorMessage.INVALID_QUANTITY);
         System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY);
     }
 
@@ -123,6 +129,7 @@ public class StockView {
     }
 
     public void printInvalidPrice() {
+        LOGGER.warning(StockConfig.ErrorMessage.INVALID_PRICE);
         System.out.println(StockConfig.ErrorMessage.INVALID_PRICE);
     }
 
@@ -148,6 +155,7 @@ public class StockView {
     }
 
     public void printInvalidOption() {
+        LOGGER.warning(StockConfig.ErrorMessage.INVALID_OPTION);
         System.out.println(StockConfig.ErrorMessage.INVALID_OPTION);
     }
 
@@ -162,6 +170,7 @@ public class StockView {
     }
 
     public void printCannotDeleteWithQuantity() {
+        LOGGER.warning(StockConfig.ErrorMessage.CANNOT_DELETE_WITH_QUANTITY);
         System.out.println(StockConfig.ErrorMessage.CANNOT_DELETE_WITH_QUANTITY);
     }
 
@@ -174,6 +183,7 @@ public class StockView {
     }
 
     public void printDeleteFailed() {
+        LOGGER.warning(StockConfig.ErrorMessage.DELETE_FAILED);
         System.out.println(StockConfig.ErrorMessage.DELETE_FAILED);
     }
 
@@ -182,7 +192,9 @@ public class StockView {
     }
 
     public void printStockNotFound(int productId) {
-        System.out.println(String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, productId));
+        String errorMsg = String.format(StockConfig.ErrorMessage.STOCK_NOT_FOUND, productId);
+        LOGGER.warning(errorMsg);
+        System.out.println(errorMsg);
     }
 
     public void printDeleteAnotherProductPrompt() {
@@ -238,6 +250,7 @@ public class StockView {
     }
 
     public void printUpdateFailed() {
+        LOGGER.warning(StockConfig.ErrorMessage.UPDATE_FAILED_CHECK_DUPLICATES);
         System.out.println(StockConfig.ErrorMessage.UPDATE_FAILED_CHECK_DUPLICATES);
     }
 
@@ -256,14 +269,18 @@ public class StockView {
     }
 
     public void printInvalidQuantityChoice() {
+        LOGGER.warning(StockConfig.ErrorMessage.INVALID_QUANTITY_CHOICE);
         System.out.println(StockConfig.ErrorMessage.INVALID_QUANTITY_CHOICE);
     }
 
     public void printQuantityAtMaximum(int maxQuantity) {
-        System.out.println(String.format(StockConfig.ErrorMessage.QUANTITY_AT_MAXIMUM, maxQuantity));
+        String errorMsg = String.format(StockConfig.ErrorMessage.QUANTITY_AT_MAXIMUM, maxQuantity);
+        LOGGER.warning(errorMsg);
+        System.out.println(errorMsg);
     }
 
     public void printCannotReduceMoreThanCurrent() {
+        LOGGER.warning(StockConfig.ErrorMessage.CANNOT_REDUCE_MORE_THAN_CURRENT);
         System.out.println(StockConfig.ErrorMessage.CANNOT_REDUCE_MORE_THAN_CURRENT);
     }
 

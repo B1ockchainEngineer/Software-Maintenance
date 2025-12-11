@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class OrderRepository {
     private static final String DATA_DIR = "data/";
     private static final String ORDER_FILE_PATH = DATA_DIR + "order.txt";
-    private static final Logger LOGGER = Logger.getLogger(OrderRepository.class.getName());
+    private final Logger logger = Logger.getLogger(OrderRepository.class.getName());
     private static final String ORDER_MARKER = "ORDER";
 
     /**
@@ -39,7 +39,7 @@ public class OrderRepository {
             writer.write(order.getPrice() + "\t");
             writer.write("\n");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writing order", e);
+            logger.log(Level.SEVERE, "Error writing order", e);
         }
     }
 
@@ -60,7 +60,7 @@ public class OrderRepository {
                 writer.write("\n");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writing orders", e);
+            logger.log(Level.SEVERE, "Error writing orders", e);
         }
     }
 
@@ -111,12 +111,12 @@ public class OrderRepository {
                         orders.add(new Order(orderNo, stockID, stockName, quantity, price));
                         orderNo++;
                     } catch (NumberFormatException e) {
-                        LOGGER.log(Level.WARNING, "Error parsing order line: " + line, e);
+                        logger.log(Level.WARNING, "Error parsing order line: " + line, e);
                     }
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading order file", e);
+            logger.log(Level.SEVERE, "Error reading order file", e);
         }
 
         return orders;
@@ -172,7 +172,7 @@ public class OrderRepository {
                 writer.write(line + "\n");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error updating order", e);
+            logger.log(Level.SEVERE, "Error updating order", e);
             return false;
         }
 
@@ -181,7 +181,7 @@ public class OrderRepository {
             if (inputFile.delete() && tempFile.renameTo(inputFile)) {
                 return true;
             } else {
-                LOGGER.log(Level.SEVERE, "Error replacing order file after update");
+                logger.log(Level.SEVERE, "Error replacing order file after update");
                 return false;
             }
         }
@@ -235,7 +235,7 @@ public class OrderRepository {
                 writer.write(line + "\n");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting order", e);
+            logger.log(Level.SEVERE, "Error deleting order", e);
             return false;
         }
 
@@ -244,7 +244,7 @@ public class OrderRepository {
             if (inputFile.delete() && tempFile.renameTo(inputFile)) {
                 return true;
             } else {
-                LOGGER.log(Level.SEVERE, "Error replacing order file after deletion");
+                logger.log(Level.SEVERE, "Error replacing order file after deletion");
                 return false;
             }
         }
@@ -264,7 +264,7 @@ public class OrderRepository {
             // Open in overwrite mode (false) - clears file
             writer.write("");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error clearing orders file", e);
+            logger.log(Level.SEVERE, "Error clearing orders file", e);
         }
     }
 
@@ -291,7 +291,7 @@ public class OrderRepository {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating order file", e);
+                logger.log(Level.SEVERE, "Error creating order file", e);
             }
         }
     }

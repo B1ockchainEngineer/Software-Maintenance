@@ -17,15 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Member Model Tests")
 class MemberModelTest {
 
-    private static final Logger LOGGER = Logger.getLogger(MemberModelTest.class.getName());
+    private static final Logger logger = Logger.getLogger(MemberModelTest.class.getName());
 
     @BeforeAll
     static void setUpLogger() {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setLevel(Level.ALL);
-        LOGGER.addHandler(handler);
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.setUseParentHandlers(false);
+        logger.addHandler(handler);
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
     }
 
     @Test
@@ -47,7 +47,7 @@ class MemberModelTest {
         String info = member.toString();
         assertTrue(info.contains("MEMBER ID >> M-101"));
         assertTrue(info.contains("NORMAL DISCOUNT RATE"));
-        LOGGER.info("NormalMember test passed. Discount: " + expectedDiscount);
+        logger.info("NormalMember test passed. Discount: " + expectedDiscount);
     }
 
     @Test
@@ -63,7 +63,7 @@ class MemberModelTest {
 
         String info = member.toString();
         assertTrue(info.contains("GOLD DISCOUNT RATE"));
-        LOGGER.info("GoldMember test passed. Discount: " + expectedDiscount);
+        logger.info("GoldMember test passed. Discount: " + expectedDiscount);
     }
 
     @Test
@@ -79,7 +79,7 @@ class MemberModelTest {
 
         String info = member.toString();
         assertTrue(info.contains("PREMIUM DISCOUNT RATE"));
-        LOGGER.info("PremiumMember test passed. Discount: " + expectedDiscount);
+        logger.info("PremiumMember test passed. Discount: " + expectedDiscount);
     }
 
     @Test
@@ -94,6 +94,6 @@ class MemberModelTest {
 
         // Restore
         NormalMember.setNormalRate(originalNormal);
-        LOGGER.info("Static rate update test passed.");
+        logger.info("Static rate update test passed.");
     }
 }

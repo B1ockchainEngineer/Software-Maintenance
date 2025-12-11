@@ -22,7 +22,7 @@ public class StaffRepository {
     private static final String DATA_DIR = "data/";
     private static final String TEMP_DIR = DATA_DIR + "temp/";
     private static final String STAFF_FILE_PATH = DATA_DIR + "staff.txt";
-    private static final Logger LOGGER = Logger.getLogger(StaffRepository.class.getName());
+    private final Logger logger = Logger.getLogger(StaffRepository.class.getName());
 
     private void ensureFileExists() {
         ensureDirectoriesExist();
@@ -31,7 +31,7 @@ public class StaffRepository {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating staff file", e);
+                logger.log(Level.SEVERE, "Error creating staff file", e);
             }
         }
     }
@@ -73,9 +73,9 @@ public class StaffRepository {
                 }
             }
         } catch (FileNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Error reading staff file", e);
+            logger.log(Level.SEVERE, "Error reading staff file", e);
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.SEVERE, "Error parsing staff data", e);
+            logger.log(Level.SEVERE, "Error parsing staff data", e);
         }
 
         return staffList;
@@ -103,7 +103,7 @@ public class StaffRepository {
             writer.write(staff.getStfSalary() + "\t");
             writer.write("\n");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writing staff record", e);
+            logger.log(Level.SEVERE, "Error writing staff record", e);
         }
     }
 
@@ -133,13 +133,13 @@ public class StaffRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting staff", e);
+            logger.log(Level.SEVERE, "Error deleting staff", e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe("Error finalizing staff deletion.");
+                logger.severe("Error finalizing staff deletion.");
             }
         } else {
             tempFile.delete();
@@ -162,7 +162,7 @@ public class StaffRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading staff file", e);
+            logger.log(Level.SEVERE, "Error reading staff file", e);
         }
         return false;
     }
@@ -250,13 +250,13 @@ public class StaffRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error updating staff", e);
+            logger.log(Level.SEVERE, "Error updating staff", e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe("Error finalizing staff update.");
+                logger.severe("Error finalizing staff update.");
                 return false;
             }
         } else {
@@ -295,13 +295,13 @@ public class StaffRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting staff by ID", e);
+            logger.log(Level.SEVERE, "Error deleting staff by ID", e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe("Error finalizing staff deletion by ID.");
+                logger.severe("Error finalizing staff deletion by ID.");
             }
         } else {
             tempFile.delete();
@@ -343,7 +343,7 @@ public class StaffRepository {
                 }
             }
         } catch (FileNotFoundException | NumberFormatException e) {
-            LOGGER.log(Level.SEVERE, "Error reading staff credentials", e);
+            logger.log(Level.SEVERE, "Error reading staff credentials", e);
         }
         return null;
     }

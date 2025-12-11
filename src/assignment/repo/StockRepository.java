@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class StockRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(StockRepository.class.getName());
+    private final Logger logger = Logger.getLogger(StockRepository.class.getName());
 
     // Instance-based state (no longer static)
     private List<Stock> stocklist = new ArrayList<>();
@@ -40,7 +40,7 @@ public class StockRepository {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_CREATE_ERROR, e);
+                logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_CREATE_ERROR, e);
             }
         }
     }
@@ -76,13 +76,13 @@ public class StockRepository {
                         double stockPrice = Double.parseDouble(parts[3]);
                         stocklist.add(new Stock(stockId, stockName, stockQty, stockPrice));
                     } catch (NumberFormatException e) {
-                        LOGGER.log(Level.WARNING, "Skipping invalid stock line: " + line, e);
+                        logger.log(Level.WARNING, "Skipping invalid stock line: " + line, e);
                         // Continue processing other lines
                     }
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
 
         return stocklist;
@@ -97,7 +97,7 @@ public class StockRepository {
         try (FileWriter writer = new FileWriter(StockConfig.STOCK_FILE_PATH, true)) {
             writer.write(stock.toFileString() + "\n");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_WRITE_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_WRITE_ERROR, e);
         }
     }
 
@@ -114,7 +114,7 @@ public class StockRepository {
                 fw.write(line);
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_UPDATE_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_UPDATE_ERROR, e);
         }
     }
 
@@ -151,13 +151,13 @@ public class StockRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_DELETE_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_DELETE_ERROR, e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe(StockConfig.ErrorMessage.FILE_DELETE_ERROR);
+                logger.severe(StockConfig.ErrorMessage.FILE_DELETE_ERROR);
             }
         } else {
             tempFile.delete();
@@ -185,7 +185,7 @@ public class StockRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
         return false;
     }
@@ -214,7 +214,7 @@ public class StockRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
+            logger.log(Level.SEVERE, StockConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
         return maxId;
     }

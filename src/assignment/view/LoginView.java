@@ -5,12 +5,14 @@ import assignment.util.config.AppConfig;
 import assignment.util.config.LoginConfig;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Logger;
 
 /**
  * View class for Login functionality.
  * Handles all print outputs and display logic for login.
  */
 public class LoginView {
+    private static final Logger LOGGER = Logger.getLogger(LoginView.class.getName());
 
     public void printLoginHeader() {
         System.out.println(LoginConfig.TITLE_LOGIN);
@@ -33,6 +35,7 @@ public class LoginView {
 
     public void printLoginFailedIcNotFound() {
         System.out.println();
+        LOGGER.warning(LoginConfig.ErrorMessage.LOGIN_FAILED + " - " + LoginConfig.ErrorMessage.CHECK_IC_NUMBER);
         System.out.println(LoginConfig.ErrorMessage.LOGIN_FAILED);
         System.out.println(LoginConfig.ErrorMessage.CHECK_IC_NUMBER);
         System.out.println();
@@ -40,6 +43,7 @@ public class LoginView {
 
     public void printLoginFailedIncorrectPassword() {
         System.out.println();
+        LOGGER.warning(LoginConfig.ErrorMessage.LOGIN_FAILED + " - " + LoginConfig.ErrorMessage.IC_EXISTS_PASSWORD_WRONG);
         System.out.println(LoginConfig.ErrorMessage.LOGIN_FAILED);
         System.out.println(LoginConfig.ErrorMessage.IC_EXISTS_PASSWORD_WRONG);
         System.out.println();
@@ -50,11 +54,13 @@ public class LoginView {
     }
 
     public void printEmptyIcError() {
+        LOGGER.warning(LoginConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
         System.out.println(LoginConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
     }
 
     public void printEmptyPasswordError() {
         System.out.println();
+        LOGGER.warning(LoginConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY);
         System.out.println(LoginConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY);
     }
 

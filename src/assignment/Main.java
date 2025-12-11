@@ -28,7 +28,7 @@ import assignment.util.SalesUtil;
 
 public class Main {
 
-    public static int totalPayment = 0; // Global accumulator
+    private int totalPayment = 0; // Payment accumulator for this Main instance
 
     // Controllers shared for this Main instance
     private final StockController stockController;

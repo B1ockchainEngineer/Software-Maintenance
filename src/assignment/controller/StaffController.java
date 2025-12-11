@@ -14,13 +14,15 @@ import assignment.util.config.AppConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Controller for staff-related flows.
  * Handles staff menu and delegates to StaffService for business logic.
  */
 public class StaffController {
-
+    private static final Logger LOGGER = Logger.getLogger(StaffController.class.getName());
+    
     private final StaffService staffService;
     private final StaffView staffView;
 
@@ -45,6 +47,7 @@ public class StaffController {
 
             StaffMenu selection = StaffMenu.getByOption(staffOpt);
             if (selection == null) {
+                LOGGER.warning(StaffConfig.ErrorMessage.INVALID_OPTION);
                 System.out.println(StaffConfig.ErrorMessage.INVALID_OPTION);
                 ConsoleUtil.systemPause();
                 continue;
@@ -123,6 +126,7 @@ public class StaffController {
             ConsoleUtil.systemPause();
         } else {
             System.out.println();
+            LOGGER.warning(StaffConfig.ErrorMessage.FAILED_TO_ADD_STAFF + " - " + StaffConfig.ErrorMessage.REASON_IC_EXISTS);
             System.out.println(StaffConfig.ErrorMessage.FAILED_TO_ADD_STAFF);
             System.out.println(StaffConfig.ErrorMessage.REASON_IC_EXISTS);
             System.out.println(StaffConfig.ErrorMessage.USE_DIFFERENT_IC);
@@ -150,6 +154,7 @@ public class StaffController {
             }
 
             if (!choice.equals("1") && !choice.equals("2")) {
+                LOGGER.warning("INVALID CHOICE! Please enter 1 or 2!");
                 System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
                 System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                 String retry = ValidationUtil.scanner.nextLine().trim();
@@ -183,6 +188,7 @@ public class StaffController {
                 List<Staff> results = staffService.findByName(name);
                 if (results.isEmpty()) {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -234,12 +240,15 @@ public class StaffController {
                 }
 
                 if (ic.trim().isEmpty()) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println();
                     continue; // Ask again
                 }
 
                 if (!ic.matches("\\d{12}")) {
+                    LOGGER.warning("INVALID IC FORMAT! IC must be 12 digits! - IC: " + ic);
+                    LOGGER.warning("INVALID IC FORMAT! IC must be 12 digits!");
                     System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
                     continue; // Ask again
                 }
@@ -247,6 +256,8 @@ public class StaffController {
                 staffToUpdate = staffService.findByIc(ic);
                 if (staffToUpdate == null) {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND! - IC: " + ic);
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -295,6 +306,7 @@ public class StaffController {
                 staffToUpdate.setStfName(newName);
                 System.out.println("  -> Name updated successfully!");
             } else {
+                LOGGER.warning("Invalid name format! Keeping current value. - Name: " + newName);
                 System.out.println("  -> Invalid name format! Keeping current value.");
                 System.out.println("     (Name must be 2-50 characters, letters and spaces only)");
             }
@@ -318,9 +330,11 @@ public class StaffController {
                     staffToUpdate.setStfPassword(newPassword);
                     System.out.println("  -> Password updated successfully!");
                 } else {
+                    LOGGER.warning("Passwords do not match! Keeping current password.");
                     System.out.println("  -> Passwords do not match! Keeping current password.");
                 }
             } else {
+                LOGGER.warning("Invalid password format! Keeping current password.");
                 System.out.println("  -> Invalid password format! Keeping current password.");
                 System.out.println("     (Password must be 8-16 alphanumeric characters)");
             }
@@ -340,14 +354,17 @@ public class StaffController {
             try {
                 int newAge = Integer.parseInt(ageInput);
                 if (newAge < 0) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE + " Keeping current value. - Age: " + newAge);
                     System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE + " Keeping current value.");
                 } else if (newAge >= 18 && newAge <= 54) {
                     staffToUpdate.setStfAge(newAge);
                     System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_UPDATED);
                 } else {
+                    LOGGER.warning(StaffConfig.ErrorMessage.AGE_INVALID + " - Age: " + newAge);
                     System.out.println("  -> " + StaffConfig.ErrorMessage.AGE_INVALID);
                 }
             } catch (NumberFormatException e) {
+                LOGGER.warning(StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value. - Input: " + ageInput);
                 System.out.println("  -> " + StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value.");
             }
         } else {
@@ -366,6 +383,7 @@ public class StaffController {
             try {
                 double newSalary = Double.parseDouble(salaryInput);
                 if (newSalary < 0) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE + " Keeping current value. - Salary: " + newSalary);
                     System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE + " Keeping current value.");
                 } else if (newSalary > 0) {
                     if (newSalary > 1000000) {
@@ -382,9 +400,11 @@ public class StaffController {
                         System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_UPDATED);
                     }
                 } else {
+                    LOGGER.warning(StaffConfig.ErrorMessage.SALARY_INVALID + " - Salary: " + newSalary);
                     System.out.println("  -> " + StaffConfig.ErrorMessage.SALARY_INVALID);
                 }
             } catch (NumberFormatException e) {
+                LOGGER.warning(StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value. - Input: " + salaryInput);
                 System.out.println("  -> " + StaffConfig.ErrorMessage.INVALID_NUMBER + " Keeping current value.");
             }
         } else {
@@ -412,6 +432,7 @@ public class StaffController {
                 System.out.println();
             } else {
                 System.out.println();
+                LOGGER.severe("FAILED TO UPDATE STAFF!");
                 System.out.println("<<<FAILED TO UPDATE STAFF!>>>");
                 System.out.println("Possible reasons:");
                 System.out.println("  - Staff record not found");
@@ -465,6 +486,7 @@ public class StaffController {
             }
 
             if (!choice.equals("1") && !choice.equals("2")) {
+                LOGGER.warning("INVALID CHOICE! Please enter 1 or 2!");
                 System.out.println("\n<<<INVALID CHOICE! Please enter 1 or 2!>>>\n");
                 System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                 String retry = ValidationUtil.scanner.nextLine().trim();
@@ -500,6 +522,7 @@ public class StaffController {
                 List<Staff> results = staffService.findByName(name);
                 if (results.isEmpty()) {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -554,12 +577,14 @@ public class StaffController {
                 }
 
                 if (icToDelete.trim().isEmpty()) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println();
                     continue; // Ask again
                 }
 
                 if (!icToDelete.matches("\\d{12}")) {
+                    LOGGER.warning("INVALID IC FORMAT! IC must be 12 digits!");
                     System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
                     continue; // Ask again
                 }
@@ -567,6 +592,7 @@ public class StaffController {
                 staffToDelete = staffService.findByIc(icToDelete);
                 if (staffToDelete == null) {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -640,6 +666,7 @@ public class StaffController {
             System.out.println();
         } else {
             System.out.println();
+            LOGGER.severe("FAILED TO DELETE STAFF!");
             System.out.println("<<<FAILED TO DELETE STAFF!>>>");
             System.out.println("Please try again or contact system administrator.");
             System.out.println();
@@ -678,6 +705,7 @@ public class StaffController {
                 }
 
                 if (idInput.isEmpty()) {
+                    LOGGER.warning("ID CANNOT BE EMPTY!");
                     System.out.println("\n<<<ID CANNOT BE EMPTY!>>>\n");
                     System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                     String retry = ValidationUtil.scanner.nextLine().trim();
@@ -700,7 +728,8 @@ public class StaffController {
                         break;
                     } else {
                         System.out.println();
-                        System.out.println("<<<STAFF NOT FOUND!>>>");
+                        LOGGER.warning("STAFF NOT FOUND!");
+                    System.out.println("<<<STAFF NOT FOUND!>>>");
                         System.out.println();
                         System.out.println("TIP: You can:");
                         System.out.println("  - View the staff list to verify the ID");
@@ -719,6 +748,7 @@ public class StaffController {
                         continue;
                     }
                 } catch (NumberFormatException e) {
+                    LOGGER.warning("INVALID INPUT! Please enter a valid number!");
                     System.out.println("\n<<<INVALID INPUT! Please enter a valid number!>>>\n");
                     System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                     String retry = ValidationUtil.scanner.nextLine().trim();
@@ -744,6 +774,7 @@ public class StaffController {
                 }
 
                 if (ic.isEmpty()) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println(StaffConfig.ErrorMessage.IC_CANNOT_BE_EMPTY);
                     System.out.println();
                     System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
@@ -759,6 +790,7 @@ public class StaffController {
                 }
 
                 if (!ic.matches("\\d{12}")) {
+                    LOGGER.warning("INVALID IC FORMAT! IC must be 12 digits!");
                     System.out.println("\n<<<INVALID IC FORMAT! IC must be 12 digits!>>>\n");
                     System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
                     String retry = ValidationUtil.scanner.nextLine().trim();
@@ -779,6 +811,7 @@ public class StaffController {
                     break;
                 } else {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -830,6 +863,7 @@ public class StaffController {
                     break;
                 } else {
                     System.out.println();
+                    LOGGER.warning("STAFF NOT FOUND!");
                     System.out.println("<<<STAFF NOT FOUND!>>>");
                     System.out.println();
                     System.out.println("TIP: You can:");
@@ -852,6 +886,7 @@ public class StaffController {
             }
 
         } else {
+            LOGGER.warning("INVALID CHOICE! Please enter 1, 2, or 3!");
             System.out.println("\n<<<INVALID CHOICE! Please enter 1, 2, or 3!>>>\n");
             System.out.print("PRESS 'E' TO EXIT OR ENTER TO TRY AGAIN: ");
             String retry = ValidationUtil.scanner.nextLine().trim();
@@ -895,12 +930,14 @@ public class StaffController {
             }
 
             if (ic.isEmpty()) {
+                LOGGER.warning("IC cannot be empty. Please enter a 12-digit IC number.");
                 System.out.println("  -> ERROR: IC cannot be empty. Please enter a 12-digit IC number.");
                 System.out.println();
                 continue;
             }
 
             if (!ic.matches("\\d{12}")) {
+                LOGGER.warning("Invalid format! IC must be exactly 12 digits. - IC: " + ic);
                 System.out.println("  -> ERROR: Invalid format! IC must be exactly 12 digits.");
                 System.out.println("     Example: 123456789012");
                 System.out.println();
@@ -909,6 +946,7 @@ public class StaffController {
 
             if (staffService.getAllStaff().stream()
                     .anyMatch(s -> s.getStfIC().equals(ic))) {
+                LOGGER.warning("This IC already exists in the system! - IC: " + ic);
                 System.out.println("  -> ERROR: This IC already exists in the system!");
                 System.out.println("     Please use a different IC number.");
                 System.out.println();
@@ -935,12 +973,14 @@ public class StaffController {
             }
 
             if (name.isEmpty()) {
+                LOGGER.warning("Name cannot be empty. Please enter a valid name.");
                 System.out.println("  -> ERROR: Name cannot be empty. Please enter a valid name.");
                 System.out.println();
                 continue;
             }
 
             if (!name.matches("^[a-zA-Z ]+$")) {
+                LOGGER.warning("Invalid characters! Name should contain only letters and spaces. - Name: " + name);
                 System.out.println("  -> ERROR: Invalid characters! Name should contain only:");
                 System.out.println("     - Letters (A-Z, a-z)");
                 System.out.println("     - Spaces");
@@ -950,6 +990,7 @@ public class StaffController {
             }
 
             if (name.length() < 2) {
+                LOGGER.warning("Name is too short. Please enter at least 2 characters. - Name: " + name);
                 System.out.println("  -> ERROR: Name is too short. Please enter at least 2 characters.");
                 System.out.println();
                 continue;
@@ -1045,6 +1086,7 @@ public class StaffController {
             }
 
             if (input.isEmpty()) {
+                LOGGER.warning("Age cannot be empty. Please enter a number.");
                 System.out.println("  -> ERROR: Age cannot be empty. Please enter a number.");
                 System.out.println();
                 continue;
@@ -1053,16 +1095,19 @@ public class StaffController {
             try {
                 int age = Integer.parseInt(input);
                 if (age < 0) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE);
                     System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE);
                     System.out.println();
                     continue;
                 }
                 if (age < 18) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.AGE_TOO_YOUNG);
                     System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_TOO_YOUNG);
                     System.out.println();
                     continue;
                 }
                 if (age > 54) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.AGE_TOO_OLD);
                     System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.AGE_TOO_OLD);
                     System.out.println();
                     continue;
@@ -1071,6 +1116,7 @@ public class StaffController {
                 System.out.println();
                 return age;
             } catch (NumberFormatException e) {
+                LOGGER.warning(StaffConfig.ErrorMessage.INVALID_NUMBER + " - Age input: " + input);
                 System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }
@@ -1091,6 +1137,7 @@ public class StaffController {
             }
 
             if (input.isEmpty()) {
+                LOGGER.warning("Salary cannot be empty. Please enter a number.");
                 System.out.println("  -> ERROR: Salary cannot be empty. Please enter a number.");
                 System.out.println();
                 continue;
@@ -1099,11 +1146,13 @@ public class StaffController {
             try {
                 double salary = Double.parseDouble(input);
                 if (salary < 0) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE);
                     System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE);
                     System.out.println();
                     continue;
                 }
                 if (salary <= 0) {
+                    LOGGER.warning(StaffConfig.ErrorMessage.SALARY_MUST_BE_POSITIVE);
                     System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.SALARY_MUST_BE_POSITIVE);
                     System.out.println("     Please enter a positive amount (e.g., 2500.00)");
                     System.out.println();
@@ -1122,6 +1171,7 @@ public class StaffController {
                 System.out.println();
                 return salary;
             } catch (NumberFormatException e) {
+                LOGGER.warning(StaffConfig.ErrorMessage.INVALID_NUMBER + " - Salary input: " + input);
                 System.out.println("  -> ERROR: " + StaffConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }

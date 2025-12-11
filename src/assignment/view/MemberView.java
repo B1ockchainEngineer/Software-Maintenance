@@ -11,12 +11,14 @@ import assignment.util.config.AppConfig;
 import assignment.util.config.MemberConfig;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * View class for Member management.
  * Handles all print outputs and menu displays.
  */
 public class MemberView {
+    private static final Logger LOGGER = Logger.getLogger(MemberView.class.getName());
 
     public void printMemberMenu() {
         System.out.println(MemberConfig.TITLE_MEMBER_SYSTEM);
@@ -77,7 +79,9 @@ public class MemberView {
         }
 
         if (!foundMembers) {
-            System.out.println(String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType));
+            String errorMsg = String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType);
+            LOGGER.warning(errorMsg);
+            System.out.println(errorMsg);
         }
         System.out.println(AppConfig.SEPARATOR_LONG);
     }

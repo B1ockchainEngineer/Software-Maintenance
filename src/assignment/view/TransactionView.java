@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * Handles all display outputs for transaction operations.
  */
 public class TransactionView {
-    private static final Logger LOGGER = Logger.getLogger(TransactionView.class.getName());
+    private final Logger logger = Logger.getLogger(TransactionView.class.getName());
 
     /**
      * Displays transaction summary report with all transactions.
@@ -119,7 +119,7 @@ public class TransactionView {
      * Displays message when invalid transaction number is entered.
      */
     public void printInvalidTransactionNumber() {
-        LOGGER.warning("Invalid transaction number");
+        logger.warning("Invalid transaction number");
         System.out.println(SalesConfig.MSG_INVALID_TRANSACTION);
     }
 }

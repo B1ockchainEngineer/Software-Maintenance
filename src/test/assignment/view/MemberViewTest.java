@@ -30,15 +30,15 @@ class MemberViewTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private MemberView memberView;
-    private static final Logger LOGGER = Logger.getLogger(MemberViewTest.class.getName());
+    private static final Logger logger = Logger.getLogger(MemberViewTest.class.getName());
 
     @BeforeAll
     static void setUpLogger() {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setLevel(Level.ALL);
-        LOGGER.addHandler(handler);
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.setUseParentHandlers(false);
+        logger.addHandler(handler);
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
     }
 
     @BeforeEach
@@ -61,7 +61,7 @@ class MemberViewTest {
         assertTrue(output.contains(MemberConfig.TITLE_MEMBER_SYSTEM));
         assertTrue(output.contains("ADD NEW MEMBER"));
         assertTrue(output.contains("BACK TO PREVIOUS MENU"));
-        LOGGER.info("PrintMemberMenu test passed.");
+        logger.info("PrintMemberMenu test passed.");
     }
 
     @Test
@@ -73,7 +73,7 @@ class MemberViewTest {
         assertTrue(output.contains("NORMAL MEMBER"));
         assertTrue(output.contains("GOLD MEMBER"));
         assertTrue(output.contains("PREMIUM MEMBER"));
-        LOGGER.info("PrintTierMenu test passed.");
+        logger.info("PrintTierMenu test passed.");
     }
 
     @Test
@@ -87,7 +87,7 @@ class MemberViewTest {
         assertTrue(output.contains("M-101"));
         assertTrue(output.contains("Alice"));
         assertTrue(output.contains("121212121234"));
-        LOGGER.info("DisplayMemberDetails test passed.");
+        logger.info("DisplayMemberDetails test passed.");
     }
 
     @Test
@@ -112,6 +112,6 @@ class MemberViewTest {
         String outputGold = outContent.toString();
         
         assertTrue(outputGold.contains("Bob"));
-        LOGGER.info("DisplayMembersByType test passed.");
+        logger.info("DisplayMembersByType test passed.");
     }
 }

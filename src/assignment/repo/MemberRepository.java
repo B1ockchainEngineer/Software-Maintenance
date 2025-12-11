@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class MemberRepository {
 
 
-    private static final Logger LOGGER = Logger.getLogger(MemberRepository.class.getName());
+    private final Logger logger = Logger.getLogger(MemberRepository.class.getName());
 
     private final String memberFilePath;
 
@@ -47,7 +47,7 @@ public class MemberRepository {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_CREATE_ERROR, e);
+                logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_CREATE_ERROR, e);
             }
         }
     }
@@ -97,7 +97,7 @@ public class MemberRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
+                logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
 
         return members;
@@ -118,7 +118,7 @@ public class MemberRepository {
             //Deleted discount rate, take it by reading its type
             writer.write("\n");
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_WRITE_ERROR, e);
+                logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_WRITE_ERROR, e);
         }
     }
 
@@ -143,7 +143,7 @@ public class MemberRepository {
                 fw.write(line);
             }
         } catch (IOException e) {
-            LOGGER.severe(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
+                logger.severe(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
         }
     }
 
@@ -177,13 +177,13 @@ public class MemberRepository {
                 writer.write(line + System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_DELETE_ERROR, e);
+                logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_DELETE_ERROR, e);
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
-                LOGGER.severe(MemberConfig.ErrorMessage.FILE_DELETE_ERROR);
+                logger.severe(MemberConfig.ErrorMessage.FILE_DELETE_ERROR);
             }
         } else {
             tempFile.delete();
@@ -207,7 +207,7 @@ public class MemberRepository {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
+                logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
         }
         return false;
     }

@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * Handles all display outputs for payment operations.
  */
 public class PaymentView {
-    private static final Logger LOGGER = Logger.getLogger(PaymentView.class.getName());
+    private final Logger logger = Logger.getLogger(PaymentView.class.getName());
 
     /**
      * Displays the payment menu title.
@@ -75,7 +75,7 @@ public class PaymentView {
      * Displays failure message when payment fails.
      */
     public void printPaymentFailure() {
-        LOGGER.severe("Payment failure: payment processing failed");
+        logger.severe("Payment failure: payment processing failed");
         System.out.println(SalesConfig.MSG_PAYMENT_FAILED);
     }
 
@@ -135,7 +135,7 @@ public class PaymentView {
      * Displays member error message.
      */
     public void printMemberErrorMessage(String errorMessage) {
-        LOGGER.warning("Member error: " + errorMessage);
+        logger.warning("Member error: " + errorMessage);
         System.out.println(errorMessage);
     }
 

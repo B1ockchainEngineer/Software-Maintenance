@@ -2,9 +2,11 @@ package assignment.util;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import assignment.util.ConsoleUtil;
+import java.util.logging.Logger;
 
 public class ValidationUtil {
+    private static final Logger LOGGER = Logger.getLogger(ValidationUtil.class.getName());
+    
     // Shared Scanner instance for the whole application.
     // Exposed as public so legacy code that accesses ValidationUtil.scanner still compiles.
     public static final Scanner scanner = new Scanner(System.in);
@@ -14,11 +16,13 @@ public class ValidationUtil {
 
         // Check if empty or contains non-digit characters
         if (input.isEmpty() || !input.matches("\\d+")) {
+            LOGGER.warning("PLEASE ENTER DIGITS ONLY (NO SPACES OR LETTERS).");
             System.out.println("PLEASE ENTER DIGITS ONLY (NO SPACES OR LETTERS).\n");
             return null;
         }
 
         if(length != input.length()){
+            LOGGER.warning("THE INPUT LENGTH MUST BE IN " + length + " DIGITS!!");
             System.out.println("THE INPUT LENGTH MUST BE IN " + length + " DIGITS!!\n");
             return null;
         }
@@ -31,6 +35,7 @@ public class ValidationUtil {
 
         try {
             if (!scanner.hasNextInt()) {
+                LOGGER.warning("PLEASE ENTER AN INTEGER INPUT.");
                 System.out.println("PLEASE ENTER AN INTEGER INPUT.\n");
                 scanner.nextLine(); // Consume bad input
                 return -9999;
@@ -40,18 +45,21 @@ public class ValidationUtil {
             scanner.nextLine();
 
         } catch (InputMismatchException ex) {
+            LOGGER.warning("PLEASE ENTER AN INTEGER INPUT.");
             System.out.println("PLEASE ENTER AN INTEGER INPUT.\n");
             return -9999;
         }
 
         if (endingNum != 0) {
             if (input < startingNum || input > endingNum) {
+                LOGGER.warning("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!");
                 System.out.println("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!\n");
                 ConsoleUtil.clearScreen();
                 return -9999;
             }
         } else if (startingNum != 0) {
             if (input < startingNum) {
+                LOGGER.warning("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!");
                 System.out.println("THE INPUT IS OUT OF RANGE, PLEASE INPUT A CORRECT ONE!!\n");
                 ConsoleUtil.clearScreen();
                 return -9999;
@@ -67,11 +75,13 @@ public class ValidationUtil {
         try {
             String line = scanner.nextLine();
             if (line.isEmpty()) {
+                LOGGER.warning("PLEASE ENTER A CHARACTER INPUT.");
                 System.out.println("PLEASE ENTER A CHARACTER INPUT. \n");
                 return 'O'; // 'O' used as generic invalid character
             }
             input = line.charAt(0);
         } catch (Exception ex) {
+            LOGGER.warning("PLEASE ENTER A CHARACTER INPUT.");
             System.out.println("PLEASE ENTER A CHARACTER INPUT. \n");
             return 'O';
         }
@@ -99,6 +109,7 @@ public class ValidationUtil {
             System.out.print(question);
             yesNo = ValidationUtil.charValidation();
             if (yesNo != 'Y' && yesNo != 'N') {
+                LOGGER.warning("Invalid Option! Please Re-enter!");
                 System.out.println("Invalid Option! Please Re-enter!");
             }
         } while (yesNo != 'Y' && yesNo != 'N');
@@ -111,6 +122,7 @@ public class ValidationUtil {
 
         try {
             if (!scanner.hasNextDouble()) {
+                LOGGER.warning("PLEASE ENTER A VALID DOUBLE INPUT.");
                 System.out.println("PLEASE ENTER A VALID DOUBLE INPUT. \n");
                 scanner.nextLine(); // Consume bad input
                 return -9999;
@@ -118,6 +130,7 @@ public class ValidationUtil {
             input = scanner.nextDouble();
             scanner.nextLine(); // Consume the newline character
         } catch (InputMismatchException ex) {
+            LOGGER.warning("PLEASE ENTER A VALID DOUBLE INPUT.");
             System.out.println("PLEASE ENTER A VALID DOUBLE INPUT. \n");
             return -9999;
         }

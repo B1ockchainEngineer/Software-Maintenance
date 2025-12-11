@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("MemberService Tests")
 class MemberServiceTest {
 
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MemberServiceTest.class.getName());
+    private final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MemberServiceTest.class.getName());
     private MemberRepository memberRepo;
     private MemberService memberService;
 
@@ -85,7 +85,7 @@ class MemberServiceTest {
         List<Membership> members = memberService.getAllMembers();
         assertNotNull(members);
         assertEquals(2, members.size());
-        LOGGER.info("Success. Members count: " + members.size());
+        logger.info("Success. Members count: " + members.size());
     }
 
     @Test
@@ -93,12 +93,12 @@ class MemberServiceTest {
     void testAddMember_Success() {
         Membership newMember = new NormalMember("Charlie", "111111111111", 103, "0111111111", MemberConfig.MEMBER_TYPE_NORMAL);
         boolean result = memberService.addMember(newMember);
-        LOGGER.info("Add result: " + result);
+        logger.info("Add result: " + result);
 
         assertTrue(result);
         assertEquals(3, memberService.getAllMembers().size());
         assertEquals("Charlie", memberService.findMemberById(103).getName());
-        LOGGER.info("Member 103 verified.");
+        logger.info("Member 103 verified.");
     }
 
     @Test
@@ -107,7 +107,7 @@ class MemberServiceTest {
         // Alice has IC 121212121234
         Membership duplicateMember = new NormalMember("Duplicate", "121212121234", 104, "0112223333", MemberConfig.MEMBER_TYPE_NORMAL);
         boolean result = memberService.addMember(duplicateMember);
-        LOGGER.info("Add duplicate result: " + result);
+        logger.info("Add duplicate result: " + result);
 
         assertFalse(result);
         assertEquals(2, memberService.getAllMembers().size());
@@ -118,7 +118,7 @@ class MemberServiceTest {
     void testCheckIdExists() {
         assertTrue(memberService.checkIdExists(101));
         assertFalse(memberService.checkIdExists(9999));
-        LOGGER.info("ID check passed.");
+        logger.info("ID check passed.");
     }
 
     @Test
@@ -128,7 +128,7 @@ class MemberServiceTest {
         assertNotNull(found);
         assertEquals(101, found.getId());
         assertEquals("Alice", found.getName());
-        LOGGER.info("Found: " + found.getName());
+        logger.info("Found: " + found.getName());
     }
 
     @Test
@@ -136,7 +136,7 @@ class MemberServiceTest {
     void testFindMemberById_NotFound() {
         Membership found = memberService.findMemberById(9999);
         assertNull(found);
-        LOGGER.info("Correctly returned null.");
+        logger.info("Correctly returned null.");
     }
 
     @Test
@@ -148,7 +148,7 @@ class MemberServiceTest {
         // Bob is 2nd in list (index 1) if assume load order
         // List is [Alice, Bob]
         assertEquals(1, index);
-        LOGGER.info("Index for 102: " + index);
+        logger.info("Index for 102: " + index);
     }
 
     @Test
@@ -157,7 +157,7 @@ class MemberServiceTest {
         List<Membership> members = memberService.getAllMembers();
         int index = memberService.findMemberIndexById(members, 9999);
         assertEquals(SalesUtil.INVALID_INPUT, index);
-        LOGGER.info("Index: " + index);
+        logger.info("Index: " + index);
     }
 
     @Test
@@ -172,7 +172,7 @@ class MemberServiceTest {
         // Verify via repo (mock internal state updated)
         Membership updated = memberService.findMemberById(101);
         assertEquals("ALICE UPDATED", updated.getName());
-        LOGGER.info("Saved name: " + updated.getName());
+        logger.info("Saved name: " + updated.getName());
     }
 
     @Test
@@ -183,7 +183,7 @@ class MemberServiceTest {
         
         assertEquals(1, memberService.getAllMembers().size());
         assertNull(memberService.findMemberById(101));
-        LOGGER.info("Deleted 101. Result: " + result);
+        logger.info("Deleted 101. Result: " + result);
     }
 
     @Test
@@ -192,7 +192,7 @@ class MemberServiceTest {
         boolean result = memberService.deleteMemberById(9999);
         assertFalse(result);
         assertEquals(2, memberService.getAllMembers().size());
-        LOGGER.info("Deletion failed. Result: " + result);
+        logger.info("Deletion failed. Result: " + result);
     }
 
     @Test
@@ -200,7 +200,7 @@ class MemberServiceTest {
     void testIcExists() {
         assertTrue(memberService.icExists("121212121234"));
         assertFalse(memberService.icExists("000000000000"));
-        LOGGER.info("IC check verified.");
+        logger.info("IC check verified.");
     }
 
     @Test
@@ -216,7 +216,7 @@ class MemberServiceTest {
         assertEquals(MemberConfig.DISCOUNT_RATE_GOLD, result.getDiscountRate()); // 0.10
         assertEquals(goldMember, result.getMember());
         assertNull(result.getErrorMessage());
-        LOGGER.info("Discount Rate: " + result.getDiscountRate());
+        logger.info("Discount Rate: " + result.getDiscountRate());
     }
 
     @Test
@@ -230,7 +230,7 @@ class MemberServiceTest {
 
         MemberService.DiscountResult r3 = memberService.getDiscountRate("0");
         assertEquals(0.0, r3.getDiscountRate());
-        LOGGER.info("Discount for invalid inputs checked (0.0).");
+        logger.info("Discount for invalid inputs checked (0.0).");
     }
 
     @Test
@@ -241,7 +241,7 @@ class MemberServiceTest {
         assertTrue(result.hasError());
         assertEquals(0.0, result.getDiscountRate());
         assertEquals(MemberConfig.MSG_MEMBER_NOT_FOUND_PAYMENT, result.getErrorMessage());
-        LOGGER.info("Error msg: " + result.getErrorMessage());
+        logger.info("Error msg: " + result.getErrorMessage());
     }
 
     @Test
@@ -252,6 +252,6 @@ class MemberServiceTest {
         assertTrue(result.hasError());
         assertEquals(0.0, result.getDiscountRate());
         assertEquals(MemberConfig.MSG_INVALID_MEMBER_ID_FORMAT_PAYMENT, result.getErrorMessage());
-        LOGGER.info("Error msg: " + result.getErrorMessage());
+        logger.info("Error msg: " + result.getErrorMessage());
     }
 }

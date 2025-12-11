@@ -9,12 +9,15 @@ import assignment.util.PasswordUtil;
 import assignment.util.config.SignupConfig;
 import assignment.view.SignupView;
 
+import java.util.logging.Logger;
+
 /**
  * Controller for handling staff signup/registration functionality.
  * Handles menu presentation and delegates work to StaffService for business logic.
  */
 public class SignupController {
-
+    private static final Logger LOGGER = Logger.getLogger(SignupController.class.getName());
+    
     private final StaffService staffService;
     private final SignupView signupView;
 
@@ -289,6 +292,7 @@ public class SignupController {
             try {
                 int age = Integer.parseInt(input);
                 if (age < 0) {
+                    LOGGER.warning(SignupConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE + " - Age: " + age);
                     System.out.println(SignupConfig.ErrorMessage.AGE_CANNOT_BE_NEGATIVE);
                     System.out.println();
                     continue;
@@ -296,10 +300,12 @@ public class SignupController {
                 if (age >= 18 && age <= 54) {
                     return age;
                 } else {
+                    LOGGER.warning(SignupConfig.ErrorMessage.INVALID_AGE + " - Age: " + age);
                     System.out.println(SignupConfig.ErrorMessage.INVALID_AGE);
                     System.out.println();
                 }
             } catch (NumberFormatException e) {
+                LOGGER.warning(SignupConfig.ErrorMessage.INVALID_NUMBER + " - Input: " + input);
                 System.out.println(SignupConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }
@@ -324,6 +330,7 @@ public class SignupController {
             try {
                 double salary = Double.parseDouble(input);
                 if (salary < 0) {
+                    LOGGER.warning(SignupConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE + " - Salary: " + salary);
                     System.out.println(SignupConfig.ErrorMessage.SALARY_CANNOT_BE_NEGATIVE);
                     System.out.println();
                     continue;
@@ -331,10 +338,12 @@ public class SignupController {
                 if (salary > 0) {
                     return salary;
                 } else {
+                    LOGGER.warning(SignupConfig.ErrorMessage.INVALID_SALARY + " - Salary: " + salary);
                     System.out.println(SignupConfig.ErrorMessage.INVALID_SALARY);
                     System.out.println();
                 }
             } catch (NumberFormatException e) {
+                LOGGER.warning(SignupConfig.ErrorMessage.INVALID_NUMBER + " - Input: " + input);
                 System.out.println(SignupConfig.ErrorMessage.INVALID_NUMBER);
                 System.out.println();
             }

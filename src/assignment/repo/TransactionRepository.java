@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class TransactionRepository {
     private static final String TRANSACTION_FILE_PATH = SalesConfig.TRANSACTION_FILE_PATH;
-    private static final Logger LOGGER = Logger.getLogger(TransactionRepository.class.getName());
+    private final Logger logger = Logger.getLogger(TransactionRepository.class.getName());
 
     /**
      * Appends a transaction with its items to the file.
@@ -57,7 +57,7 @@ public class TransactionRepository {
                 writer.write("\n");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writing transaction", e);
+            logger.log(Level.SEVERE, "Error writing transaction", e);
         }
     }
 
@@ -111,7 +111,7 @@ public class TransactionRepository {
                 transactions.add(lastTransaction);
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error reading transaction file", e);
+            logger.log(Level.SEVERE, "Error reading transaction file", e);
         }
 
         return transactions;
@@ -143,7 +143,7 @@ public class TransactionRepository {
             double total = Double.parseDouble(parts[4]);
             builder.setAmounts(subtotal, discount, tax, total);
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Error parsing transaction header: " + String.join("\t", parts), e);
+            logger.log(Level.WARNING, "Error parsing transaction header: " + String.join("\t", parts), e);
         }
     }
 
@@ -155,7 +155,7 @@ public class TransactionRepository {
             double price = Double.parseDouble(parts[4]);
             builder.addItem(new Stock(stockID, stockName, qty, price));
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Error parsing item line: " + String.join("\t", parts), e);
+            logger.log(Level.WARNING, "Error parsing item line: " + String.join("\t", parts), e);
         }
     }
 
@@ -168,7 +168,7 @@ public class TransactionRepository {
             builder.setAmounts(subtotal, discount, tax, total);
             // Old format has no items, so items list remains empty
         } catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Error parsing old format transaction: " + String.join("\t", parts), e);
+            logger.log(Level.WARNING, "Error parsing old format transaction: " + String.join("\t", parts), e);
         }
     }
 
@@ -185,7 +185,7 @@ public class TransactionRepository {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating transaction file", e);
+                logger.log(Level.SEVERE, "Error creating transaction file", e);
             }
         }
     }

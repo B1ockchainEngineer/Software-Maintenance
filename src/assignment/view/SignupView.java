@@ -6,11 +6,14 @@ import assignment.util.config.SignupConfig;
 import assignment.util.PasswordStrengthUtil;
 import assignment.util.PasswordStrengthUtil.PasswordStrength;
 
+import java.util.logging.Logger;
+
 /**
  * View class for Signup/Registration functionality.
  * Handles all print outputs and display logic for staff registration.
  */
 public class SignupView {
+    private static final Logger LOGGER = Logger.getLogger(SignupView.class.getName());
 
     public void printSignupHeader() {
         System.out.println(SignupConfig.TITLE_STAFF_REGISTRATION);
@@ -28,11 +31,13 @@ public class SignupView {
 
     public void printInvalidRegistrationCodeFormat() {
         System.out.println();
+        LOGGER.warning(SignupConfig.ErrorMessage.INVALID_REGISTRATION_CODE_FORMAT);
         System.out.println(SignupConfig.ErrorMessage.INVALID_REGISTRATION_CODE_FORMAT);
     }
 
     public void printIncorrectRegistrationCode() {
         System.out.println();
+        LOGGER.warning(SignupConfig.ErrorMessage.INCORRECT_REGISTRATION_CODE);
         System.out.println(SignupConfig.ErrorMessage.INCORRECT_REGISTRATION_CODE);
     }
 
@@ -113,6 +118,7 @@ public class SignupView {
 
         if (strength.getLevel() <= 2) {
             System.out.println();
+            LOGGER.warning(SignupConfig.ErrorMessage.WEAK_PASSWORD_DETECTED);
             System.out.println(SignupConfig.ErrorMessage.WEAK_PASSWORD_DETECTED);
             System.out.println(SignupConfig.ErrorMessage.RECOMMENDATIONS);
             System.out.print(PasswordStrengthUtil.getPasswordFeedback(password));
@@ -121,6 +127,7 @@ public class SignupView {
 
     public void printInvalidPasswordFormat() {
         System.out.println();
+        LOGGER.warning(SignupConfig.ErrorMessage.INVALID_PASSWORD_FORMAT);
         System.out.println(SignupConfig.ErrorMessage.INVALID_PASSWORD_FORMAT);
         System.out.println(SignupConfig.ErrorMessage.CURRENT_ISSUES);
     }
@@ -139,6 +146,7 @@ public class SignupView {
     }
 
     public void printPasswordMismatch() {
+        LOGGER.warning(SignupConfig.ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         System.out.println(SignupConfig.ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         System.out.println();
     }
@@ -220,6 +228,7 @@ public class SignupView {
 
     public void printRegistrationFailed() {
         System.out.println();
+        LOGGER.severe(SignupConfig.ErrorMessage.REGISTRATION_FAILED);
         System.out.println(SignupConfig.ErrorMessage.REGISTRATION_FAILED);
     }
 
@@ -234,32 +243,38 @@ public class SignupView {
     }
 
     public void printInvalidIcFormat() {
+        LOGGER.warning(SignupConfig.ErrorMessage.INVALID_IC_FORMAT);
         System.out.println(SignupConfig.ErrorMessage.INVALID_IC_FORMAT);
         System.out.println();
     }
 
     public void printInvalidPlaceOfBirth() {
+        LOGGER.warning(SignupConfig.ErrorMessage.INVALID_PLACE_OF_BIRTH);
         System.out.println(SignupConfig.ErrorMessage.INVALID_PLACE_OF_BIRTH);
         System.out.println();
     }
 
     public void printInvalidIcDate() {
+        LOGGER.warning(SignupConfig.ErrorMessage.INVALID_IC_DATE);
         System.out.println(SignupConfig.ErrorMessage.INVALID_IC_DATE);
         System.out.println();
     }
 
     public void printIcAlreadyExists() {
+        LOGGER.warning(SignupConfig.ErrorMessage.IC_ALREADY_EXISTS);
         System.out.println(SignupConfig.ErrorMessage.IC_ALREADY_EXISTS);
         System.out.println();
     }
 
     public void printEmptyNameError() {
+        LOGGER.warning(SignupConfig.ErrorMessage.NAME_CANNOT_BE_EMPTY);
         System.out.println(SignupConfig.ErrorMessage.NAME_CANNOT_BE_EMPTY);
         System.out.println();
     }
 
     public void printEmptyPasswordError() {
         System.out.println();
+        LOGGER.warning(SignupConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY);
         System.out.println(SignupConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY);
         System.out.println();
     }
