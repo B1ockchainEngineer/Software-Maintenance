@@ -143,7 +143,7 @@ public class MemberRepository {
                 fw.write(line);
             }
         } catch (IOException e) {
-            System.out.println(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
+            LOGGER.severe(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
         }
     }
 

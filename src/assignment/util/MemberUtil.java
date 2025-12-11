@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import assignment.util.config.MemberConfig;
 
 public class MemberUtil {
+
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MemberUtil.class.getName());
     /**
      * Helper to validate IC input.
      * Checks for length, numeric format, and valid date of birth.
@@ -17,7 +19,7 @@ public class MemberUtil {
 
         // Must be exactly 12 digits
         if (input.length() != 12 || !input.matches("\\d+")) {
-            System.out.println("<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>\n");
+            LOGGER.severe("<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>\n");
             return null;
         }
 
@@ -29,7 +31,7 @@ public class MemberUtil {
 
             // Place of birth: only 01-16 allowed
             if (pb < 1 || pb > 16) {
-                System.out.println("<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>\n");
+                LOGGER.severe("<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>\n");
                 return null;
             }
 
@@ -54,11 +56,11 @@ public class MemberUtil {
                 return input;
 
             } catch (DateTimeException e) {
-                System.out.println("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
+                LOGGER.severe("<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>\n");
                 return null;
 
         } catch (Exception e) {
-            System.out.println("<<< INVALID IC FORMAT >>>\n");
+            LOGGER.severe("<<< INVALID IC FORMAT >>>\n");
             return null;
         }
     }
@@ -71,7 +73,7 @@ public class MemberUtil {
         if (name.matches("^[a-zA-Z ]+$")) {
             return true;
         } else {
-            System.out.println("Invalid input. Please enter a name with alphabet characters only. \n");
+            LOGGER.severe("Invalid input. Please enter a name with alphabet characters only. \n");
             return false;
         }
     }
@@ -85,12 +87,12 @@ public class MemberUtil {
         String data = ValidationUtil.scanner.nextLine().trim();
 
         if (!data.matches("\\d+")) {
-            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+            LOGGER.severe(MemberConfig.ErrorMessage.INVALID_HP);
             return null;
         }
 
         if (!data.startsWith("01")) {
-            System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+            LOGGER.severe(MemberConfig.ErrorMessage.INVALID_HP);
             return null;
         }
 
@@ -104,7 +106,7 @@ public class MemberUtil {
             }
         }
 
-        System.out.println(MemberConfig.ErrorMessage.INVALID_HP);
+        LOGGER.severe(MemberConfig.ErrorMessage.INVALID_HP);
         return null;
     }
 
