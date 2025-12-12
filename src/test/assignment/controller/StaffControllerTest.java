@@ -1,14 +1,18 @@
-package test.assignment.controller;
+package assignment.controller;
 
 import assignment.controller.StaffController;
 import assignment.model.Staff;
 import assignment.repo.StaffRepository;
 import assignment.service.StaffService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,31 +24,48 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("StaffController Tests")
 class StaffControllerTest {
 
+    private static final Logger LOGGER = Logger.getLogger(StaffControllerTest.class.getName());
     private StaffService staffService;
     private StaffController staffController;
 
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
+
     @BeforeEach
     void setUp() {
+        LOGGER.info("=========================================");
+        LOGGER.info("SETTING UP StaffControllerTest");
+        LOGGER.info("=========================================");
         // Use real StaffRepository that loads from staff.txt file
         StaffRepository staffRepository = new StaffRepository();
         staffService = new StaffService(staffRepository);
         staffController = new StaffController(staffService);
+        LOGGER.info("StaffController and StaffService instances created");
+        LOGGER.info("=========================================");
     }
 
     @Test
     @DisplayName("Should initialize StaffController with StaffService")
     void testStaffControllerInitialization() {
-        assertNotNull(staffController);
-        System.out.println("Initialization successful.");
+        LOGGER.info("TEST: StaffController - Initialization");
+        assertNotNull(staffController, "StaffController should not be null");
+        LOGGER.info("✓ StaffController initialized successfully");
     }
 
     @Test
     @DisplayName("Should have access to all staff from file")
     void testGetAllStaff() {
+        LOGGER.info("TEST: StaffController - Get all staff from file");
         List<Staff> staff = staffService.getAllStaff();
-        assertNotNull(staff);
+        assertNotNull(staff, "Staff list should not be null");
         assertFalse(staff.isEmpty(), "Should have at least one staff from staff.txt");
-        System.out.println("Got " + staff.size() + " staff from staff.txt file.");
+        LOGGER.info("✓ Retrieved " + staff.size() + " staff from staff.txt file");
     }
 
     @Test

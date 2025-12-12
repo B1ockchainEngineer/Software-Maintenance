@@ -4,12 +4,16 @@ import assignment.model.Staff;
 import assignment.util.config.AppConfig;
 import assignment.util.config.SalesConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,9 +24,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Main View Tests")
 class MainViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(MainViewTest.class.getName());
     private MainView mainView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -55,6 +69,7 @@ class MainViewTest {
         assertTrue(output.contains("Welcome to TAR CAFE Management System"));
         assertTrue(output.contains("Please select an option:"));
         assertTrue(output.contains(AppConfig.SEPARATOR_LINE));
+        LOGGER.info("PrintLoginMenu test passed.");
     }
 
     @Test
@@ -67,6 +82,7 @@ class MainViewTest {
         String output = getOutput();
         // Menu options should be displayed (format: "1. Option Name")
         assertTrue(output.contains("1.") || output.contains("2."));
+        LOGGER.info("PrintLoginMenu with menu options test passed.");
     }
 
     // ================== printMainMenu TESTS ==================
@@ -87,6 +103,7 @@ class MainViewTest {
         assertTrue(output.contains("Logged in as: JOHN DOE"));
         assertTrue(output.contains("Please select an option:"));
         assertTrue(output.contains(AppConfig.SEPARATOR_LINE));
+        LOGGER.info("PrintMainMenu with staff test passed.");
     }
 
     @Test
@@ -100,6 +117,7 @@ class MainViewTest {
         assertTrue(output.contains("[ MAIN MENU ]"));
         assertTrue(output.contains("Please select an option:"));
         assertFalse(output.contains("Logged in as:"));
+        LOGGER.info("PrintMainMenu with null staff test passed.");
     }
 
     @Test
@@ -116,6 +134,7 @@ class MainViewTest {
         String output = getOutput();
         // Menu options should be displayed (format: "1. Option Name")
         assertTrue(output.contains("1.") || output.contains("2."));
+        LOGGER.info("PrintMainMenu with menu options test passed.");
     }
 
     // ================== printStockMenu TESTS ==================
@@ -130,6 +149,7 @@ class MainViewTest {
         String output = getOutput();
         assertTrue(output.contains("[ FOOD AND BEVERAGE MANAGEMENT SYSTEM ]"));
         assertTrue(output.contains(AppConfig.SEPARATOR_LINE));
+        LOGGER.info("PrintStockMenu test passed.");
     }
 
     @Test
@@ -142,6 +162,7 @@ class MainViewTest {
         String output = getOutput();
         // Menu options should be displayed (format: "1. Option Name")
         assertTrue(output.contains("1.") || output.contains("2."));
+        LOGGER.info("PrintStockMenu with menu options test passed.");
     }
 
     // ================== printSalesMenu TESTS ==================
@@ -156,6 +177,7 @@ class MainViewTest {
         String output = getOutput();
         assertTrue(output.contains(SalesConfig.TITLE_SALES_MENU));
         assertTrue(output.contains(AppConfig.SEPARATOR_LINE));
+        LOGGER.info("PrintSalesMenu test passed.");
     }
 
     @Test
@@ -168,6 +190,7 @@ class MainViewTest {
         String output = getOutput();
         // Menu options should be displayed (format: "1. Option Name")
         assertTrue(output.contains("1.") || output.contains("2."));
+        LOGGER.info("PrintSalesMenu with menu options test passed.");
     }
 
     // ================== printExitMessage TESTS ==================
@@ -183,6 +206,7 @@ class MainViewTest {
         assertTrue(output.contains("THANK YOU FOR USING TAR CAFE SYSTEM"));
         assertTrue(output.contains("EXITING THE PROGRAM..."));
         assertTrue(output.contains(AppConfig.SEPARATOR_LONG));
+        LOGGER.info("PrintExitMessage test passed.");
     }
 
     // ================== printBackToMainMessage TESTS ==================
@@ -196,6 +220,7 @@ class MainViewTest {
         // Then: Should display back to main message
         String output = getOutput();
         assertTrue(output.contains("BACK TO MAIN MENU..."));
+        LOGGER.info("PrintBackToMainMessage test passed.");
     }
 
     // ================== printBackToPreviousMessage TESTS ==================
@@ -209,6 +234,7 @@ class MainViewTest {
         // Then: Should display back to previous message
         String output = getOutput();
         assertTrue(output.contains("BACK TO PREVIOUS PAGE..."));
+        LOGGER.info("PrintBackToPreviousMessage test passed.");
     }
 
     // ================== printLoggedOutMessage TESTS ==================
@@ -222,6 +248,7 @@ class MainViewTest {
         // Then: Should display logged out message
         String output = getOutput();
         assertTrue(output.contains("RETURNING TO LOGIN MENU..."));
+        LOGGER.info("PrintLoggedOutMessage test passed.");
     }
 
     // ================== printSelectionPrompt TESTS ==================
@@ -235,6 +262,7 @@ class MainViewTest {
         // Then: Should display selection prompt
         String output = getOutput();
         assertTrue(output.contains(AppConfig.PROMPT_SELECTION));
+        LOGGER.info("PrintSelectionPrompt test passed.");
     }
 
     @Test
@@ -247,6 +275,7 @@ class MainViewTest {
         String output = getOutput();
         assertTrue(output.contains(AppConfig.PROMPT_SELECTION));
         // The prompt should be on a line by itself (no trailing newline from print)
+        LOGGER.info("PrintSelectionPrompt without newline test passed.");
     }
 
     // ================== printInvalidOptionMessage TESTS ==================
@@ -260,6 +289,7 @@ class MainViewTest {
         // Then: Should display invalid option message
         String output = getOutput();
         assertTrue(output.contains(AppConfig.MSG_INVALID_OPTION));
+        LOGGER.info("PrintInvalidOptionMessage test passed.");
     }
 
     // ================== INTEGRATION TESTS ==================
@@ -282,6 +312,7 @@ class MainViewTest {
         String mainOutput = getOutput();
         assertTrue(mainOutput.contains("[ MAIN MENU ]"));
         assertTrue(mainOutput.contains("Logged in as: TEST USER"));
+        LOGGER.info("Complete login flow test passed.");
     }
 
     @Test
@@ -309,6 +340,7 @@ class MainViewTest {
         mainView.printSalesMenu();
         String salesOutput = getOutput();
         assertTrue(salesOutput.contains(SalesConfig.TITLE_SALES_MENU));
+        LOGGER.info("Menu navigation flow test passed.");
     }
 
     @Test
@@ -327,6 +359,7 @@ class MainViewTest {
         String exitOutput = getOutput();
         assertTrue(exitOutput.contains("THANK YOU FOR USING TAR CAFE SYSTEM"));
         assertTrue(exitOutput.contains("EXITING THE PROGRAM..."));
+        LOGGER.info("Exit flow test passed.");
     }
 }
 

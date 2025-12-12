@@ -4,6 +4,7 @@ import assignment.model.Staff;
 import assignment.util.config.AppConfig;
 import assignment.util.config.StaffConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,9 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Staff View Tests")
 class StaffViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(StaffViewTest.class.getName());
     private StaffView staffView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -57,6 +71,7 @@ class StaffViewTest {
         assertTrue(output.contains("Total Staff: 5"));
         assertTrue(output.contains(StaffConfig.MSG_PLEASE_SELECT_OPTION));
         assertTrue(output.contains(AppConfig.SEPARATOR_LINE));
+        LOGGER.info("PrintStaffMenu test passed.");
     }
 
     @Test
@@ -68,6 +83,7 @@ class StaffViewTest {
         // Then: Should display zero total staff
         String output = getOutput();
         assertTrue(output.contains("Total Staff: 0"));
+        LOGGER.info("PrintStaffMenu with zero staff test passed.");
     }
 
     // ================== printAddStaffHeader TESTS ==================
@@ -84,6 +100,7 @@ class StaffViewTest {
         assertTrue(output.contains(StaffConfig.MSG_FILL_INFORMATION));
         assertTrue(output.contains(StaffConfig.MSG_PRESS_E_TO_CANCEL));
         assertTrue(output.contains("Current Staff Count: 3"));
+        LOGGER.info("PrintAddStaffHeader test passed.");
     }
 
     // ================== printNewStaffSummary TESTS ==================
@@ -106,6 +123,7 @@ class StaffViewTest {
         assertTrue(output.contains("010203040506"));
         assertTrue(output.contains("25 years"));
         assertTrue(output.contains("RM 3,000.00"));
+        LOGGER.info("PrintNewStaffSummary test passed.");
     }
 
     // ================== printStaffAddedSuccess TESTS ==================
@@ -126,6 +144,7 @@ class StaffViewTest {
         assertTrue(output.contains("S-12346"));
         assertTrue(output.contains("Jane Smith"));
         assertTrue(output.contains("New Staff Count: 6"));
+        LOGGER.info("PrintStaffAddedSuccess test passed.");
     }
 
     // ================== printUpdateStaffMenu TESTS ==================
@@ -142,6 +161,7 @@ class StaffViewTest {
         assertTrue(output.contains(StaffConfig.MSG_FIND_STAFF_BY));
         assertTrue(output.contains(StaffConfig.MSG_FIND_BY_NAME));
         assertTrue(output.contains(StaffConfig.MSG_FIND_BY_IC));
+        LOGGER.info("PrintUpdateStaffMenu test passed.");
     }
 
     // ================== displayStaffDetails TESTS ==================
@@ -159,6 +179,7 @@ class StaffViewTest {
         // Then: Should display staff information
         String output = getOutput();
         assertTrue(output.contains("Test Staff") || output.contains("TEST STAFF"));
+        LOGGER.info("DisplayStaffDetails test passed.");
     }
 
     // ================== printDeleteStaffMenu TESTS ==================
@@ -184,6 +205,7 @@ class StaffViewTest {
         assertTrue(output.contains("S-1001"));
         assertTrue(output.contains("S-1002"));
         assertTrue(output.contains("TOTAL STAFF: 2"));
+        LOGGER.info("PrintDeleteStaffMenu with staff list test passed.");
     }
 
     @Test
@@ -199,6 +221,7 @@ class StaffViewTest {
         String output = getOutput();
         assertTrue(output.contains(StaffConfig.TITLE_DELETE_STAFF));
         assertTrue(output.contains("TOTAL STAFF: 0"));
+        LOGGER.info("PrintDeleteStaffMenu with empty list test passed.");
     }
 
     // ================== printDeleteConfirmation TESTS ==================
@@ -218,6 +241,7 @@ class StaffViewTest {
         assertTrue(output.contains(StaffConfig.TITLE_DELETE_STAFF_CONFIRMATION));
         assertTrue(output.contains(StaffConfig.WARNING_DELETE_IRREVERSIBLE));
         assertTrue(output.contains(StaffConfig.MSG_STAFF_TO_BE_DELETED));
+        LOGGER.info("PrintDeleteConfirmation test passed.");
     }
 
     // ================== printSearchStaffMenu TESTS ==================
@@ -261,6 +285,7 @@ class StaffViewTest {
         String output = getOutput();
         assertTrue(output.contains(StaffConfig.TITLE_SEARCH_STAFF));
         assertFalse(output.contains(StaffConfig.MSG_QUICK_REFERENCE));
+        LOGGER.info("PrintSearchStaffMenu with large list test passed.");
     }
 
     @Test
@@ -276,6 +301,7 @@ class StaffViewTest {
         String output = getOutput();
         assertTrue(output.contains(StaffConfig.TITLE_SEARCH_STAFF));
         assertTrue(output.contains(StaffConfig.MSG_SEARCH_BY));
+        LOGGER.info("PrintSearchStaffMenu with empty list test passed.");
     }
 
     // ================== displaySearchResults TESTS ==================
@@ -301,6 +327,7 @@ class StaffViewTest {
         assertTrue(output.contains("Found: 2 staff member(s)"));
         assertTrue(output.contains("[1]"));
         assertTrue(output.contains("[2]"));
+        LOGGER.info("DisplaySearchResults with results test passed.");
     }
 
     @Test
@@ -318,6 +345,7 @@ class StaffViewTest {
         assertTrue(output.contains(String.format(StaffConfig.ErrorMessage.NO_STAFF_FOUND, "ID")));
         assertTrue(output.contains(StaffConfig.ErrorMessage.TIP_SEARCH_DIFFERENT));
         assertTrue(output.contains(StaffConfig.ErrorMessage.TIP_DIFFERENT_SPELLING));
+        LOGGER.info("DisplaySearchResults with no results test passed.");
     }
 
     // ================== displayStaffList TESTS ==================
@@ -349,6 +377,7 @@ class StaffViewTest {
         assertTrue(output.contains("S-6001"));
         assertTrue(output.contains("S-6002"));
         assertTrue(output.contains("S-6003"));
+        LOGGER.info("DisplayStaffList with staff test passed.");
     }
 
     @Test
@@ -365,6 +394,7 @@ class StaffViewTest {
         assertTrue(output.contains(StaffConfig.TITLE_VIEW_STAFF));
         assertTrue(output.contains(StaffConfig.ErrorMessage.NO_STAFF_TO_DISPLAY));
         assertTrue(output.contains(StaffConfig.ErrorMessage.TIP_ADD_STAFF));
+        LOGGER.info("DisplayStaffList with empty list test passed.");
     }
 
     @Test
@@ -389,5 +419,6 @@ class StaffViewTest {
         assertTrue(output.contains("Highest Salary: RM 4000.00"));
         assertTrue(output.contains("Lowest Salary: RM 2000.00"));
         assertTrue(output.contains("Total Payroll: RM 9000.00")); // 2000+4000+3000
+        LOGGER.info("DisplayStaffList statistics calculation test passed.");
     }
 }

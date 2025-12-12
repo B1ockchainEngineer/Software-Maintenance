@@ -3,6 +3,7 @@ package assignment.repo;
 import assignment.model.Stock;
 import assignment.util.config.StockConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -18,13 +22,26 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests actual file I/O operations using temporary test files.
  */
 class StockRepositoryIntegrationTest {
+    private static final Logger LOGGER = Logger.getLogger(StockRepositoryIntegrationTest.class.getName());
     private StockRepository repository;
     private String originalStockFilePath;
     private File testStockFile;
     private File backupStockFile;
 
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
+
     @BeforeEach
     void setUp() throws IOException {
+        LOGGER.info("=========================================");
+        LOGGER.info("SETTING UP StockRepositoryIntegrationTest");
+        LOGGER.info("=========================================");
         // Save original file path
         originalStockFilePath = StockConfig.STOCK_FILE_PATH;
 

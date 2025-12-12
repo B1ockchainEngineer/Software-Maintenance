@@ -32,7 +32,6 @@ public class SalesConfig {
     public static final String LABEL_NO_ITEMS = "ITEMS: (No items recorded)";
     public static final String LABEL_TOTAL_TRANSACTIONS = "TOTAL TRANSACTIONS:";
     // Alias to avoid duplicate literals for grand totals
-    public static final String LABEL_GRAND_TOTAL = LABEL_TOTAL;
     public static final String LABEL_PRODUCT_NAME = "PRODUCT NAME:";
     public static final String LABEL_PRODUCT_PRICE = "PRODUCT PRICE:";
     public static final String LABEL_AVAILABLE_QUANTITY = "AVAILABLE QUANTITY:";
@@ -44,7 +43,6 @@ public class SalesConfig {
     public static final String LABEL_NEW_ORDER_QUANTITY = "NEW ORDER QUANTITY:";
     public static final String LABEL_CART_ITEMS = "CART ITEMS:";
     public static final String LABEL_ALL_ORDERS = "ALL ORDERS:";
-    public static final String LABEL_ORDER_DETAILS = "ORDER DETAILS:";
     public static final String LABEL_MEMBER_FOUND = "Member found:";
     public static final String LABEL_DISCOUNT_RATE = "Discount rate:";
     

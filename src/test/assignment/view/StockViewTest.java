@@ -2,6 +2,8 @@ package assignment.view;
 
 import assignment.model.Stock;
 import assignment.util.config.StockConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +11,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,9 +23,19 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class StockViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(StockViewTest.class.getName());
     private StockView stockView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -30,7 +45,7 @@ class StockViewTest {
         System.setOut(new PrintStream(outputStream));
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
@@ -53,6 +68,7 @@ class StockViewTest {
         String output = getOutput();
         assertTrue(output.contains(StockConfig.TITLE_VIEW_STOCK));
         assertTrue(output.contains(StockConfig.ErrorMessage.NO_STOCK_TO_DISPLAY));
+        LOGGER.info("DisplayAvailableStock with empty list test passed.");
     }
 
     @Test
@@ -75,6 +91,7 @@ class StockViewTest {
         assertTrue(output.contains("TEST PRODUCT"));
         assertTrue(output.contains("10"));
         assertTrue(output.contains("25.50"));
+        LOGGER.info("DisplayAvailableStock with single stock test passed.");
     }
 
     @Test
@@ -96,6 +113,7 @@ class StockViewTest {
         assertTrue(output.contains("PRODUCT B"));
         assertTrue(output.contains("10003"));
         assertTrue(output.contains("PRODUCT C"));
+        LOGGER.info("DisplayAvailableStock with multiple stocks test passed.");
     }
 
     @Test
@@ -112,6 +130,7 @@ class StockViewTest {
         assertTrue(output.contains("10004"));
         assertTrue(output.contains("OUT OF STOCK"));
         assertTrue(output.contains("0"));
+        LOGGER.info("DisplayAvailableStock with zero quantity test passed.");
     }
 
     // ================== printAddStockHeader TESTS ==================
@@ -137,6 +156,7 @@ class StockViewTest {
         // Then: Should display formatted ID
         String output = getOutput();
         assertTrue(output.contains("PRODUCT ID >> P-10005"));
+        LOGGER.info("PrintProductID test passed.");
     }
 
     @Test
@@ -144,6 +164,7 @@ class StockViewTest {
         stockView.printProductID(0);
         String output = getOutput();
         assertTrue(output.contains("P-0"));
+        LOGGER.info("PrintProductID with zero test passed.");
     }
 
     // ================== printNewStockSummary TESTS ==================
@@ -163,6 +184,7 @@ class StockViewTest {
         assertTrue(output.contains("NEW PRODUCT"));
         assertTrue(output.contains("25"));
         assertTrue(output.contains("15.75"));
+        LOGGER.info("PrintNewStockSummary test passed.");
     }
 
     // ================== printDeleteStockMenu TESTS ==================
@@ -176,6 +198,7 @@ class StockViewTest {
         String output = getOutput();
         assertTrue(output.contains(StockConfig.TITLE_DELETE_PRODUCT));
         assertTrue(output.contains("-------------------------------------------------------"));
+        LOGGER.info("PrintDeleteStockMenu test passed.");
     }
 
     // ================== displayStockDetails TESTS ==================
@@ -196,6 +219,7 @@ class StockViewTest {
         assertTrue(output.contains("DETAIL TEST"));
         assertTrue(output.contains("30"));
         assertTrue(output.contains("20.50"));
+        LOGGER.info("DisplayStockDetails test passed.");
     }
 
     @Test

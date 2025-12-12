@@ -2,12 +2,17 @@ package assignment.view;
 
 import assignment.model.Staff;
 import assignment.util.config.SignupConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,9 +23,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Signup View Tests")
 class SignupViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(SignupViewTest.class.getName());
     private SignupView signupView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -30,7 +45,7 @@ class SignupViewTest {
         System.setOut(new PrintStream(outputStream));
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
@@ -51,6 +66,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.TITLE_STAFF_REGISTRATION));
         assertTrue(output.contains(SignupConfig.MSG_REGISTRATION_CODE_DESCRIPTION));
+        LOGGER.info("PrintSignupHeader test passed.");
     }
 
     // ================== printRegistrationCodeStep TESTS ==================
@@ -65,6 +81,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_REGISTRATION_CODE));
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_REGISTRATION_CODE));
+        LOGGER.info("PrintRegistrationCodeStep test passed.");
     }
 
     // ================== printInvalidRegistrationCodeFormat TESTS ==================
@@ -78,6 +95,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INVALID_REGISTRATION_CODE_FORMAT));
+        LOGGER.info("PrintInvalidRegistrationCodeFormat test passed.");
     }
 
     // ================== printIncorrectRegistrationCode TESTS ==================
@@ -91,6 +109,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INCORRECT_REGISTRATION_CODE));
+        LOGGER.info("PrintIncorrectRegistrationCode test passed.");
     }
 
     // ================== printRegistrationCodeVerified TESTS ==================
@@ -105,6 +124,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.MSG_REGISTRATION_CODE_VERIFIED));
         assertTrue(output.contains(SignupConfig.MSG_PROCEEDING_TO_REGISTRATION));
+        LOGGER.info("PrintRegistrationCodeVerified test passed.");
     }
 
     // ================== printRegisterStaffHeader TESTS ==================
@@ -120,6 +140,7 @@ class SignupViewTest {
         assertTrue(output.contains(SignupConfig.TITLE_REGISTER_STAFF));
         assertTrue(output.contains(SignupConfig.MSG_FILL_INFORMATION));
         assertTrue(output.contains(SignupConfig.MSG_PRESS_E_TO_CANCEL));
+        LOGGER.info("PrintRegisterStaffHeader test passed.");
     }
 
     // ================== printIcStep TESTS ==================
@@ -134,6 +155,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_STAFF_IC));
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_STAFF_IC));
+        LOGGER.info("PrintIcStep test passed.");
     }
 
     @Test
@@ -146,6 +168,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_STAFF_IC));
         assertFalse(output.contains(SignupConfig.STEP_STAFF_IC));
+        LOGGER.info("PrintIcPrompt test passed.");
     }
 
     // ================== printIcCollected TESTS ==================
@@ -160,6 +183,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains("121212121234"));
         assertTrue(output.contains("IC collected:")); // Check for actual formatted output
+        LOGGER.info("PrintIcCollected test passed.");
     }
 
     // ================== printNameStep TESTS ==================
@@ -174,6 +198,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_STAFF_NAME));
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_STAFF_NAME));
+        LOGGER.info("PrintNameStep test passed.");
     }
 
     // ================== printNameCollected TESTS ==================
@@ -188,6 +213,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains("John Doe"));
         assertTrue(output.contains("Name collected:")); // Check for actual formatted output
+        LOGGER.info("PrintNameCollected test passed.");
     }
 
     // ================== printPasswordStep TESTS ==================
@@ -205,6 +231,7 @@ class SignupViewTest {
         assertTrue(output.contains(SignupConfig.MSG_PASSWORD_REQ_1)); // "• Minimum 8 characters"
         // Note: MSG_PASSWORD_REQ_2 and MSG_PASSWORD_REQ_3 are now empty, so they won't be displayed
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_PASSWORD));
+        LOGGER.info("PrintPasswordStep test passed.");
     }
 
     @Test
@@ -217,6 +244,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_PASSWORD));
         assertFalse(output.contains(SignupConfig.STEP_PASSWORD));
+        LOGGER.info("PrintPasswordPrompt test passed.");
     }
 
     // ================== printEmptyPasswordError TESTS ==================
@@ -230,6 +258,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY));
+        LOGGER.info("PrintEmptyPasswordError test passed.");
     }
 
     // ================== printPasswordStrength TESTS ==================
@@ -243,6 +272,7 @@ class SignupViewTest {
         // Then: Should display strength information
         String output = getOutput();
         assertTrue(output.contains("PASSWORD STRENGTH:")); // Check for actual formatted output
+        LOGGER.info("PrintPasswordStrength test passed.");
     }
 
     @Test
@@ -255,6 +285,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.WEAK_PASSWORD_DETECTED));
         assertTrue(output.contains(SignupConfig.ErrorMessage.RECOMMENDATIONS));
+        LOGGER.info("PrintPasswordStrength with weak password test passed.");
     }
 
     // ================== printInvalidPasswordFormat TESTS ==================
@@ -268,6 +299,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INVALID_PASSWORD_FORMAT));
+        LOGGER.info("PrintInvalidPasswordFormat test passed.");
     }
 
     // ================== printWeakPasswordWarning TESTS ==================
@@ -281,6 +313,7 @@ class SignupViewTest {
         // Then: Should display warning prompt
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_WEAK_PASSWORD_CONTINUE));
+        LOGGER.info("PrintWeakPasswordWarning test passed.");
     }
 
     // ================== printPasswordConfirmPrompt TESTS ==================
@@ -294,6 +327,7 @@ class SignupViewTest {
         // Then: Should display confirm prompt
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_CONFIRM_PASSWORD));
+        LOGGER.info("PrintPasswordConfirmPrompt test passed.");
     }
 
     // ================== printPasswordMismatch TESTS ==================
@@ -307,6 +341,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.PASSWORDS_DO_NOT_MATCH));
+        LOGGER.info("PrintPasswordMismatch test passed.");
     }
 
     // ================== printPasswordConfirmed TESTS ==================
@@ -321,6 +356,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains("Password confirmed!")); // Check for actual formatted output
         assertTrue(output.contains("FINAL PASSWORD STRENGTH:")); // Check for actual formatted output
+        LOGGER.info("PrintPasswordConfirmed test passed.");
     }
 
     // ================== printPasswordCollected TESTS ==================
@@ -334,6 +370,7 @@ class SignupViewTest {
         // Then: Should display collected message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.MSG_PASSWORD_COLLECTED));
+        LOGGER.info("PrintPasswordCollected test passed.");
     }
 
     // ================== printAdditionalInfoStep TESTS ==================
@@ -347,6 +384,7 @@ class SignupViewTest {
         // Then: Should display step
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_ADDITIONAL_INFO));
+        LOGGER.info("PrintAdditionalInfoStep test passed.");
     }
 
     // ================== printAgePrompt TESTS ==================
@@ -360,6 +398,7 @@ class SignupViewTest {
         // Then: Should display prompt
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_STAFF_AGE));
+        LOGGER.info("PrintAgePrompt test passed.");
     }
 
     // ================== printSalaryPrompt TESTS ==================
@@ -373,6 +412,7 @@ class SignupViewTest {
         // Then: Should display prompt
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.PROMPT_ENTER_STAFF_SALARY));
+        LOGGER.info("PrintSalaryPrompt test passed.");
     }
 
     // ================== printRegistrationSummary TESTS ==================
@@ -397,6 +437,7 @@ class SignupViewTest {
         assertTrue(output.contains("28"));
         assertTrue(output.contains("4000.50"));
         assertTrue(output.contains(SignupConfig.PROMPT_CONFIRM_REGISTRATION));
+        LOGGER.info("PrintRegistrationSummary test passed.");
     }
 
     // ================== printSavingRegistration TESTS ==================
@@ -410,6 +451,7 @@ class SignupViewTest {
         // Then: Should display saving step
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.STEP_SAVING));
+        LOGGER.info("PrintSavingRegistration test passed.");
     }
 
     // ================== printRegistrationSuccess TESTS ==================
@@ -431,6 +473,7 @@ class SignupViewTest {
         assertTrue(output.contains("Success Test"));
         assertTrue(output.contains("121212121234"));
         assertTrue(output.contains(SignupConfig.MSG_YOU_CAN_LOGIN));
+        LOGGER.info("PrintRegistrationSuccess test passed.");
     }
 
     // ================== printRegistrationFailed TESTS ==================
@@ -444,6 +487,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.REGISTRATION_FAILED));
+        LOGGER.info("PrintRegistrationFailed test passed.");
     }
 
     // ================== printRegistrationCancelled TESTS ==================
@@ -457,6 +501,7 @@ class SignupViewTest {
         // Then: Should display cancelled message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.MSG_REGISTRATION_CANCELLED));
+        LOGGER.info("PrintRegistrationCancelled test passed.");
     }
 
     // ================== printCancelConfirmationPrompt TESTS ==================
@@ -471,6 +516,7 @@ class SignupViewTest {
         String output = getOutput();
         assertTrue(output.contains("IC entry"));
         assertTrue(output.contains("Are you sure you want to cancel")); // Check for actual formatted output
+        LOGGER.info("PrintCancelConfirmationPrompt test passed.");
     }
 
     // ================== printInvalidIcFormat TESTS ==================
@@ -484,6 +530,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INVALID_IC_FORMAT));
+        LOGGER.info("PrintInvalidIcFormat test passed.");
     }
 
     // ================== printInvalidPlaceOfBirth TESTS ==================
@@ -497,6 +544,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INVALID_PLACE_OF_BIRTH));
+        LOGGER.info("PrintInvalidPlaceOfBirth test passed.");
     }
 
     // ================== printInvalidIcDate TESTS ==================
@@ -510,6 +558,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.INVALID_IC_DATE));
+        LOGGER.info("PrintInvalidIcDate test passed.");
     }
 
     // ================== printIcAlreadyExists TESTS ==================
@@ -523,6 +572,7 @@ class SignupViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(SignupConfig.ErrorMessage.IC_ALREADY_EXISTS));
+        LOGGER.info("PrintIcAlreadyExists test passed.");
     }
 
     // ================== printEmptyNameError TESTS ==================

@@ -3,6 +3,8 @@ package assignment.view;
 import assignment.model.Order;
 import assignment.model.PaymentResult;
 import assignment.view.PaymentView;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,9 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("PaymentView Tests")
 class PaymentViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(PaymentViewTest.class.getName());
     private PaymentView paymentView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -33,7 +48,7 @@ class PaymentViewTest {
         System.setOut(new PrintStream(outputStream));
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
@@ -56,6 +71,7 @@ class PaymentViewTest {
         assertTrue(output.contains("PRODUCT A"));
         assertTrue(output.contains("PRODUCT B"));
         assertTrue(output.contains("RM"));
+        LOGGER.info("DisplayCartItems test passed.");
     }
 
     @Test
@@ -73,6 +89,7 @@ class PaymentViewTest {
         assertTrue(output.contains("20.00"));
         assertTrue(output.contains("10.80"));
         assertTrue(output.contains("190.80"));
+        LOGGER.info("PrintPaymentSummary test passed.");
     }
 
     @Test
@@ -86,6 +103,7 @@ class PaymentViewTest {
         assertTrue(output.contains("0.00"));
         assertTrue(output.contains("6.00"));
         assertTrue(output.contains("106.00"));
+        LOGGER.info("PrintPaymentSummary with no discount test passed.");
     }
 
     @Test
@@ -94,6 +112,7 @@ class PaymentViewTest {
         paymentView.printPaymentSuccess();
         String output = outputStream.toString();
         assertFalse(output.trim().isEmpty());
+        LOGGER.info("PrintPaymentSuccess test passed.");
     }
 
     @Test
@@ -102,6 +121,7 @@ class PaymentViewTest {
         paymentView.printPaymentFailure();
         String output = outputStream.toString();
         assertFalse(output.trim().isEmpty());
+        LOGGER.info("PrintPaymentFailure test passed.");
     }
 
     @Test
@@ -112,6 +132,7 @@ class PaymentViewTest {
         assertTrue(output.contains("John Doe"));
         assertTrue(output.contains("Gold"));
         assertTrue(output.contains("10.0%"));
+        LOGGER.info("PrintMemberFoundMessage test passed.");
     }
 
     @Test
@@ -120,6 +141,7 @@ class PaymentViewTest {
         paymentView.printEmptyCartMessage("Cart is empty");
         String output = outputStream.toString();
         assertTrue(output.contains("Cart is empty"));
+        LOGGER.info("PrintEmptyCartMessage test passed.");
     }
 }
 

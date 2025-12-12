@@ -3,6 +3,8 @@ package assignment.view;
 import assignment.model.Order;
 import assignment.model.Stock;
 import assignment.view.OrderView;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,9 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("OrderView Tests")
 class OrderViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(OrderViewTest.class.getName());
     private OrderView orderView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -33,7 +48,7 @@ class OrderViewTest {
         System.setOut(new PrintStream(outputStream));
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
@@ -55,6 +70,7 @@ class OrderViewTest {
         assertTrue(output.contains("1001"));
         assertTrue(output.contains("PRODUCT A"));
         assertTrue(output.contains("50.00"));
+        LOGGER.info("DisplayAvailableItems test passed.");
     }
 
     @Test
@@ -74,6 +90,7 @@ class OrderViewTest {
         assertTrue(output.contains("2"));
         assertTrue(output.contains("PRODUCT A"));
         assertTrue(output.contains("PRODUCT B"));
+        LOGGER.info("DisplayCartItems test passed.");
     }
 
     @Test
@@ -87,6 +104,7 @@ class OrderViewTest {
         assertTrue(output.contains("PRODUCT NAME"));
         assertTrue(output.contains("QUANTITY"));
         assertTrue(output.contains("RM"));
+        LOGGER.info("DisplayOrderDetail test passed.");
     }
 
     @Test
@@ -101,6 +119,7 @@ class OrderViewTest {
         assertTrue(output.contains("AVAILABLE QUANTITY"));
         assertTrue(output.contains("PRODUCT A"));
         assertTrue(output.contains("50.00"));
+        LOGGER.info("PrintProductDetails test passed.");
     }
 
     @Test
@@ -112,6 +131,7 @@ class OrderViewTest {
         String output = outputStream.toString();
         assertTrue(output.contains("TOTAL COST"));
         assertTrue(output.contains("100.00"));
+        LOGGER.info("PrintCartSummary test passed.");
     }
 }
 

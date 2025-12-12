@@ -3,6 +3,8 @@ package assignment.view;
 import assignment.model.Staff;
 import assignment.util.config.LoginConfig;
 import assignment.view.LoginView;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,9 +25,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Login View Tests")
 class LoginViewTest {
 
+    private static final Logger LOGGER = Logger.getLogger(LoginViewTest.class.getName());
     private LoginView loginView;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
+
+    @BeforeAll
+    static void setUpLogger() {
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -32,7 +47,7 @@ class LoginViewTest {
         System.setOut(new PrintStream(outputStream));
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
@@ -53,6 +68,7 @@ class LoginViewTest {
         String output = getOutput();
         assertTrue(output.contains(LoginConfig.TITLE_LOGIN));
         assertTrue(output.contains(LoginConfig.MSG_PLEASE_ENTER_CREDENTIALS));
+        LOGGER.info("PrintLoginHeader test passed.");
     }
 
     // ================== printLoginSuccess TESTS ==================
@@ -75,6 +91,7 @@ class LoginViewTest {
         assertTrue(output.contains("2024-01-15 09:30:00")); // Formatted login time
         assertTrue(output.contains("WELCOME")); // Welcome message
         assertTrue(output.contains("LOGIN TIME:")); // Login time label
+        LOGGER.info("PrintLoginSuccess test passed.");
     }
 
     @Test
@@ -87,6 +104,7 @@ class LoginViewTest {
 
         String output = getOutput();
         assertTrue(output.contains("2024-12-25 14:45:30"));
+        LOGGER.info("PrintLoginSuccess format login time test passed.");
     }
 
     // ================== printLoginFailedIcNotFound TESTS ==================
@@ -101,6 +119,7 @@ class LoginViewTest {
         String output = getOutput();
         assertTrue(output.contains(LoginConfig.ErrorMessage.LOGIN_FAILED));
         assertTrue(output.contains(LoginConfig.ErrorMessage.CHECK_IC_NUMBER));
+        LOGGER.info("PrintLoginFailedIcNotFound test passed.");
     }
 
     // ================== printLoginFailedIncorrectPassword TESTS ==================
@@ -115,6 +134,7 @@ class LoginViewTest {
         String output = getOutput();
         assertTrue(output.contains(LoginConfig.ErrorMessage.LOGIN_FAILED));
         assertTrue(output.contains(LoginConfig.ErrorMessage.IC_EXISTS_PASSWORD_WRONG));
+        LOGGER.info("PrintLoginFailedIncorrectPassword test passed.");
     }
 
     // ================== printRetryOrExitPrompt TESTS ==================
@@ -141,6 +161,7 @@ class LoginViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(LoginConfig.ErrorMessage.IC_CANNOT_BE_EMPTY));
+        LOGGER.info("PrintEmptyIcError test passed.");
     }
 
     // ================== printEmptyPasswordError TESTS ==================
@@ -154,6 +175,7 @@ class LoginViewTest {
         // Then: Should display error message
         String output = getOutput();
         assertTrue(output.contains(LoginConfig.ErrorMessage.PASSWORD_CANNOT_BE_EMPTY));
+        LOGGER.info("PrintEmptyPasswordError test passed.");
     }
 
     // ================== printLogoutSuccess TESTS ==================
@@ -176,6 +198,7 @@ class LoginViewTest {
         assertTrue(output.contains("2024-01-15 17:45:00")); // Formatted logout time
         assertTrue(output.contains("GOODBYE")); // Goodbye message
         assertTrue(output.contains("LOGOUT TIME:")); // Logout time label
+        LOGGER.info("PrintLogoutSuccess test passed.");
     }
 
     @Test
@@ -188,6 +211,7 @@ class LoginViewTest {
 
         String output = getOutput();
         assertTrue(output.contains("2024-06-30 23:59:59"));
+        LOGGER.info("PrintLogoutSuccess format logout time test passed.");
     }
 }
 
