@@ -21,7 +21,6 @@ public class MemberUtil {
         if (input.isEmpty()) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
-            System.out.println(errorMsg);
             System.out.println();
             return null;
         }
@@ -30,7 +29,6 @@ public class MemberUtil {
         if (input.length() != 12) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
-            System.out.println(errorMsg);
             System.out.println();
             return null;
         }
@@ -39,7 +37,6 @@ public class MemberUtil {
         if (!input.matches("\\d{12}")) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
-            System.out.println(errorMsg);
             System.out.println();
             return null;
         }
@@ -54,7 +51,6 @@ public class MemberUtil {
             if (pb < 1 || pb > 16) {
                 String errorMsg = "<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>";
                 LOGGER.severe(errorMsg);
-                System.out.println(errorMsg);
                 System.out.println();
                 return null;
             }
@@ -83,14 +79,12 @@ public class MemberUtil {
             } catch (DateTimeException e) {
                 String errorMsg = "<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>";
                 LOGGER.severe(errorMsg);
-                System.out.println(errorMsg);
                 System.out.println();
                 return null;
 
         } catch (Exception e) {
             String errorMsg = "<<< INVALID IC FORMAT >>>";
             LOGGER.severe(errorMsg);
-            System.out.println(errorMsg);
             System.out.println();
             return null;
         }

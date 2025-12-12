@@ -172,7 +172,6 @@ public class MemberController {
                 } while (memberIC == null);
                 if (memberService.icExists(memberIC)) {
                     LOGGER.severe(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS);
-                    System.out.println(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS);
                     System.out.println();
                 } else {
                     break;
