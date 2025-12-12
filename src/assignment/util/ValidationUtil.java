@@ -110,6 +110,7 @@ public class ValidationUtil {
             yesNo = ValidationUtil.charValidation();
             if (yesNo != 'Y' && yesNo != 'N') {
                 LOGGER.warning("Invalid Option! Please Re-enter!");
+                ConsoleUtil.delayForLog();
                 System.out.println("Invalid Option! Please Re-enter!");
             }
         } while (yesNo != 'Y' && yesNo != 'N');
