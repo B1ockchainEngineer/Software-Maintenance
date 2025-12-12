@@ -7,6 +7,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
+import assignment.util.ConsoleUtil;
 import assignment.util.config.AppConfig;
 import assignment.util.config.MemberConfig;
 
@@ -81,6 +82,7 @@ public class MemberView {
         if (!foundMembers) {
             String errorMsg = String.format(MemberConfig.ErrorMessage.NO_MEMBERS_TYPE_FOUND, membershipType);
             LOGGER.warning(errorMsg);
+            ConsoleUtil.delayForLog();
             System.out.println(errorMsg);
         }
         System.out.println(AppConfig.SEPARATOR_LONG);

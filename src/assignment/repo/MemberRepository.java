@@ -4,6 +4,7 @@ import assignment.model.GoldMember;
 import assignment.model.Membership;
 import assignment.model.NormalMember;
 import assignment.model.PremiumMember;
+import assignment.util.ConsoleUtil;
 import assignment.util.config.AppConfig;
 import assignment.util.config.MemberConfig;
 import java.io.BufferedReader;
@@ -48,6 +49,7 @@ public class MemberRepository {
                 file.createNewFile();
             } catch (IOException e) {
                 logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_CREATE_ERROR, e);
+                ConsoleUtil.delayForLog();
             }
         }
     }
@@ -98,6 +100,7 @@ public class MemberRepository {
             }
         } catch (IOException e) {
                 logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
+                ConsoleUtil.delayForLog();
         }
 
         return members;
@@ -119,6 +122,7 @@ public class MemberRepository {
             writer.write("\n");
         } catch (IOException e) {
                 logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_WRITE_ERROR, e);
+                ConsoleUtil.delayForLog();
         }
     }
 
@@ -144,6 +148,7 @@ public class MemberRepository {
             }
         } catch (IOException e) {
                 logger.severe(MemberConfig.ErrorMessage.SAVE_MEMBERS_FAILED_TEMPLATE + e.getMessage());
+                ConsoleUtil.delayForLog();
         }
     }
 
@@ -178,12 +183,14 @@ public class MemberRepository {
             }
         } catch (IOException e) {
                 logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_DELETE_ERROR, e);
+            ConsoleUtil.delayForLog();
             return false;
         }
 
         if (found) {
             if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
                 logger.severe(MemberConfig.ErrorMessage.FILE_DELETE_ERROR);
+                ConsoleUtil.delayForLog();
             }
         } else {
             tempFile.delete();
@@ -208,6 +215,7 @@ public class MemberRepository {
             }
         } catch (IOException e) {
                 logger.log(Level.SEVERE, MemberConfig.ErrorMessage.FILE_READ_ERROR, e);
+                ConsoleUtil.delayForLog();
         }
         return false;
     }

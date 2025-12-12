@@ -21,6 +21,7 @@ public class MemberUtil {
         if (input.isEmpty()) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
             System.out.println();
             return null;
         }
@@ -29,6 +30,7 @@ public class MemberUtil {
         if (input.length() != 12) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
             System.out.println();
             return null;
         }
@@ -37,6 +39,7 @@ public class MemberUtil {
         if (!input.matches("\\d{12}")) {
             String errorMsg = "<<< INVALID IC - MUST BE EXACTLY 12 DIGITS ONLY >>>";
             LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
             System.out.println();
             return null;
         }
@@ -51,6 +54,7 @@ public class MemberUtil {
             if (pb < 1 || pb > 16) {
                 String errorMsg = "<<< INVALID PLACE OF BIRTH CODE (7th-8th digits): MUST BE 01-16 >>>";
                 LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
                 System.out.println();
                 return null;
             }
@@ -79,12 +83,14 @@ public class MemberUtil {
             } catch (DateTimeException e) {
                 String errorMsg = "<<< INVALID BIRTH DATE (e.g. 30 Feb, 32nd day, or 29 Feb on non-leap year) >>>";
                 LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
                 System.out.println();
                 return null;
 
         } catch (Exception e) {
             String errorMsg = "<<< INVALID IC FORMAT >>>";
             LOGGER.severe(errorMsg);
+            ConsoleUtil.delayForLog();
             System.out.println();
             return null;
         }
@@ -99,6 +105,7 @@ public class MemberUtil {
             return true;
         } else {
             LOGGER.severe("Invalid input. Please enter a name with alphabet characters only. \n");
+            ConsoleUtil.delayForLog();
             return false;
         }
     }
@@ -113,11 +120,13 @@ public class MemberUtil {
 
         if (!data.matches("\\d+")) {
             LOGGER.severe(MemberConfig.ErrorMessage.INVALID_HP);
+            ConsoleUtil.delayForLog();
             return null;
         }
 
         if (!data.startsWith("01")) {
             LOGGER.severe(MemberConfig.ErrorMessage.INVALID_HP);
+            ConsoleUtil.delayForLog();
             return null;
         }
 

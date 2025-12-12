@@ -61,6 +61,7 @@ public class MemberController {
             MemberMenu selection = MemberMenu.getByOption(memberOpt);
             if (selection == null) {
                 LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                ConsoleUtil.delayForLog();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -111,6 +112,7 @@ public class MemberController {
 
             if (userChoice == null) {
                 LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                ConsoleUtil.delayForLog();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -160,7 +162,6 @@ public class MemberController {
         System.out.println("MEMBER ID >> M-" + member.getId());
         System.out.println(MemberConfig.MSG_YOUR_MEMBER_ID);
 
-        do {
             System.out.println(MemberConfig.PROMPT_PRESS_ENTER);
             ValidationUtil.scanner.nextLine(); // consume newline
 
@@ -172,6 +173,7 @@ public class MemberController {
                 } while (memberIC == null);
                 if (memberService.icExists(memberIC)) {
                     LOGGER.severe(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS);
+                    ConsoleUtil.delayForLog();
                     System.out.println();
                 } else {
                     break;
@@ -210,9 +212,10 @@ public class MemberController {
                 System.out.println(AppConfig.SEPARATOR_LINE);
                 System.out.println();
 
-                break;
             }
-        } while (true);
+
+            System.out.println(MemberConfig.PROMPT_PRESS_ENTER);
+            ValidationUtil.scanner.nextLine(); // consume newline
     }
 
     /**
@@ -246,6 +249,7 @@ public class MemberController {
 
             if (target == null) {
                 LOGGER.severe(String.format(MemberConfig.ErrorMessage.DELETE_CANCELLED_OR_NOT_FOUND, memberIdToDelete));
+                ConsoleUtil.delayForLog();
             } else {
                 System.out.println(MemberConfig.MSG_DETAILS_TO_DELETE);
                 memberView.displayMemberDetails(target);
@@ -259,12 +263,14 @@ public class MemberController {
                         System.out.println(String.format(MemberConfig.SuccessfulMessage.MEMBER_DELETED, memberIdToDelete));
                     } else {
                         LOGGER.severe(MemberConfig.ErrorMessage.DELETE_FAILED);
+                        ConsoleUtil.delayForLog();
                     }
                 }
             }
 
         } catch (NumberFormatException e) {
             LOGGER.severe(MemberConfig.ErrorMessage.INVALID_MEMBER_ID_FORMAT);
+            ConsoleUtil.delayForLog();
         }
         ConsoleUtil.systemPause();
         ConsoleUtil.clearScreen();
@@ -281,6 +287,7 @@ public class MemberController {
 
         if (memberService.getAllMembers().isEmpty()) {
             LOGGER.severe(MemberConfig.ErrorMessage.NO_MEMBER_TO_DISPLAY);
+            ConsoleUtil.delayForLog();
         } else {
             while (true){
                 System.out.println(MemberConfig.PROMPT_FILTER_BY_TYPE);
@@ -298,6 +305,7 @@ public class MemberController {
 
                 if (choice == null) {
                     LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                    ConsoleUtil.delayForLog();
                     ConsoleUtil.systemPause();
                     continue;
                 }
@@ -307,7 +315,10 @@ public class MemberController {
                     case NORMAL_MEMBER -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_NORMAL);
                     case GOLD_MEMBER   -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_GOLD);
                     case PREMIUM_MEMBER -> memberView.displayMembersByType(memberService.getAllMembers(), MemberConfig.MEMBER_TYPE_PREMIUM);
-                    default -> LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                    default -> {
+                        LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                        ConsoleUtil.delayForLog();
+                    }
                 }
             }
         }
@@ -348,9 +359,11 @@ public class MemberController {
 
             if (!found) {
                 LOGGER.severe(MemberConfig.ErrorMessage.MEMBER_NOT_FOUND);
+                ConsoleUtil.delayForLog();
             }
         } catch (NumberFormatException e) {
             LOGGER.severe(MemberConfig.ErrorMessage.INVALID_MEMBER_ID_FORMAT);
+            ConsoleUtil.delayForLog();
         }
 
         ConsoleUtil.systemPause();
@@ -412,6 +425,7 @@ public class MemberController {
 
             if (userEditChoice == null) {
                 LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                ConsoleUtil.delayForLog();
                 ConsoleUtil.systemPause();
                 continue;
             }
@@ -444,11 +458,14 @@ public class MemberController {
                     do {
                         System.out.print(MemberConfig.PROMPT_NEW_IC);
                         newIc = MemberUtil.icValidation();
-                        if (newIc == null) continue;
+                        if (newIc == null) {
+                            continue;
+                        }
 
                         // check IC used by another member
                         if (memberService.icExists(newIc)){
                             LOGGER.severe(MemberConfig.ErrorMessage.IC_ALREADY_EXISTS_OTHER);
+                            ConsoleUtil.delayForLog();
                         } else {
                             break;
                         }
@@ -470,6 +487,7 @@ public class MemberController {
 
                     if (userChoice == null) {
                         LOGGER.severe(MemberConfig.ErrorMessage.INVALID_OPTION);
+                ConsoleUtil.delayForLog();
                         ConsoleUtil.systemPause();
                         continue;
                     }

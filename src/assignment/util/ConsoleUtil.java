@@ -41,4 +41,16 @@ public class ConsoleUtil {
             System.err.println("Pause error: " + e.getMessage());
         }
     }
+
+    /**
+     * Small delay to allow logger to print before next prompt.
+     * Fixes race condition between stderr and stdout.
+     */
+    public static void delayForLog() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }
